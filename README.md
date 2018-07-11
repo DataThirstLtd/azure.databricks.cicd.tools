@@ -14,6 +14,15 @@ This is simpler that the Databricks method of linking an individual file to a gi
 
 VSTS Deployment tasks will follow shortly. In the meantime you can clone this module. Please star this repo for updates on this.
 
+# Install-Module
+https://www.powershellgallery.com/packages/azure.databricks.cicd.tools
+
+Install-Module -Name azure.databricks.cicd.tools
+
+or
+
+Save-Module -Name azure.databricks.cicd.tools -Path <path>
+
 # Export-DatabricksFolder
 Pull down a folder of scripts from your Databricks workspace so that you can commit the files to your Git repo. It is recommended that you set the OutputPath to be inside your Git repo.
 
