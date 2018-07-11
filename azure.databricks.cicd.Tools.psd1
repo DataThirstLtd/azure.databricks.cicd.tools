@@ -12,7 +12,7 @@
     RootModule = 'azure.databricks.cicd.Tools.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.0.2'
+    ModuleVersion = '1.0.4'
 
     # ID used to uniquely identify this module
     GUID = 'b277a688-f588-434c-a1dc-a44ff2105279'
@@ -69,7 +69,7 @@
     FunctionsToExport = '*'
 
     # Cmdlets to export from this module
-    CmdletsToExport = '*'
+    CmdletsToExport = 'Add-SecretScope', 'Export-DatabricksFolder', 'Import-DatabricksFolder', 'Set-Secret'
 
     # Variables to export from this module
     VariablesToExport = '*'
@@ -91,7 +91,7 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags = @("Databricks", "Azure")
+            Tags = @("Databricks", "Azure", "DevOps", "Deploy")
 
             # A URL to the license for this module.
             # LicenseUri = ''

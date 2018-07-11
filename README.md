@@ -23,6 +23,10 @@ or
 
 Save-Module -Name azure.databricks.cicd.tools -Path <path>
 
+Followed by:
+
+Import-Module -Name azure.databricks.cicd.tools
+
 # Export-DatabricksFolder
 Pull down a folder of scripts from your Databricks workspace so that you can commit the files to your Git repo. It is recommended that you set the OutputPath to be inside your Git repo.
 
