@@ -12,7 +12,7 @@
     RootModule = 'azure.databricks.cicd.Tools.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.0.4'
+    ModuleVersion = '1.0.5'
 
     # ID used to uniquely identify this module
     GUID = 'b277a688-f588-434c-a1dc-a44ff2105279'
@@ -27,7 +27,7 @@
     Copyright = 'Data Thirst Ltd 2018'
 
     # Description of the functionality provided by this module
-    Description = 'PowerShell module help with Azure Databricks CI & CD Scenarios'
+    Description = 'PowerShell module to help with Azure Databricks CI & CD Scenarios. See https://github.com/DataThirstLtd/azure.databricks.cicd.tools & http://datathirst.net'
 
     # Minimum version of the Windows PowerShell engine required by this module
     PowerShellVersion = '5.0'
@@ -110,7 +110,7 @@
     } # End of PrivateData hashtable
 
     # HelpInfo URI of this module
-    # HelpInfoURI = ''
+    HelpInfoURI = 'https://github.com/DataThirstLtd/azure.databricks.cicd.tools'
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
