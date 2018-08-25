@@ -9,7 +9,7 @@ function Set-LocalNotebook ($DatabricksFile, $Language, $Region, $InternalBearer
     {
         # Databricks exports with a comment line in the header, remove this and ensure we have Windows line endings
         $Response = (Invoke-RestMethod -Method Get -Uri $uri -Headers @{Authorization = $InternalBearerToken}) -split '\n' | Select-Object -Skip 1
-        $Response = $Response.replace("[^`r]`n", "`r`n")
+        $Response = ($Response.replace("[^`r]`n", "`r`n") -Join "`r`n")
 
         Write-Verbose "Creating file $LocalExportPath"
         New-Item -force -path $LocalExportPath -value $Response -type file | out-null
