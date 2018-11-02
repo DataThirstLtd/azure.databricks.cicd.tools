@@ -1,4 +1,4 @@
-Function Set-Secret
+Function Set-DatabricksSecret
 {
     [cmdletbinding()]
     param (
@@ -18,3 +18,6 @@ Function Set-Secret
     Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/secrets/put" -Headers @{Authorization = $InternalBearerToken}
     Write-Output "Secret $SecretName Set"
 }
+
+New-Alias -Name Set-Secret -Value Set-DatabricksSecret
+
