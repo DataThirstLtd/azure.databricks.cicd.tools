@@ -38,6 +38,7 @@ Author: Simon D'Morias / Data Thirst Ltd
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Region = $Region.Replace(" ","")
 
     $outJSON = Get-FolderContents $ExportPath $Region $InternalBearerToken
     Get-Notebooks $outJSON $ExportPath $Region $InternalBearerToken $LocalOutputPath

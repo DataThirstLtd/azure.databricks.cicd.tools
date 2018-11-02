@@ -32,6 +32,7 @@ Author: Simon D'Morias / Data Thirst Ltd
 #>  
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Region = $Region.Replace(" ","")
 
     $Files = Get-ChildItem $LocalPath -Recurse -Attributes !D
     ForEach ($FileToPush In $Files)

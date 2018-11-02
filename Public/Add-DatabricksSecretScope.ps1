@@ -10,6 +10,7 @@ Function Add-DatabricksSecretScope
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     
     $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Region = $Region.Replace(" ","")
     $body = '{"scope": "' + $ScopeName + '"}'
 
     Try
