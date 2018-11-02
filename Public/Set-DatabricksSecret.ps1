@@ -10,6 +10,7 @@ Function Set-DatabricksSecret
     )
 
     $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Region = $Region.Replace(" ","")
 
     Add-SecretScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName
 
