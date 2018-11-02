@@ -1,4 +1,4 @@
-Function Add-SecretScope
+Function Add-DatabricksSecretScope
 {
     [cmdletbinding()]
     param (
@@ -31,3 +31,5 @@ Function Add-SecretScope
     }
 
 }
+
+New-Alias -Name Add-SecretScope -Value Add-DatabricksSecretScope

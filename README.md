@@ -58,7 +58,7 @@ Deploy a folder of scripts from a local folder (Git repo) to a specific folder i
 -LocalPath: The local folder containing the scripts to deploy. Subfolders will also be deployed.<br>
 -DatabricksPath: The folder inside Databricks you would like to deploy into. Eg /Shared/MyETL. Must start /<br>
 
-## Set-Secret
+## Set-DatabricksSecret
 
 Deploys a Secret value to Databricks, this can be a key to a storage account or a password etc. The secret must be created within a scope which will be created for you if it does not exist.
 
