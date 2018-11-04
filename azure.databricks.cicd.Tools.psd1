@@ -12,7 +12,7 @@
     RootModule = 'azure.databricks.cicd.Tools.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.0.6'
+    ModuleVersion = '1.0.7'
 
     # ID used to uniquely identify this module
     GUID = 'b277a688-f588-434c-a1dc-a44ff2105279'
@@ -69,7 +69,7 @@
     FunctionsToExport = '*'
 
     # Cmdlets to export from this module
-    CmdletsToExport = 'Add-DatabrricksSecretScope', 'Export-DatabricksFolder', 'Import-DatabricksFolder', 'Set-DatabricksSecret', 'Get-DatabricksClusters', 'Get-DatabricksNodeTypes', 'Get-DatabricksSparkVersions', 'New-DatabricksCluster', 'Remove-DatabricksCluster', 'Start-DatabricksCluster', 'Stop-DatabricksCluster', 'Update-DatabricksClusterResize'
+    CmdletsToExport = 'Add-DatabricksSecretScope', 'Export-DatabricksFolder', 'Import-DatabricksFolder', 'Set-DatabricksSecret', 'Get-DatabricksClusters', 'Get-DatabricksNodeTypes', 'Get-DatabricksSparkVersions', 'New-DatabricksCluster', 'Remove-DatabricksCluster', 'Start-DatabricksCluster', 'Stop-DatabricksCluster', 'Update-DatabricksClusterResize'
 
     # Variables to export from this module
     VariablesToExport = '*'
