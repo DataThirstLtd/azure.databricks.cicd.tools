@@ -1,4 +1,4 @@
-Function Add-NotebookJob {  
+Function Add-DatabricksNotebookJob {  
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true)][string]$BearerToken,    
@@ -96,12 +96,5 @@ Author: Tadeusz Balcer
     }
     Catch {
         Write-Error $_.ErrorDetails.Message
-        # if ($_.ErrorDetails.Message.Contains('already exists') -eq $true) {
-        #     Write-Verbose "Folder already exists"
-        # }
-        # else {
-        #     Write-Error $_.ErrorDetails.Message
-        #     break
-        # }
     }
 }

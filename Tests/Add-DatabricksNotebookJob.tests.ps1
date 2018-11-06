@@ -7,12 +7,12 @@ $JobName = "Test script job"
 $SparkVersion = "4.3.1-scala2.11"
 $NodeType = "Standard_D3_v2"
 $NumberOfWorkers = 3
-$Timeout = 100
+$Timeout = 1000
 $MaxRetries = 1
 $ScheduleCronExpression = "0 15 22 ? * *"
 $Timezone = "Europe/Warsaw"
 $NotebookPath = "/Shared/test.py"
 $NotebookParametersJson = '{"key": "value", "name": "test"}'
 
-Add-NotebookJob -BearerToken $BearerToken -Region $Region -JobName $JobName -SparkVersion $SparkVersion -NodeType $NodeType -NumberOfWorkers $NumberOfWorkers -Timeout $Timeout -MaxRetries $MaxRetries -ScheduleCronExpression $ScheduleCronExpression -Timezone $Timezone -NotebookPath $NotebookPath -NotebookParametersJson $NotebookParametersJson
+Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName $JobName -SparkVersion $SparkVersion -NodeType $NodeType -NumberOfWorkers $NumberOfWorkers -Timeout $Timeout -MaxRetries $MaxRetries -ScheduleCronExpression $ScheduleCronExpression -Timezone $Timezone -NotebookPath $NotebookPath -NotebookParametersJson $NotebookParametersJson
 
