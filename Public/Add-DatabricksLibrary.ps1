@@ -64,7 +64,7 @@ Author: Simon D'Morias / Data Thirst Ltd
 
     $Body = @{"cluster_id"=$ClusterId}
 
-    if (($LibrarySettings -notcontains '{') -and ($LibraryType -eq "pypi") {
+    if (($LibrarySettings -notcontains '{') -and ($LibraryType -eq "pypi")) {
         #Pypi and only string passed - try as simple name
         Write-Verbose "Converting to pypi JSON request"
         $LibrarySettings = '{package: "' + $LibrarySettings '"}'
