@@ -67,7 +67,7 @@ Author: Simon D'Morias / Data Thirst Ltd
     if (($LibrarySettings -notcontains '{') -and ($LibraryType -eq "pypi")) {
         #Pypi and only string passed - try as simple name
         Write-Verbose "Converting to pypi JSON request"
-        $LibrarySettings = '{package: "' + $LibrarySettings '"}'
+        $LibrarySettings = '{package: "' + $LibrarySettings + '"}'
     }
 
     if ($LibrarySettings -contains '{'){
