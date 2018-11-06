@@ -4,9 +4,12 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $true)][string]$BearerToken,    
         [parameter(Mandatory = $true)][string]$Region,
         [parameter(Mandatory = $true)][string]$JobName,
-        [parameter(Mandatory = $true)][string]$SparkVersion,
-        [parameter(Mandatory = $true)][string]$NodeType,
-        [parameter(Mandatory = $true)][int]$NumberOfWorkers,
+        [parameter(Mandatory = $false)][string]$ClusterId,
+        [parameter(Mandatory = $false)][string]$SparkVersion,
+        [parameter(Mandatory = $false)][string]$NodeType,
+        [parameter(Mandatory = $false)][string]$DriverNodeType,
+        [parameter(Mandatory = $false)][int]$MinNumberOfWorkers,
+        [parameter(Mandatory = $false)][int]$MaxNumberOfWorkers,
         [parameter(Mandatory = $false)][int]$Timeout,
         [parameter(Mandatory = $false)][int]$MaxRetries,
         [parameter(Mandatory = $false)][string]$ScheduleCronExpression,
@@ -28,17 +31,35 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example: northeurope
 
 .PARAMETER JobName
-Name of the job that will appear in the Job list
+Name of the job that will appear in the Job list. If a job with this name exists
+it will be updated.
+
+.PARAMETER ClusterId
+The ClusterId of an existing cluster to use. Optional.
 
 .PARAMETER SparkVersion
 Spark version for cluster that will run the job. Example: 4.0.x-scala2.11
+Note: Ignored if ClusterId is populated.
     
 .PARAMETER NodeType
-Type of worker for cluster that will run the job. Example: Standard_D3_v2
+Type of worker for cluster that will run the job. Example: Standard_D3_v2.
+Note: Ignored if ClusterId is populated.
 
-.PARAMETER NumberOfWorkers
+.PARAMETER DriverNodeType
+Type of driver for cluster that will run the job. Example: Standard_D3_v2.
+If not provided the NodeType will be used.
+Note: Ignored if ClusterId is populated.
+
+.PARAMETER MinNumberOfWorkers
 Number of workers for cluster that will run the job.
-    
+Note: If Min & Max Workers are the same autoscale is disabled.
+Note: Ignored if ClusterId is populated.
+
+.PARAMETER MaxNumberOfWorkers
+Number of workers for cluster that will run the job.
+Note: If Min & Max Workers are the same autoscale is disabled.
+Note: Ignored if ClusterId is populated.
+
 .PARAMETER Timeout
 Timeout, in seconds, applied to each run of the job. If not set, there will be no timeout. 
 
@@ -50,51 +71,90 @@ By default, job will run when triggered using Jobs UI or sending API request to 
 
 .PARAMETER Timezone
 Timezone for Cron Schedule Expression. Required if ScheduleCronExpression provided. See here for all possible timezones: http://joda-time.sourceforge.net/timezones.html
+Example: UTC
 
 .PARAMETER NotebookPath
 Path to the Notebook in Databricks that will be executed by this Job. 
 
 .PARAMETER NotebookParameters
-Optional paramteres that will be provided to Notebook when Job is executed. Example: {"name":"john doe","age":"35"}
+Optional parameters that will be provided to Notebook when Job is executed. Example: {"name":"john doe","age":"35"}
     
 .NOTES
 Author: Tadeusz Balcer
+Extended: Simon D'Morias / Data Thirst Ltd
 #>
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Body = '{
-        "name": "' + $JobName + '",
-        "new_cluster": {
-          "spark_version": "' + $SparkVersion + '",
-          "node_type_id": "' + $NodeType + '",
-          "num_workers": ' + $NumberOfWorkers + '
-        },' +
-    $(If ($PSBoundParameters.ContainsKey('Timeout')) 
-    {'"timeout_seconds": ' + $Timeout + ','}) + 
-    
-    $(If ($PSBoundParameters.ContainsKey('MaxRetries')) 
-    {'"max_retries": ' + $MaxRetries + ','}) + 
-    
-    $(If ($PSBoundParameters.ContainsKey('ScheduleCronExpression') -and $PSBoundParameters.ContainsKey('Timezone')) {
-            '"schedule": {
-                "quartz_cron_expression": "' + $ScheduleCronExpression + '",
-                "timezone_id": "' + $Timezone + '"
-              },
-              '
-        }) + 
-    '"notebook_task": {
-          "notebook_path": "' + $NotebookPath + '"
-          ' + $(If ($PSBoundParameters.ContainsKey('NotebookParametersJson')) {
-            ',"base_parameters": ' + $NotebookParametersJson
-          }) + 
-    '}
-}'
+    $Region = $Region.Replace(" ","")
 
+    $ExistingJobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
+
+    $ExistingJobDetail = $ExistingJobs | Where-Object {$_.settings.name -eq $JobName} | Select-Object job_id -First 1
+
+    if ($ExistingJobDetail){
+        $JobId = $ExistingJobDetail.job_id[0]
+        Write-Output "Updating JobId: $JobId"
+        $Mode = "reset"
+    } 
+    else{
+        $Mode = "create"
+    }
+
+    $JobBody = @{}
+    $JobBody['name'] = $JobName
+
+    If ($ClusterId){
+        $JobBody['existing_cluster_id'] = $ClusterId
+    }
+    else {
+        $ClusterDetails = @{}
+        $ClusterDetails['node_type_id'] = $NodeType
+        $DriverNodeType = if ($PSBoundParameters.ContainsKey('DriverNodeType')) { $DriverNodeType } else { $NodeType }
+        $ClusterDetails['driver_node_type_id'] = $DriverNodeType
+        $ClusterDetails['spark_version'] = $SparkVersion
+        If ($MinNumberOfWorkers -eq $MaxNumberOfWorkers){
+            $ClusterDetails['num_workers'] = $MinNumberOfWorkers
+        }
+        else {
+            $ClusterDetails['autoscale'] = @{"min_workers"=$MinNumberOfWorkers;"max_workers"=$MaxNumberOfWorkers}
+        }
+        $JobBody['new_cluster'] = $ClusterDetails
+    }
+
+    If ($PSBoundParameters.ContainsKey('Timeout')) {$JobBody['timeout_seconds'] = $Timeout}
+    If ($PSBoundParameters.ContainsKey('MaxRetries')) {$JobBody['max_retries'] = $MaxRetries}
+    If ($PSBoundParameters.ContainsKey('ScheduleCronExpression')) {
+        $JobBody['schedule'] = @{"quartz_cron_expression"=$ScheduleCronExpression;"timezone_id"=$Timezone}
+    }
+    
+    $Notebook = @{}
+    $Notebook['notebook_path'] = $NotebookPath
+    If ($PSBoundParameters.ContainsKey('NotebookParametersJson')) {
+        $Notebook['base_parameters'] = $NotebookParametersJson | ConvertFrom-Json
+    }
+
+    $JobBody['notebook_task'] = $Notebook
+
+    If ($Mode -eq 'create'){
+        $Body = $JobBody
+    }
+    else {
+        $Body = @{}
+        $Body['job_id']= $JobId
+        $Body['new_settings'] = $JobBody
+    }
+
+    $BodyText = $Body | ConvertTo-Json -Depth 10
+
+    Write-Verbose $BodyText
+  
     Try {
-        Invoke-RestMethod -Method Post -Body $Body -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/create" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/$Mode" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
+        Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
+        Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
         Write-Error $_.ErrorDetails.Message
     }
 }
