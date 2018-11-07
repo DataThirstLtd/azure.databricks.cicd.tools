@@ -4,5 +4,9 @@ $BearerToken = Get-Content "$PSScriptRoot\MyBearerToken.txt"  # Create this file
 $Region = "westeurope"
 $ScopeName = "DataThirst"
 
-Add-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName  -Verbose
-
+Describe "Add-DatabricksSecretScope" {
+    It "Simple addition"{
+        $Res = Add-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName  -Verbose
+        $Res | Should -Exist
+    }
+}

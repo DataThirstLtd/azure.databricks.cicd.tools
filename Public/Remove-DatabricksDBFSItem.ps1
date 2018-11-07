@@ -1,22 +1,26 @@
-Function Get-DatabricksNodeTypes
+Function Remove-DatabricksDBFSItem
 { 
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$Path
     ) 
 <#
 .SYNOPSIS
-Get a list of Node types available for use.
+Delete a file or folder within DBFS
 
 .DESCRIPTION
-Get a list of Node types available for use.
+Delete a file or folder within DBFS. 
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
 
 .PARAMETER Region
 Azure Region - must match the URL of your Databricks workspace, example northeurope
+
+.PARAMETER Path
+The Databricks DBFS folder to delete
 
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd 
@@ -26,8 +30,14 @@ Author: Simon D'Morias / Data Thirst Ltd
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
     $Region = $Region.Replace(" ","")
     
+    $Body = @{}
+    $Body['path'] = $Path
+    $Body['recursive'] = 'true'
+
+    $BodyText = $Body | ConvertTo-Json -Depth 10
+    
     Try {
-        $Nodes = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/list-node-types" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/delete" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
@@ -35,6 +45,6 @@ Author: Simon D'Morias / Data Thirst Ltd
         Write-Error $_.ErrorDetails.Message
     }
 
-    Return $Nodes.node_types
+    Return 
 }
     

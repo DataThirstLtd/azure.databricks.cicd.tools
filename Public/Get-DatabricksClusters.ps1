@@ -3,7 +3,8 @@ Function Get-DatabricksClusters
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$ClusterId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -19,6 +20,13 @@ Function Get-DatabricksClusters
         Write-Error $_.ErrorDetails.Message
     }
 
-    Return $Clusters.clusters
+    if ($PSBoundParameters.ContainsKey('ClusterId')){
+        $Result = $Clusters.clusters | Where-Object {$_.cluster_id -eq $ClusterId}
+        Return $Result
+    }
+    else {
+        Return $Clusters.clusters
+    }
+
 }
     

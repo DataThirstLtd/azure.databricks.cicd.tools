@@ -1,22 +1,26 @@
-Function Get-DatabricksNodeTypes
+Function Get-DatabricksDBFSFolder
 { 
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$Path
     ) 
 <#
 .SYNOPSIS
-Get a list of Node types available for use.
+Get a listing of files and folders within DBFS
 
 .DESCRIPTION
-Get a list of Node types available for use.
+Get a listing of files and folders within DBFS 
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
 
 .PARAMETER Region
 Azure Region - must match the URL of your Databricks workspace, example northeurope
+
+.PARAMETER Path
+The Databricks DBFS folder to list
 
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd 
@@ -27,7 +31,7 @@ Author: Simon D'Morias / Data Thirst Ltd
     $Region = $Region.Replace(" ","")
     
     Try {
-        $Nodes = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/list-node-types" -Headers @{Authorization = $InternalBearerToken}
+        $Files = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/list?path=$Path" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
@@ -35,6 +39,6 @@ Author: Simon D'Morias / Data Thirst Ltd
         Write-Error $_.ErrorDetails.Message
     }
 
-    Return $Nodes.node_types
+    Return $Files.files
 }
     

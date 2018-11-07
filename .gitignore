@@ -332,3 +332,4 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 Tests/MyBearerToken2.txt
+Tests/Scratch.ps1

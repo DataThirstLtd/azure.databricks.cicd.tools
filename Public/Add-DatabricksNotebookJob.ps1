@@ -15,7 +15,8 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][string]$ScheduleCronExpression,
         [parameter(Mandatory = $false)][string]$Timezone,
         [parameter(Mandatory = $true)][string]$NotebookPath,
-        [parameter(Mandatory = $false)][string]$NotebookParametersJson
+        [parameter(Mandatory = $false)][string]$NotebookParametersJson,
+        [parameter(Mandatory = $false)][string[]]$Libraries
     ) 
 <#
 .SYNOPSIS
@@ -78,6 +79,9 @@ Path to the Notebook in Databricks that will be executed by this Job.
 
 .PARAMETER NotebookParameters
 Optional parameters that will be provided to Notebook when Job is executed. Example: {"name":"john doe","age":"35"}
+
+.PARAMETER Libraries
+Optional. Array of json strings. Example: '{"pypi":{package:"simplejson"}}', '{"jar", "DBFS:/mylibraries/test.jar"}'
     
 .NOTES
 Author: Tadeusz Balcer
@@ -136,6 +140,10 @@ Extended: Simon D'Morias / Data Thirst Ltd
 
     $JobBody['notebook_task'] = $Notebook
 
+    If ($PSBoundParameters.ContainsKey('Libraries')) {
+        $JobBody['libraries'] = $Libraries | ConvertFrom-Json
+    }
+
     If ($Mode -eq 'create'){
         $Body = $JobBody
     }
@@ -150,11 +158,18 @@ Extended: Simon D'Morias / Data Thirst Ltd
     Write-Verbose $BodyText
   
     Try {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/$Mode" -Headers @{Authorization = $InternalBearerToken}
+        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/$Mode" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
         Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
         Write-Error $_.ErrorDetails.Message
+    }
+
+    if ($Moode -eq "create") {
+        Return $JobDetails.job_id
+    }
+    else {
+        Return $JobId
     }
 }

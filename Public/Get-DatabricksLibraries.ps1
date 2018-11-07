@@ -6,7 +6,26 @@ Function Get-DatabricksLibraries
         [parameter(Mandatory = $true)][string]$Region,
         [parameter(Mandatory = $true)][string]$ClusterId
     ) 
+<#
+.SYNOPSIS
+Get a list of Libraries and thier statuses for a Databricks cluster
 
+.DESCRIPTION
+Get a list of Libraries and thier statuses for a Databricks cluster
+
+.PARAMETER BearerToken
+Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
+
+.PARAMETER Region
+Azure Region - must match the URL of your Databricks workspace, example northeurope
+
+.PARAMETER ClusterId
+ClusterId for existing Databricks cluster. Does not need to be running.
+
+.NOTES
+Author: Simon D'Morias / Data Thirst Ltd 
+
+#>  
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
     $Region = $Region.Replace(" ","")
