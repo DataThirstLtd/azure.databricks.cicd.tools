@@ -7,6 +7,5 @@ $ScopeName = "DataThirst"
 Describe "Add-DatabricksSecretScope" {
     It "Simple addition"{
         $Res = Add-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName  -Verbose
-        $Res | Should -Exist
     }
 }
