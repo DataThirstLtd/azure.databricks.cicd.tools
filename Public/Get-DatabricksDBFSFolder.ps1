@@ -1,10 +1,10 @@
-Function Get-DatabricksClusters 
+Function Get-DatabricksDBFSFolder
 { 
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true)][string]$BearerToken, 
         [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $false)][string]$ClusterId
+        [parameter(Mandatory = $false)][string]$Path
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -12,7 +12,7 @@ Function Get-DatabricksClusters
     $Region = $Region.Replace(" ","")
     
     Try {
-        $Clusters = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/list" -Headers @{Authorization = $InternalBearerToken}
+        $Files = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/list?path=$Path" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
@@ -20,13 +20,6 @@ Function Get-DatabricksClusters
         Write-Error $_.ErrorDetails.Message
     }
 
-    if ($PSBoundParameters.ContainsKey('ClusterId')){
-        $Result = $Clusters.clusters | Where-Object {$_.cluster_id -eq $ClusterId}
-        Return $Result
-    }
-    else {
-        Return $Clusters.clusters
-    }
-
+    Return $Files.files
 }
     
