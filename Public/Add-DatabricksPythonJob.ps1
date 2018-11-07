@@ -1,4 +1,4 @@
-Function Add-DatabricksNotebookJob {  
+Function Add-DatabricksPythonJob {  
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true)][string]$BearerToken,    
@@ -14,8 +14,8 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][int]$MaxRetries,
         [parameter(Mandatory = $false)][string]$ScheduleCronExpression,
         [parameter(Mandatory = $false)][string]$Timezone,
-        [parameter(Mandatory = $true)][string]$NotebookPath,
-        [parameter(Mandatory = $false)][string]$NotebookParametersJson,
+        [parameter(Mandatory = $true)][string]$PythonFilePath,
+        [parameter(Mandatory = $false)][string]$PythonParametersJson,
         [parameter(Mandatory = $false)][string[]]$Libraries
     ) 
 <#
@@ -74,11 +74,11 @@ By default, job will run when triggered using Jobs UI or sending API request to 
 Timezone for Cron Schedule Expression. Required if ScheduleCronExpression provided. See here for all possible timezones: http://joda-time.sourceforge.net/timezones.html
 Example: UTC
 
-.PARAMETER NotebookPath
-Path to the Notebook in Databricks that will be executed by this Job. 
+.PARAMETER PythonFilePath
+Path to the Python file in DBFS that will be executed by this Job. 
 
-.PARAMETER NotebookParameters
-Optional parameters that will be provided to Notebook when Job is executed. Example: {"name":"john doe","age":"35"}
+.PARAMETER PythonParametersJson
+Optional parameters that will be provided to the file when Job is executed. Example: {"name":"john doe","age":"35"}
 
 .PARAMETER Libraries
 Optional. Array of json strings. Example: '{"pypi":{package:"simplejson"}}', '{"jar", "DBFS:/mylibraries/test.jar"}'
@@ -132,13 +132,13 @@ Extended: Simon D'Morias / Data Thirst Ltd
         $JobBody['schedule'] = @{"quartz_cron_expression"=$ScheduleCronExpression;"timezone_id"=$Timezone}
     }
     
-    $Notebook = @{}
-    $Notebook['notebook_path'] = $NotebookPath
-    If ($PSBoundParameters.ContainsKey('NotebookParametersJson')) {
-        $Notebook['base_parameters'] = $NotebookParametersJson | ConvertFrom-Json
+    $Python = @{}
+    $Python['python_file'] = $PythonFilePath
+    If ($PSBoundParameters.ContainsKey('PythonParametersJson')) {
+        $Python['parameters'] = $PythonParametersJson | ConvertFrom-Json
     }
 
-    $JobBody['notebook_task'] = $Notebook
+    $JobBody['spark_python_task'] = $Python
 
     If ($PSBoundParameters.ContainsKey('Libraries')) {
         $JobBody['libraries'] = $Libraries | ConvertFrom-Json

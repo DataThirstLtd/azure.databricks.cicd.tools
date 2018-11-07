@@ -6,7 +6,26 @@ Function Get-DatabricksDBFSFolder
         [parameter(Mandatory = $true)][string]$Region,
         [parameter(Mandatory = $false)][string]$Path
     ) 
+<#
+.SYNOPSIS
+Get a listing of files and folders within DBFS
 
+.DESCRIPTION
+Get a listing of files and folders within DBFS 
+
+.PARAMETER BearerToken
+Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
+
+.PARAMETER Region
+Azure Region - must match the URL of your Databricks workspace, example northeurope
+
+.PARAMETER Path
+The Databricks DBFS folder to list
+
+.NOTES
+Author: Simon D'Morias / Data Thirst Ltd 
+
+#>  
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
     $Region = $Region.Replace(" ","")

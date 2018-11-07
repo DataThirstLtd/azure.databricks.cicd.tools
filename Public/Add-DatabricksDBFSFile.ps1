@@ -7,6 +7,34 @@ Function Add-DatabricksDBFSFile {
         [parameter(Mandatory = $true)][string]$FilePattern,
         [parameter(Mandatory = $true)][string]$TargetLocation
     ) 
+<#
+.SYNOPSIS
+Upload a file or folder of files to DBFS
+
+.DESCRIPTION
+Upload a file or folder of files to DBFS. Support exact path or pattern matching. Folder does not need to
+exist - they will be created as needed.
+
+.PARAMETER BearerToken
+Your Databricks Bearer token to authenticate to your workspace (see User Settings in Databricks WebUI)
+
+.PARAMETER Region
+Azure Region - must match the URL of your Databricks workspace, example northeurope
+
+.PARAMETER LocalRootFolder
+Path to file(s) to upload, can be relative. Note that folders are recursed always.
+    
+.PARAMETER FilePattern
+File pattern to match. Examples: *.py  *.*  ProjectA*.*
+
+.PARAMETER TargetLocation
+Target folder in DBFS should start /.
+Does not need to exist.
+
+.NOTES
+Author: Simon D'Morias / Data Thirst Ltd
+
+#>
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
