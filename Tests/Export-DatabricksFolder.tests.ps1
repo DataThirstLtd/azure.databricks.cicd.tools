@@ -5,6 +5,8 @@ $Region = "westeurope"
 $ExportPath = "/Shared/UnitTest"
 $LocalOutputPath = "Output"
 
+Set-Location $PSScriptRoot
+
 Describe "Export-DatabricksFolder"{
     BeforeAll {
         # Upload sample files here with two files in

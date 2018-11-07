@@ -34,21 +34,28 @@ Author: Simon D'Morias / Data Thirst Ltd
     $InternalBearerToken = Format-BearerToken($BearerToken)
     $Region = $Region.Replace(" ","")
 
+    Push-Location
     $Files = Get-ChildItem $LocalPath -Recurse -Attributes !D
+    Set-Location $LocalPath
+    
     ForEach ($FileToPush In $Files)
     {
         $Path = $FileToPush.DirectoryName
         $LocalPath = $LocalPath.Replace("/","\")
 
         # Build relative Databricks path
-        $Path = $DatabricksPath + ($Path.Replace($LocalPath,"").Replace("\","/"))
+        # $Path = $DatabricksPath + ($Path.Replace($LocalPath,"").Replace("\","/"))
+
+        $Path = (Join-Path $DatabricksPath ((Resolve-Path $FileToPush -Relative).Path) )
+        $Path = $Path.Replace("\","/")
+        $Path = $Path.Replace("/./","/")
 
         # Create folder in Databricks
         Add-DatabricksFolder -Bearer $BearerToken -Region $Region -Path $Path
 
         $BinaryContents = [System.IO.File]::ReadAllBytes($FileToPush.FullName)
         $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
-        $TargetPath = $Path + "/" + $FileToPush.BaseName
+        $TargetPath = $Path + $FileToPush.BaseName
 
         $FileType = @{".py"="PYTHON";".scala"="SCALA";".r"="R";".sql"="SQL" }
         $FileFormat = $FileType[$FileToPush.Extension]
@@ -71,4 +78,6 @@ Author: Simon D'Morias / Data Thirst Ltd
             Invoke-RestMethod -Uri "https://$Region.azuredatabricks.net/api/2.0/workspace/import" -Body $Body -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
         }
     }
+
+    Pop-Location
 }
