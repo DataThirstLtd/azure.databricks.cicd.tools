@@ -12,7 +12,7 @@
     RootModule = 'azure.databricks.cicd.Tools.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.1.0'
+    ModuleVersion = '1.1.1'
 
     # ID used to uniquely identify this module
     GUID = 'b277a688-f588-434c-a1dc-a44ff2105279'
@@ -69,7 +69,11 @@
     FunctionsToExport = '*'
 
     # Cmdlets to export from this module
-    CmdletsToExport = 'Add-DatabricksSecretScope', 'Export-DatabricksFolder', 'Import-DatabricksFolder', 'Set-DatabricksSecret', 'Get-DatabricksClusters', 'Get-DatabricksNodeTypes', 'Get-DatabricksSparkVersions', 'New-DatabricksCluster', 'Remove-DatabricksCluster', 'Start-DatabricksCluster', 'Stop-DatabricksCluster', 'Update-DatabricksClusterResize'
+    CmdletsToExport = 'Add-DatabricksSecretScope', 'Export-DatabricksFolder', 'Import-DatabricksFolder', 
+        'Set-DatabricksSecret', 'Get-DatabricksClusters', 'Get-DatabricksNodeTypes', 'Get-DatabricksSparkVersions', 
+        'New-DatabricksCluster', 'Remove-DatabricksCluster', 'Start-DatabricksCluster', 'Stop-DatabricksCluster', 
+        'Update-DatabricksClusterResize', 'Add-DatabricksDBFSFile', 'Add-DatabricksLibrary', 'Add-DatabricksNotebookJob',
+        'Get-DatabricksDBFSFolder', 'Get-DatabricksJobs', 'Get-DatabricksLibraries'
 
     # Variables to export from this module
     VariablesToExport = '*'
@@ -91,7 +95,7 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags = @("Databricks", "Azure", "DevOps", "Deploy")
+            Tags = @("Databricks", "Azure", "DevOps", "Deploy", "DBFS")
 
             # A URL to the license for this module.
             # LicenseUri = ''
