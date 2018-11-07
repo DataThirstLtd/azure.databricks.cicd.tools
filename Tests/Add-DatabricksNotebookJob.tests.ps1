@@ -6,8 +6,8 @@ Describe "Add-DatabricksNotebookJob" {
     $JobName = "UnitTestJob"
     $SparkVersion = "4.1.x-scala2.11"
     $NodeType = "Standard_D3_v2"
-    $MinNumberOfWorkers = 2
-    $MaxNumberOfWorkers = 10
+    $MinNumberOfWorkers = 1
+    $MaxNumberOfWorkers = 1
     $Timeout = 1000
     $MaxRetries = 1
     $ScheduleCronExpression = "0 15 22 ? * *"

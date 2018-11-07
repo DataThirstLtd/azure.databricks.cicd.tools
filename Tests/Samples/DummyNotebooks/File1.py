@@ -1,2 +1,2 @@
 
-hfjdkshfjksdhfjh
+print('hello world')
