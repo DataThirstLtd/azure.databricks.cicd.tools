@@ -55,6 +55,7 @@ Author: Simon D'Morias / Data Thirst Ltd
         $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
 
         $FileTarget = (Join-Path $TargetLocation (Resolve-Path $f -Relative))
+        $FileTarget = $FileTarget.Replace("\","/")
         $FileTarget = $FileTarget.Replace("/./","/")
         
         $Body = @{"contents"=$EncodedContents}
