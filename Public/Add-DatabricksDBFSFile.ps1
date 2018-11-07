@@ -15,8 +15,7 @@ Function Add-DatabricksDBFSFile {
     Push-Location
     Set-Location $LocalRootFolder
 
-    $LocalRootFolder = Resolve-Path $LocalRootFolder
-    $AllFiles = Get-ChildItem -Path $LocalRootFolder -Filter $FilePattern -Recurse -File
+    $AllFiles = Get-ChildItem -Filter $FilePattern -Recurse -File
 
     Foreach ($f in $AllFiles){
         Write-Verbose "Replacing CRLF with LF for $f"
