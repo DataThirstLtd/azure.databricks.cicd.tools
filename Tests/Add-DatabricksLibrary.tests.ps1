@@ -4,7 +4,7 @@ $BearerToken = Get-Content "$PSScriptRoot\MyBearerToken.txt"  # Create this file
 $Region = "westeurope"
 Set-Location $PSScriptRoot
 
-$ClusterId = (Get-DatabricksClusters -BearerToken $BearerToken -Region $Region).cluster_id[0]
+$ClusterId = "0926-081131-crick762"
 
 Describe "Add-DatabricksLibrary" {
     It "Simple add DBFS Jar"{

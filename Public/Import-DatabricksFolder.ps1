@@ -46,7 +46,15 @@ Author: Simon D'Morias / Data Thirst Ltd
         # Build relative Databricks path
         # $Path = $DatabricksPath + ($Path.Replace($LocalPath,"").Replace("\","/"))
 
-        $Path = (Join-Path $DatabricksPath ((Resolve-Path $FileToPush -Relative).Path) )
+        if ($FileToPush.DirectoryName -ne (Get-Location).Path) {
+            $FolderFromTargetRoot = (Resolve-Path ($FileToPush.DirectoryName) -Relative)
+            $Path = Join-Path $DatabricksPath $FolderFromTargetRoot
+        }
+        else{
+            $Path = $DatabricksPath
+        }
+        
+        #$Path = $Path.DirectoryName
         $Path = $Path.Replace("\","/")
         $Path = $Path.Replace("/./","/")
 
@@ -55,7 +63,7 @@ Author: Simon D'Morias / Data Thirst Ltd
 
         $BinaryContents = [System.IO.File]::ReadAllBytes($FileToPush.FullName)
         $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
-        $TargetPath = $Path + $FileToPush.BaseName
+        $TargetPath = $Path + '/'+ $FileToPush.BaseName
 
         $FileType = @{".py"="PYTHON";".scala"="SCALA";".r"="R";".sql"="SQL" }
         $FileFormat = $FileType[$FileToPush.Extension]
