@@ -98,7 +98,7 @@ Extended: Simon D'Morias / Data Thirst Ltd
 
     if ($ExistingJobDetail){
         $JobId = $ExistingJobDetail.job_id[0]
-        Write-Output "Updating JobId: $JobId"
+        Write-Verbose "Updating JobId: $JobId"
         $Mode = "reset"
     } 
     else{
@@ -166,7 +166,7 @@ Extended: Simon D'Morias / Data Thirst Ltd
         Write-Error $_.ErrorDetails.Message
     }
 
-    if ($Moode -eq "create") {
+    if ($Mode -eq "create") {
         Return $JobDetails.job_id
     }
     else {
