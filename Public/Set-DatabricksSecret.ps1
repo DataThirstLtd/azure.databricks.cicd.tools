@@ -1,4 +1,4 @@
-Function Set-Secret
+Function Set-DatabricksSecret
 {
     [cmdletbinding()]
     param (
@@ -10,6 +10,7 @@ Function Set-Secret
     )
 
     $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Region = $Region.Replace(" ","")
 
     Add-SecretScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName
 
@@ -18,3 +19,6 @@ Function Set-Secret
     Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/secrets/put" -Headers @{Authorization = $InternalBearerToken}
     Write-Output "Secret $SecretName Set"
 }
+
+New-Alias -Name Set-Secret -Value Set-DatabricksSecret
+

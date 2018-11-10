@@ -1,4 +1,4 @@
-Function Add-SecretScope
+Function Add-DatabricksSecretScope
 {
     [cmdletbinding()]
     param (
@@ -10,6 +10,7 @@ Function Add-SecretScope
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     
     $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Region = $Region.Replace(" ","")
     $body = '{"scope": "' + $ScopeName + '"}'
 
     Try
@@ -31,3 +32,5 @@ Function Add-SecretScope
     }
 
 }
+
+New-Alias -Name Add-SecretScope -Value Add-DatabricksSecretScope
