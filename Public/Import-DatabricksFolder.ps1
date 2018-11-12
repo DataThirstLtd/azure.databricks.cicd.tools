@@ -43,9 +43,6 @@ Author: Simon D'Morias / Data Thirst Ltd
         $Path = $FileToPush.DirectoryName
         $LocalPath = $LocalPath.Replace("/","\")
 
-        # Build relative Databricks path
-        # $Path = $DatabricksPath + ($Path.Replace($LocalPath,"").Replace("\","/"))
-
         if ($FileToPush.DirectoryName -ne (Get-Location).Path) {
             $FolderFromTargetRoot = (Resolve-Path ($FileToPush.DirectoryName) -Relative)
             $Path = Join-Path $DatabricksPath $FolderFromTargetRoot
@@ -54,12 +51,12 @@ Author: Simon D'Morias / Data Thirst Ltd
             $Path = $DatabricksPath
         }
         
-        #$Path = $Path.DirectoryName
         $Path = $Path.Replace("\","/")
         $Path = $Path.Replace("/./","/")
 
         # Create folder in Databricks
-        # Add-DatabricksFolder -Bearer $BearerToken -Region $Region -Path $Path
+        Add-DatabricksFolder -Bearer $BearerToken -Region $Region -Path $Path
+        Write-Verbose "Path: $Path"
 
         $BinaryContents = [System.IO.File]::ReadAllBytes($FileToPush.FullName)
         $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
@@ -82,7 +79,7 @@ Author: Simon D'Morias / Data Thirst Ltd
             Write-Warning "File $FileToPush has an unknown extension - skipping file"
         }
         else{
-            Write-Output "Pushing file $FileToPush to $TargetPath"
+            Write-Verbose "Pushing file $FileToPush to $TargetPath"
             Invoke-RestMethod -Uri "https://$Region.azuredatabricks.net/api/2.0/workspace/import" -Body $Body -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
         }
     }

@@ -4,11 +4,16 @@ $BearerToken = Get-Content "$PSScriptRoot\MyBearerToken.txt"  # Create this file
 $Region = "westeurope"
 $DatabricksPath = "/Shared/UnitTestImport"
 
+Push-Location
+
 Set-Location $PSScriptRoot
 
 Describe "Import-DatabricksFolder"{
     It "Simple Import" {
-        Import-DatabricksFolder -BearerToken $BearerToken -Region $Region -LocalPath 'Samples\DummyNotebooks' -DatabricksPath $DatabricksPath
+        Import-DatabricksFolder -BearerToken $BearerToken -Region $Region `
+            -LocalPath 'Samples\DummyNotebooks' -DatabricksPath $DatabricksPath `
+            -Verbose
     }
 }
 
+Pop-Location
