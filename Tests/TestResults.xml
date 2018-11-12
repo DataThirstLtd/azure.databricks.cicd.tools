@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="16" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2018-11-12" time="17:15:12">
+  <environment user="simon" machine-name="SIMONDMORIAC566" cwd="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests" user-domain="SIMONDMORIAC566" platform="Microsoft Windows 10 Pro|C:\Windows|\Device\Harddisk0\Partition4" nunit-version="2.5.8.0" os-version="10.0.17763" clr-version="4.0.30319.42000" />
+  <culture-info current-culture="en-US" current-uiculture="en-US" />
+  <test-suite type="TestFixture" name="Pester" executed="True" result="Success" success="True" time="56.1055" asserts="0" description="Pester">
+    <results>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Export-DatabricksFolder.tests.ps1" executed="True" result="Success" success="True" time="7.4193" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Export-DatabricksFolder.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Export-DatabricksFolder" executed="True" result="Success" success="True" time="7.4193" asserts="0" description="Export-DatabricksFolder">
+            <results>
+              <test-case description="Folder of files is exported" name="Export-DatabricksFolder.Folder of files is exported" time="7.4193" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Add-DatabricksLibrary.tests.ps1" executed="True" result="Success" success="True" time="2.8433" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Add-DatabricksLibrary.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Add-DatabricksLibrary" executed="True" result="Success" success="True" time="2.8433" asserts="0" description="Add-DatabricksLibrary">
+            <results>
+              <test-case description="Simple add DBFS Jar" name="Add-DatabricksLibrary.Simple add DBFS Jar" time="2.8433" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Import-DatabricksFolder.tests.ps1" executed="True" result="Success" success="True" time="4.8885" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Import-DatabricksFolder.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Import-DatabricksFolder" executed="True" result="Success" success="True" time="4.8885" asserts="0" description="Import-DatabricksFolder">
+            <results>
+              <test-case description="Simple Import" name="Import-DatabricksFolder.Simple Import" time="4.8885" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Get-DatabricksClusters.tests.ps1" executed="True" result="Success" success="True" time="1.6637" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Get-DatabricksClusters.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Get-DatabricksClusters" executed="True" result="Success" success="True" time="1.6637" asserts="0" description="Get-DatabricksClusters">
+            <results>
+              <test-case description="Get all clusters" name="Get-DatabricksClusters.Get all clusters" time="0.6409" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Search for cluster by id" name="Get-DatabricksClusters.Search for cluster by id" time="1.0228" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Get-DatabricksLibraries.tests.ps1" executed="True" result="Success" success="True" time="0.8352" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Get-DatabricksLibraries.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Get-DatabricksLibraries" executed="True" result="Success" success="True" time="0.8352" asserts="0" description="Get-DatabricksLibraries">
+            <results>
+              <test-case description="Simple fetch" name="Get-DatabricksLibraries.Simple fetch" time="0.8352" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Get-DatabricksNodeTypes.tests.ps1" executed="True" result="Success" success="True" time="1.0026" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Get-DatabricksNodeTypes.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Get-DatabricksNodeTypes" executed="True" result="Success" success="True" time="1.0026" asserts="0" description="Get-DatabricksNodeTypes">
+            <results>
+              <test-case description="Simple fetch" name="Get-DatabricksNodeTypes.Simple fetch" time="1.0026" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Add-DatabricksDBFSFile.tests.ps1" executed="True" result="Success" success="True" time="5.1318" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Add-DatabricksDBFSFile.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Add-DatabricksDBFSFile" executed="True" result="Success" success="True" time="5.1318" asserts="0" description="Add-DatabricksDBFSFile">
+            <results>
+              <test-case description="Add single file" name="Add-DatabricksDBFSFile.Add single file" time="2.6511" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Add folder with subfolder" name="Add-DatabricksDBFSFile.Add folder with subfolder" time="2.4807" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Remove-DatabricksCluster.tests.ps1" executed="True" result="Success" success="True" time="0" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Remove-DatabricksCluster.tests.ps1">
+        <results />
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Set-DatabricksSecret.tests.ps1" executed="True" result="Success" success="True" time="2.8691" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Set-DatabricksSecret.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Set-DatabricksSecret" executed="True" result="Success" success="True" time="2.8691" asserts="0" description="Set-DatabricksSecret">
+            <results>
+              <test-case description="Simple test value" name="Set-DatabricksSecret.Simple test value" time="2.8691" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Get-DatabricksSparkVersions.tests.ps1" executed="True" result="Success" success="True" time="7.237" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Get-DatabricksSparkVersions.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Get-DatabricksSparkVersions" executed="True" result="Success" success="True" time="7.237" asserts="0" description="Get-DatabricksSparkVersions">
+            <results>
+              <test-case description="Simple fetch" name="Get-DatabricksSparkVersions.Simple fetch" time="7.237" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Get-DatabricksJobs.tests.ps1" executed="True" result="Success" success="True" time="2.451" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Get-DatabricksJobs.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Get-DatabricksJobs" executed="True" result="Success" success="True" time="2.451" asserts="0" description="Get-DatabricksJobs">
+            <results>
+              <test-case description="Simple Fetch" name="Get-DatabricksJobs.Simple Fetch" time="2.451" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Add-DatabricksSecretScope.tests.ps1" executed="True" result="Success" success="True" time="1.5237" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Add-DatabricksSecretScope.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Add-DatabricksSecretScope" executed="True" result="Success" success="True" time="1.5237" asserts="0" description="Add-DatabricksSecretScope">
+            <results>
+              <test-case description="Simple addition" name="Add-DatabricksSecretScope.Simple addition" time="1.5237" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\New-DataBricksCluster.tests.ps1" executed="True" result="Success" success="True" time="2.0193" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\New-DataBricksCluster.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="New-DatabricksCluster" executed="True" result="Success" success="True" time="2.0193" asserts="0" description="New-DatabricksCluster">
+            <results>
+              <test-case description="Create basic cluster" name="New-DatabricksCluster.Create basic cluster" time="2.0193" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Add-DatabricksNotebookJob.tests.ps1" executed="True" result="Success" success="True" time="16.2209" asserts="0" description="Z:\Repos\GitHub\azure.databricks.cicd.tools\tests\Add-DatabricksNotebookJob.tests.ps1">
+        <results>
+          <test-suite type="TestFixture" name="Add-DatabricksNotebookJob" executed="True" result="Success" success="True" time="16.2209" asserts="0" description="Add-DatabricksNotebookJob">
+            <results>
+              <test-case description="Autoscale with parameters, new cluster" name="Add-DatabricksNotebookJob.Autoscale with parameters, new cluster" time="13.1473" asserts="0" success="True" result="Success" executed="True" />
+              <test-case description="Update Job to use existing cluster" name="Add-DatabricksNotebookJob.Update Job to use existing cluster" time="3.0736" asserts="0" success="True" result="Success" executed="True" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>

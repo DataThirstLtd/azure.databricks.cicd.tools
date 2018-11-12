@@ -1,4 +1,5 @@
 <#
+
 .SYNOPSIS
     Upload a file or folder of files from your local filesystem into DBFS.
 
@@ -14,7 +15,7 @@
     Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER LocalRootFolder
-    Path to file(s) to upload, can be relative. Note that subfolders are recursed always.
+    Path to file(s) to upload, can be relative or full. Note that subfolders are recursed always.
     
 .PARAMETER FilePattern
     File pattern to match. Examples: *.py  *.*  ProjectA*.*
@@ -22,6 +23,16 @@
 .PARAMETER TargetLocation
     Target folder in DBFS should start /.
     Does not need to exist.
+
+.EXAMPLE 
+Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder "Samples" -FilePattern "Test.jar"  -TargetLocation '/test' -Verbose
+        
+This example uploads a single file called Test.jar which is a relative path to your working directory.
+
+.EXAMPLE 
+Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder Samples/DummyNotebooks -FilePattern "*.py"  -TargetLocation '/test2/' -Verbose
+
+This example uploads a folder of py files
 
 .NOTES
     Author: Simon D'Morias / Data Thirst Ltd

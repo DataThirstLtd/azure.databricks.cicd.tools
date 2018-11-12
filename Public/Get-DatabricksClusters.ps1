@@ -7,6 +7,15 @@ Function Get-DatabricksClusters
         [parameter(Mandatory = $false)][string]$ClusterId
     ) 
 
+<#
+
+.EXAMPLE
+$cluster = Get-DatabricksClusters -BearerToken $BearerToken -Region $Region
+$state = ($cluster | Where-Object {$_.cluster_id -eq $ClusterId }).state
+if ($state -eq "TERMINATED"){
+    Start-DatabricksCluster -Region $Region -BearerToken $BearerToken -ClusterId $ClusterId
+}
+#>
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
     $Region = $Region.Replace(" ","")

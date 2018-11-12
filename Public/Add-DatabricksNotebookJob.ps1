@@ -135,9 +135,6 @@ Extended: Simon D'Morias / Data Thirst Ltd
     $Notebook = @{}
     $Notebook['notebook_path'] = $NotebookPath
     If ($PSBoundParameters.ContainsKey('NotebookParametersJson')) {
-        If ($NotebookParametersJson.Count -eq 1) {
-            $NotebookParametersJson += '{"DummyKey":"1"}'
-        }
         $Notebook['base_parameters'] = $NotebookParametersJson | ConvertFrom-Json
     }
 
@@ -160,6 +157,7 @@ Extended: Simon D'Morias / Data Thirst Ltd
     }
 
     $BodyText = $Body | ConvertTo-Json -Depth 10
+    $BodyText = Remove-DummyKey $BodyText
 
     Write-Verbose $BodyText
   
