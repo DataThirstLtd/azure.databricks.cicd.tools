@@ -59,7 +59,7 @@ Author: Simon D'Morias / Data Thirst Ltd
         $Path = $Path.Replace("/./","/")
 
         # Create folder in Databricks
-        Add-DatabricksFolder -Bearer $BearerToken -Region $Region -Path $Path
+        # Add-DatabricksFolder -Bearer $BearerToken -Region $Region -Path $Path
 
         $BinaryContents = [System.IO.File]::ReadAllBytes($FileToPush.FullName)
         $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
