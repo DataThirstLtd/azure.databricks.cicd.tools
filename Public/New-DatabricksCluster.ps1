@@ -15,7 +15,8 @@ Function New-DatabricksCluster {
         [parameter(Mandatory = $false)][string[]]$InitScripts,
         [parameter(Mandatory = $false)][string[]]$SparkEnvVars,
         [parameter(Mandatory = $false)][switch]$UniqueNames,
-        [parameter(Mandatory = $false)][switch]$Update
+        [parameter(Mandatory = $false)][switch]$Update,
+        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2
     ) 
 
 <#
@@ -113,23 +114,37 @@ Author: Simon D'Morias / Data Thirst Ltd
     }
 
     If ($PSBoundParameters.ContainsKey('CustomTags')) {
+        If ($CustomTags.Count -eq 1) {
+            $CustomTags += '{"DummyKey":"1"}'
+        }
         $CustomTags2 = $CustomTags | ConvertFrom-Json
         $Body['custom_tags'] = $CustomTags2
     }
 
     If ($PSBoundParameters.ContainsKey('InitScripts') -and (!($InitScripts -eq $null))) {
+        If ($InitScripts.Count -eq 1) {
+            $InitScripts += '{"DummyKey":"1"}'
+        }
         $InitScripts2 = $InitScripts | ConvertFrom-Json
         $Body['init_scripts'] = $InitScripts2
     }
 
     If ($PSBoundParameters.ContainsKey('AutoTerminationMinutes')) {$Body['autotermination_minutes'] = $AutoTerminationMinutes}
-    
-    If ($PSBoundParameters.ContainsKey('SparkEnvVars')) {
-        $SparkEnvVars2 = $SparkEnvVars | ConvertFrom-Json
+
+    If ($PythonVersion -eq 3){
+        $SparkEnvVars += '{"key":"PYSPARK_PYTHON","value":"/databricks/python3/bin/python3"}'
+    }
+
+    If ($SparkEnvVars.Count -gt 0) {
+        If ($SparkEnvVars.Count -eq 1) {
+            $SparkEnvVars += '{"DummyKey":"1"}'
+        }
+        $SparkEnvVars2 =  $SparkEnvVars | ConvertFrom-Json 
         $Body['spark_env_vars'] = $SparkEnvVars2
     }
     Try {
         $BodyText = $Body | ConvertTo-Json -Depth 10
+        $BodyText = Remove-DummyKey($BodyText)
         Write-Verbose $BodyText
         Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/$Mode" -Headers @{Authorization = $InternalBearerToken}
     }

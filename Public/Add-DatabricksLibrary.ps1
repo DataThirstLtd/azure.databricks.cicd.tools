@@ -25,12 +25,10 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER LibraryType
-Spark version for cluster. Example: 4.0.x-scala2.11
-See Get-DatabricksSparkVersions
+egg, jar, pypi etc
     
 .PARAMETER LibrarySettings
-Type of worker for cluster. Example: Standard_D3_v2
-See Get-DatabricksNodeTypes
+Settings can by path to jar (starting dbfs), pypi name (optionally with repo), or egg
 
 .PARAMETER ClusterId
 The cluster to install the library to. Note that the API does not support auto installing to
