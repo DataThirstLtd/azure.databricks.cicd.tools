@@ -27,18 +27,12 @@ The cluster to install the library to. Note that the API does not support auto i
 all clusters. See Get-DatabricksClusters. 
 
 .EXAMPLE
-$ClusterId = (Get-DatabricksClusters -BearerToken $BearerToken -Region $Region).cluster_id[0]
-$Settings = 'dbfs:/mnt/libraries/library.jar'
-Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region `
-    -LibraryType "jar" -LibrarySettings $Settings `
-    -ClusterId $ClusterId
+C:\PS> Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region -LibraryType "jar" -LibrarySettings "dbfs:/mnt/libraries/library.jar" -ClusterId "bob-1234"
+
+This example installs a library from a jar which exists in dbfs.
 
 .EXAMPLE 
-$ClusterId = (Get-DatabricksClusters -BearerToken $BearerToken -Region $Region).cluster_id[0]
-$Settings = 'simplejson2'
-Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region `
-    -LibraryType "pypi" -LibrarySettings $Settings `
-    -ClusterId $ClusterId
+C:\PS> Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region -LibraryType "pypi" -LibrarySettings 'simplejson2' -ClusterId 'Bob-1234'
 
 The above example applies a pypi library to a cluster by id
 

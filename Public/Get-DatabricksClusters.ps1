@@ -1,3 +1,29 @@
+<#
+.SYNOPSIS
+Pulls the contents of a Databricks folder (and subfolders) locally so that they can be committed to a repo
+
+.DESCRIPTION
+Pulls the contents of a Databricks folder (and subfolders) locally so that they can be committed to a repo
+
+.PARAMETER BearerToken
+Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
+
+.PARAMETER Region
+Azure Region - must match the URL of your Databricks workspace, example northeurope
+
+.PARAMETER ClusterId
+Optional. Returns just a single cluster.
+
+.EXAMPLE
+PS C:\> Get-DatabricksClusters -BearerToken $BearerToken -Region $Region
+
+Returns all clusters
+
+.NOTES
+Author: Simon D'Morias / Data Thirst Ltd
+
+#>
+
 Function Get-DatabricksClusters 
 { 
     [cmdletbinding()]
@@ -7,15 +33,6 @@ Function Get-DatabricksClusters
         [parameter(Mandatory = $false)][string]$ClusterId
     ) 
 
-<#
-
-.EXAMPLE
-$cluster = Get-DatabricksClusters -BearerToken $BearerToken -Region $Region
-$state = ($cluster | Where-Object {$_.cluster_id -eq $ClusterId }).state
-if ($state -eq "TERMINATED"){
-    Start-DatabricksCluster -Region $Region -BearerToken $BearerToken -ClusterId $ClusterId
-}
-#>
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
     $Region = $Region.Replace(" ","")
