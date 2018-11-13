@@ -3,6 +3,7 @@
 $PSVersionTable
 
 Get-Module
+Install-Module Pester -MinimumVersion 4.4.2 -Force -Scope CurrentUser
 Import-Module Pester -MinimumVersion 4.4.2
 Get-Module
 Set-Location $PSScriptRoot
