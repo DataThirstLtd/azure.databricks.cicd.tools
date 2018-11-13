@@ -17,19 +17,33 @@ You can also use these tools to promote code between environments as part of you
 
 The tools are now being extended to include more management functions, such as creating, starting & stopping your clusters.
 
+Supports Powershell Core 6.1+
+
 ## Install-Module
 
 https://www.powershellgallery.com/packages/azure.databricks.cicd.tools
 
+```powershell
 Install-Module -Name azure.databricks.cicd.tools
+```
 
 or
 
+```powershell
 Save-Module -Name azure.databricks.cicd.tools -Path \psmodules
+```
 
 Followed by:
 
+```powershell
 Import-Module -Name azure.databricks.cicd.tools
+```
+
+To upgrade from a previous version
+
+```powershell
+Update-Module -Name azure.databricks.cicd.tools
+```
 
 ## Secrets
 
@@ -56,9 +70,9 @@ These have been designed with CI/CD in mind - ie they should all be idempotent.
 
 ## DBFS
 
-Add-DatabricksDBFSFile - Upload a file or folder to DBFS
-Remove-DatabricksDBFSItem - Delete a file or folder
-Get-DatabricksDBFSFolder - List folder contents
+- Add-DatabricksDBFSFile - Upload a file or folder to DBFS
+- Remove-DatabricksDBFSItem - Delete a file or folder
+- Get-DatabricksDBFSFolder - List folder contents
 
 The Add-DatabricksDBFSFile can be used as part of a CI/CD pipeline to upload your source code to DBFS, or dependant libraries. You can also use it to deploy initialisation scripts for your clusters.
 
@@ -88,15 +102,16 @@ Deploy a folder of scripts from a local folder (Git repo) to a specific folder i
 
 ## Jobs
 
-Add-DatabricksNotebookJob - Schedule a job based on a Notebook.
-Add-DatabricksNotebookJob - Schedule a job based on a Python script (stored in DBFS).
+- Add-DatabricksNotebookJob - Schedule a job based on a Notebook.
+- Add-DatabricksNotebookJob - Schedule a job based on a Python script (stored in DBFS).
+- Remove-DatabricksJob
 
 Note: There is currently no support for Jar jobs or Spark Submit in this module - it may come in the future (please express an interest in Issues if you would like this). Python jobs do not work in Databricks (see the Jobs UI it is missing as an option). Generally in Azure we would recommend using ADF to execute jobs rather using Databricks jobs.
 
 ## Libraries
 
-Add-DatabricksLibrary
-Get-DatabricksLibraries
+- Add-DatabricksLibrary
+- Get-DatabricksLibraries
 
 ## Examples
 
