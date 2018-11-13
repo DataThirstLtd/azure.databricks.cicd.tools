@@ -1,12 +1,3 @@
-Function Import-DatabricksFolder
-{
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory=$true)][string]$BearerToken,
-        [parameter(Mandatory=$true)][string]$Region,
-        [parameter(Mandatory=$true)][string]$LocalPath,
-        [parameter(Mandatory=$true)][string]$DatabricksPath
-    )
 <#
 .SYNOPSIS
 Pushes the contents of a local folder (and subfolders) to Databricks
@@ -26,10 +17,24 @@ Path to your repo/local files that you would like to deploy to Databricks (shoul
 .PARAMETER DatabricksPath
 The Databricks folder to target
 
+.EXAMPLE
+PS C:\> Import-DatabricksFolder -BearerToken $BearerToken -Region $Region -LocalPath 'Samples\DummyNotebooks' -DatabricksPath 'Shared\ProjectX'
+
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd 
 
 #>  
+
+Function Import-DatabricksFolder
+{
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory=$true)][string]$BearerToken,
+        [parameter(Mandatory=$true)][string]$Region,
+        [parameter(Mandatory=$true)][string]$LocalPath,
+        [parameter(Mandatory=$true)][string]$DatabricksPath
+    )
+
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
     $Region = $Region.Replace(" ","")

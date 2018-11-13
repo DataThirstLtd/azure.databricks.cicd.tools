@@ -1,11 +1,3 @@
-Function Get-DatabricksLibraries
-{ 
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $true)][string]$ClusterId
-    ) 
 <#
 .SYNOPSIS
 Get a list of Libraries and thier statuses for a Databricks cluster
@@ -20,12 +12,25 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER ClusterId
-ClusterId for existing Databricks cluster. Does not need to be running.
+ClusterId for existing Databricks cluster. Does not need to be running. See Get-DatabricksClusters.
+
+.EXAMPLE
+PS C:\> Get-DatabricksLibraries -BearerToken $BearerToken -Region $Region -ClusterId 'Bob-1234'
 
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd 
 
 #>  
+
+Function Get-DatabricksLibraries
+{ 
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory = $true)][string]$BearerToken, 
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $true)][string]$ClusterId
+    ) 
+
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
     $Region = $Region.Replace(" ","")

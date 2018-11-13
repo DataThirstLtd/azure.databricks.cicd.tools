@@ -1,11 +1,3 @@
-Function Remove-DatabricksJob
-{ 
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $false)][string]$JobId
-    ) 
 <#
 .SYNOPSIS
 Delete a job from Databricks with given Job Id
@@ -22,9 +14,22 @@ Azure Region - must match the URL of your Databricks workspace, example northeur
 .PARAMETER JobId
 Id of the job to delete
 
+.EXAMPLE
+PS C:\> Remove-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId 10
+
 .NOTES
 Author: Tadeusz Balcer
 #>  
+
+Function Remove-DatabricksJob
+{ 
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory = $true)][string]$BearerToken, 
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$JobId
+    ) 
+
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
     $Region = $Region.Replace(" ","")

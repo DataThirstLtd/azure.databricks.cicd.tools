@@ -1,4 +1,4 @@
-$reset=$true
+$reset=$false
 
 Import-Module platyPS
 Set-Location $PSScriptRoot
@@ -6,7 +6,7 @@ Set-Location $PSScriptRoot
 Import-Module .\azure.databricks.cicd.tools.psm1 -Force
 
 if ($reset){
-    New-MarkdownHelp -Module azure.databricks.cicd.tools -OutputFolder ..\md -force
+    New-MarkdownHelp -Module azure.databricks.cicd.tools -OutputFolder ..\azure.databricks.cicd.tools.wiki -force -WithModulePage
 }
 else {
     Update-MarkdownHelp ..\md
