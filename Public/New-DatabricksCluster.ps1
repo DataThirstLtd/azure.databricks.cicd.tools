@@ -1,24 +1,3 @@
-Function New-DatabricksCluster {  
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $true)][string]$ClusterName,
-        [parameter(Mandatory = $true)][string]$SparkVersion,
-        [parameter(Mandatory = $true)][string]$NodeType,
-        [parameter(Mandatory = $false)][string]$DriverNodeType,
-        [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
-        [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers,
-        [parameter(Mandatory = $false)][int]$AutoTerminationMinutes,
-        [parameter(Mandatory = $false)][string]$Spark_conf,
-        [parameter(Mandatory = $false)][string[]]$CustomTags,
-        [parameter(Mandatory = $false)][string[]]$InitScripts,
-        [parameter(Mandatory = $false)][string[]]$SparkEnvVars,
-        [parameter(Mandatory = $false)][switch]$UniqueNames,
-        [parameter(Mandatory = $false)][switch]$Update,
-        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2
-    ) 
-
 <#
 .SYNOPSIS
 Creates a new Databricks cluster
@@ -71,11 +50,37 @@ If it does exist an error will be thrown making the script idempotent. Defaults 
 .PARAMETER Update
 Switch. If the cluster name exist then update the configuration to this one. Defaults to False.
 
+.PARAMETER PythonVersion
+2 or 3 - defaults to 2.
+
 
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
 
 #>
+
+Function New-DatabricksCluster {  
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory = $true)][string]$BearerToken,    
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $true)][string]$ClusterName,
+        [parameter(Mandatory = $true)][string]$SparkVersion,
+        [parameter(Mandatory = $true)][string]$NodeType,
+        [parameter(Mandatory = $false)][string]$DriverNodeType,
+        [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
+        [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers,
+        [parameter(Mandatory = $false)][int]$AutoTerminationMinutes,
+        [parameter(Mandatory = $false)][string]$Spark_conf,
+        [parameter(Mandatory = $false)][string[]]$CustomTags,
+        [parameter(Mandatory = $false)][string[]]$InitScripts,
+        [parameter(Mandatory = $false)][string[]]$SparkEnvVars,
+        [parameter(Mandatory = $false)][switch]$UniqueNames,
+        [parameter(Mandatory = $false)][switch]$Update,
+        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2
+    ) 
+
+
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)

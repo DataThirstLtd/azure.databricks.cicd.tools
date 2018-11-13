@@ -1,11 +1,3 @@
-Function Stop-DatabricksCluster {  
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $false)][string]$ClusterName,
-        [parameter(Mandatory = $false)][string]$ClusterId
-        )
 <#
 .SYNOPSIS
 Stops a Databricks cluster or set of clusters with the same name.
@@ -29,6 +21,16 @@ Optional. See Get-DatabricksClusters. Will stop this cluster only if provided.
 Author: Simon D'Morias / Data Thirst Ltd
 
 #>
+
+Function Stop-DatabricksCluster {  
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory = $true)][string]$BearerToken,    
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$ClusterName,
+        [parameter(Mandatory = $false)][string]$ClusterId
+        )
+
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
     $Region = $Region.Replace(" ","")

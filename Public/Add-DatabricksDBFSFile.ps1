@@ -25,14 +25,14 @@
     Does not need to exist.
 
 .EXAMPLE 
-Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder "Samples" -FilePattern "Test.jar"  -TargetLocation '/test' -Verbose
+    C:\PS> Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder "Samples" -FilePattern "Test.jar"  -TargetLocation '/test' -Verbose
         
-This example uploads a single file called Test.jar which is a relative path to your working directory.
+    This example uploads a single file called Test.jar which is a relative path to your working directory.
 
 .EXAMPLE 
-Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder Samples/DummyNotebooks -FilePattern "*.py"  -TargetLocation '/test2/' -Verbose
+    C:\PS> Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder Samples/DummyNotebooks -FilePattern "*.py"  -TargetLocation '/test2/' -Verbose
 
-This example uploads a folder of py files
+    This example uploads a folder of py files
 
 .NOTES
     Author: Simon D'Morias / Data Thirst Ltd

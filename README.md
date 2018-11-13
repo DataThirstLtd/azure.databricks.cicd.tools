@@ -19,6 +19,8 @@ The tools are now being extended to include more management functions, such as c
 
 Supports Powershell Core 6.1+
 
+See the [Wiki](https://github.com/DataThirstLtd/azure.databricks.cicd.tools/wiki) for command help.
+
 ## Install-Module
 
 https://www.powershellgallery.com/packages/azure.databricks.cicd.tools
@@ -115,7 +117,8 @@ Note: There is currently no support for Jar jobs or Spark Submit in this module 
 
 ## Examples
 
-Please see the tests folder for examples and details of how to import this module.
+See the [Wiki](https://github.com/DataThirstLtd/azure.databricks.cicd.tools/wiki) for help on the commands.
+You can also see more examples in the tests folder.
 
 ## Bearer Tokens
 
