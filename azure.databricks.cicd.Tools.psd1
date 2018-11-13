@@ -12,7 +12,7 @@
     RootModule = 'azure.databricks.cicd.Tools.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.1.1'
+    ModuleVersion = '1.1.2'
 
     # ID used to uniquely identify this module
     GUID = 'b277a688-f588-434c-a1dc-a44ff2105279'
@@ -27,7 +27,7 @@
     Copyright = 'Data Thirst Ltd 2018'
 
     # Description of the functionality provided by this module
-    Description = 'PowerShell module to help with Azure Databricks CI & CD Scenarios. See https://github.com/DataThirstLtd/azure.databricks.cicd.tools & http://datathirst.net'
+    Description = 'PowerShell module to help with Azure Databricks CI & CD Scenarios. See https://github.com/DataThirstLtd/azure.databricks.cicd.tools & https://datathirst.net'
 
     # Minimum version of the Windows PowerShell engine required by this module
     PowerShellVersion = '5.0'
@@ -95,7 +95,7 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags = @("Databricks", "Azure", "DevOps", "Deploy", "DBFS")
+            Tags = @("Databricks", "Azure", "DevOps", "Deploy", "DBFS", "Cluster", "Jobs")
 
             # A URL to the license for this module.
             # LicenseUri = ''

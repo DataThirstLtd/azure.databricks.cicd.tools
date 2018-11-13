@@ -333,3 +333,4 @@ ASALocalRun/
 .mfractor/
 Tests/MyBearerToken2.txt
 Tests/Scratch.ps1
+*TestResults*.xml

@@ -33,4 +33,5 @@ Function Add-DatabricksSecretScope
 
 }
 
+# Command was renamed to align prefixes
 New-Alias -Name Add-SecretScope -Value Add-DatabricksSecretScope

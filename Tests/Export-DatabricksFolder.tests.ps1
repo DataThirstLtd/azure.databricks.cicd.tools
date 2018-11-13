@@ -5,6 +5,8 @@ $Region = "westeurope"
 $ExportPath = "/Shared/UnitTest"
 $LocalOutputPath = "Output"
 
+Set-Location $PSScriptRoot
+
 Describe "Export-DatabricksFolder"{
     BeforeAll {
         # Upload sample files here with two files in
@@ -13,6 +15,10 @@ Describe "Export-DatabricksFolder"{
     It "Folder of files is exported" {
         Export-DatabricksFolder -ExportPath $ExportPath -BearerToken $BearerToken -Region $Region -LocalOutputPath $LocalOutputPath -Verbose
         $Count = (Get-ChildItem -Path $LocalOutputPath).Count
-        $Count | Should -Be 2
+        $Count | Should -Be 3
+    }
+
+    AfterAll {
+        Remove-Item "$PSScriptRoot\Output" -Force -Recurse
     }
 }

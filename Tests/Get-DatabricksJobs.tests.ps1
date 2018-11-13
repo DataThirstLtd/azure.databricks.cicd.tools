@@ -1,6 +1,7 @@
 Import-Module "$PSScriptRoot\..\azure.databricks.cicd.tools.psm1" -Force
 $BearerToken = Get-Content "$PSScriptRoot\MyBearerToken.txt" # Create this file in the Tests folder with just your bearer token in
 $Region = "west europe" 
+$global:jobs 
 
 Describe "Get-DatabricksJobs" {
     BeforeAll{
@@ -25,12 +26,12 @@ Describe "Get-DatabricksJobs" {
             -NotebookParametersJson $NotebookParametersJson 
     }
     It "Simple Fetch" {
-        $json = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
-        $json.Count | Should -BeGreaterThan 0
+        $global:jobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
+        $global:jobs.job_id | Should -BeGreaterThan 0
     }
 
     AfterAll{
-        # TODO Remove Job
+        Remove-DatabricksJob -Region $Region -BearerToken $BearerToken -JobId $global:jobs.job_id
     }
 }
 

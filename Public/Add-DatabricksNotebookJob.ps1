@@ -141,6 +141,9 @@ Extended: Simon D'Morias / Data Thirst Ltd
     $JobBody['notebook_task'] = $Notebook
 
     If ($PSBoundParameters.ContainsKey('Libraries')) {
+        If ($Libraries.Count -eq 1) {
+            $Libraries += '{"DummyKey":"1"}'
+        }
         $JobBody['libraries'] = $Libraries | ConvertFrom-Json
     }
 
@@ -154,6 +157,7 @@ Extended: Simon D'Morias / Data Thirst Ltd
     }
 
     $BodyText = $Body | ConvertTo-Json -Depth 10
+    $BodyText = Remove-DummyKey $BodyText
 
     Write-Verbose $BodyText
   
