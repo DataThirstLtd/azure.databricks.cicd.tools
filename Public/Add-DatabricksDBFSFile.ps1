@@ -62,9 +62,9 @@ Function Add-DatabricksDBFSFile {
 
     Foreach ($f in $AllFiles){
         $f = Resolve-Path $f.FullName
-        Write-Verbose "Replacing CRLF with LF for $f"
-        $text = [IO.File]::ReadAllText($f) -replace "`r`n", "`n"
-        [IO.File]::WriteAllText($f, $text)
+        #Write-Verbose "Replacing CRLF with LF for $f"
+        #$text = [IO.File]::ReadAllText($f) -replace "`r`n", "`n"
+        #[IO.File]::WriteAllText($f, $text)
 
         $BinaryContents = [System.IO.File]::ReadAllBytes($f)
         $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
