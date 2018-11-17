@@ -1,29 +1,10 @@
-Function Add-DatabricksNotebookJob {  
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $true)][string]$JobName,
-        [parameter(Mandatory = $false)][string]$ClusterId,
-        [parameter(Mandatory = $false)][string]$SparkVersion,
-        [parameter(Mandatory = $false)][string]$NodeType,
-        [parameter(Mandatory = $false)][string]$DriverNodeType,
-        [parameter(Mandatory = $false)][int]$MinNumberOfWorkers,
-        [parameter(Mandatory = $false)][int]$MaxNumberOfWorkers,
-        [parameter(Mandatory = $false)][int]$Timeout,
-        [parameter(Mandatory = $false)][int]$MaxRetries,
-        [parameter(Mandatory = $false)][string]$ScheduleCronExpression,
-        [parameter(Mandatory = $false)][string]$Timezone,
-        [parameter(Mandatory = $true)][string]$NotebookPath,
-        [parameter(Mandatory = $false)][string]$NotebookParametersJson,
-        [parameter(Mandatory = $false)][string[]]$Libraries
-    ) 
 <#
 .SYNOPSIS
 Creates Notebook Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create  
 
 .DESCRIPTION
 Creates Notebook Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create
+If the job name exists it will be updated instead of creating a new job.
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
@@ -82,11 +63,37 @@ Optional parameters that will be provided to Notebook when Job is executed. Exam
 
 .PARAMETER Libraries
 Optional. Array of json strings. Example: '{"pypi":{package:"simplejson"}}', '{"jar", "DBFS:/mylibraries/test.jar"}'
+
+.EXAMPLE
+PS C:\> Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -NotebookPath "/Shared/Test" -NotebookParametersJson '{"key": "value", "name": "test2"}' -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
+
+The above example create a job on a new cluster.
     
 .NOTES
 Author: Tadeusz Balcer
 Extended: Simon D'Morias / Data Thirst Ltd
 #>
+
+Function Add-DatabricksNotebookJob {  
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory = $true)][string]$BearerToken,    
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $true)][string]$JobName,
+        [parameter(Mandatory = $false)][string]$ClusterId,
+        [parameter(Mandatory = $false)][string]$SparkVersion,
+        [parameter(Mandatory = $false)][string]$NodeType,
+        [parameter(Mandatory = $false)][string]$DriverNodeType,
+        [parameter(Mandatory = $false)][int]$MinNumberOfWorkers,
+        [parameter(Mandatory = $false)][int]$MaxNumberOfWorkers,
+        [parameter(Mandatory = $false)][int]$Timeout,
+        [parameter(Mandatory = $false)][int]$MaxRetries,
+        [parameter(Mandatory = $false)][string]$ScheduleCronExpression,
+        [parameter(Mandatory = $false)][string]$Timezone,
+        [parameter(Mandatory = $true)][string]$NotebookPath,
+        [parameter(Mandatory = $false)][string]$NotebookParametersJson,
+        [parameter(Mandatory = $false)][string[]]$Libraries
+    ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
@@ -98,7 +105,7 @@ Extended: Simon D'Morias / Data Thirst Ltd
 
     if ($ExistingJobDetail){
         $JobId = $ExistingJobDetail.job_id[0]
-        Write-Output "Updating JobId: $JobId"
+        Write-Verbose "Updating JobId: $JobId"
         $Mode = "reset"
     } 
     else{
@@ -141,6 +148,9 @@ Extended: Simon D'Morias / Data Thirst Ltd
     $JobBody['notebook_task'] = $Notebook
 
     If ($PSBoundParameters.ContainsKey('Libraries')) {
+        If ($Libraries.Count -eq 1) {
+            $Libraries += '{"DummyKey":"1"}'
+        }
         $JobBody['libraries'] = $Libraries | ConvertFrom-Json
     }
 
@@ -154,6 +164,7 @@ Extended: Simon D'Morias / Data Thirst Ltd
     }
 
     $BodyText = $Body | ConvertTo-Json -Depth 10
+    $BodyText = Remove-DummyKey $BodyText
 
     Write-Verbose $BodyText
   
@@ -166,7 +177,7 @@ Extended: Simon D'Morias / Data Thirst Ltd
         Write-Error $_.ErrorDetails.Message
     }
 
-    if ($Moode -eq "create") {
+    if ($Mode -eq "create") {
         Return $JobDetails.job_id
     }
     else {

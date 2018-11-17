@@ -1,11 +1,3 @@
-Function Remove-DatabricksCluster {  
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $false)][string]$ClusterName,
-        [parameter(Mandatory = $false)][string]$ClusterId
-        )
 <#
 .SYNOPSIS
 Removes a Databricks cluster or set of clusters with the same name.
@@ -25,10 +17,23 @@ Optional. Will delete all clusters with this name.
 .PARAMETER ClusterId
 Optional. See Get-DatabricksClusters. Will delete this cluster only if provided.
 
+.EXAMPLE
+PS C:\> Remove-DatabricksCluster -BearerToken $BearerToken -Region $Region -ClusterName 'Bob-1234'
+
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
 
 #>
+
+Function Remove-DatabricksCluster {  
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory = $true)][string]$BearerToken,    
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$ClusterName,
+        [parameter(Mandatory = $false)][string]$ClusterId
+        )
+
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
     $Region = $Region.Replace(" ","")

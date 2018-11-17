@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Get a listing of files and folders within DBFS
+Delete a job from Databricks with given Job Id
 
 .DESCRIPTION
-Get a listing of files and folders within DBFS 
+Delete a job from Databricks with given Job Id 
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
@@ -11,31 +11,36 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 .PARAMETER Region
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
-.PARAMETER Path
-The Databricks DBFS folder to list
+.PARAMETER JobId
+Id of the job to delete
 
 .EXAMPLE
-PS C:\> Get-DatabricksDBFSFolder -BearerToken $BearerToken -Region $Region -Path /test
+PS C:\> Remove-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId 10
 
 .NOTES
-Author: Simon D'Morias / Data Thirst Ltd 
-
+Author: Tadeusz Balcer
 #>  
-Function Get-DatabricksDBFSFolder
+
+Function Remove-DatabricksJob
 { 
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true)][string]$BearerToken, 
         [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $false)][string]$Path
+        [parameter(Mandatory = $false)][string]$JobId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
     $Region = $Region.Replace(" ","")
     
+    $Body = @{}
+    $Body['job_id'] = $JobId
+
+    $BodyText = $Body | ConvertTo-Json -Depth 10
+    
     Try {
-        $Files = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/list?path=$Path" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/delete" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
@@ -43,6 +48,6 @@ Function Get-DatabricksDBFSFolder
         Write-Error $_.ErrorDetails.Message
     }
 
-    Return $Files.files
+    Return 
 }
     

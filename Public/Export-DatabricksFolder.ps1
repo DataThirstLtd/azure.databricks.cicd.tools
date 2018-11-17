@@ -1,13 +1,3 @@
-Function Export-DatabricksFolder
-{
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory=$true)][string]$BearerToken,
-        [parameter(Mandatory=$true)][string]$Region,
-        [parameter(Mandatory=$true)][string]$ExportPath,
-        [parameter(Mandatory=$false)][string]$LocalOutputPath
-    )
-
 <#
 .SYNOPSIS
 Pulls the contents of a Databricks folder (and subfolders) locally so that they can be committed to a repo
@@ -27,10 +17,25 @@ The Databricks folder to export, for example /Shared or /Users/simon@datathirst.
 .PARAMETER LocalOutputPath
 Path to your repo/local you would like to export the scripts to
 
+.EXAMPLE
+PS C:\> Export-DatabricksFolder -ExportPath $ExportPath -BearerToken $BearerToken -Region $Region -LocalOutputPath $LocalOutputPath -Verbose
+
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
 
 #>
+
+Function Export-DatabricksFolder
+{
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory=$true)][string]$BearerToken,
+        [parameter(Mandatory=$true)][string]$Region,
+        [parameter(Mandatory=$true)][string]$ExportPath,
+        [parameter(Mandatory=$false)][string]$LocalOutputPath
+    )
+
+
 
     if ($LocalOutputPath -ne [System.IO.Path]::GetFullPath($LocalOutputPath)){
         $LocalOutputPath = Join-Path (Get-Location) $LocalOutputPath

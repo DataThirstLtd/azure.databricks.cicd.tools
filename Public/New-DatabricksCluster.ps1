@@ -1,23 +1,3 @@
-Function New-DatabricksCluster {  
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $true)][string]$ClusterName,
-        [parameter(Mandatory = $true)][string]$SparkVersion,
-        [parameter(Mandatory = $true)][string]$NodeType,
-        [parameter(Mandatory = $false)][string]$DriverNodeType,
-        [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
-        [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers,
-        [parameter(Mandatory = $false)][int]$AutoTerminationMinutes,
-        [parameter(Mandatory = $false)][string]$Spark_conf,
-        [parameter(Mandatory = $false)][string[]]$CustomTags,
-        [parameter(Mandatory = $false)][string[]]$InitScripts,
-        [parameter(Mandatory = $false)][string[]]$SparkEnvVars,
-        [parameter(Mandatory = $false)][switch]$UniqueNames,
-        [parameter(Mandatory = $false)][switch]$Update
-    ) 
-
 <#
 .SYNOPSIS
 Creates a new Databricks cluster
@@ -70,11 +50,37 @@ If it does exist an error will be thrown making the script idempotent. Defaults 
 .PARAMETER Update
 Switch. If the cluster name exist then update the configuration to this one. Defaults to False.
 
+.PARAMETER PythonVersion
+2 or 3 - defaults to 2.
+
 
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
 
 #>
+
+Function New-DatabricksCluster {  
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory = $true)][string]$BearerToken,    
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $true)][string]$ClusterName,
+        [parameter(Mandatory = $true)][string]$SparkVersion,
+        [parameter(Mandatory = $true)][string]$NodeType,
+        [parameter(Mandatory = $false)][string]$DriverNodeType,
+        [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
+        [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers,
+        [parameter(Mandatory = $false)][int]$AutoTerminationMinutes,
+        [parameter(Mandatory = $false)][string]$Spark_conf,
+        [parameter(Mandatory = $false)][string[]]$CustomTags,
+        [parameter(Mandatory = $false)][string[]]$InitScripts,
+        [parameter(Mandatory = $false)][string[]]$SparkEnvVars,
+        [parameter(Mandatory = $false)][switch]$UniqueNames,
+        [parameter(Mandatory = $false)][switch]$Update,
+        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2
+    ) 
+
+
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
@@ -113,23 +119,37 @@ Author: Simon D'Morias / Data Thirst Ltd
     }
 
     If ($PSBoundParameters.ContainsKey('CustomTags')) {
+        If ($CustomTags.Count -eq 1) {
+            $CustomTags += '{"DummyKey":"1"}'
+        }
         $CustomTags2 = $CustomTags | ConvertFrom-Json
         $Body['custom_tags'] = $CustomTags2
     }
 
     If ($PSBoundParameters.ContainsKey('InitScripts') -and (!($InitScripts -eq $null))) {
+        If ($InitScripts.Count -eq 1) {
+            $InitScripts += '{"DummyKey":"1"}'
+        }
         $InitScripts2 = $InitScripts | ConvertFrom-Json
         $Body['init_scripts'] = $InitScripts2
     }
 
     If ($PSBoundParameters.ContainsKey('AutoTerminationMinutes')) {$Body['autotermination_minutes'] = $AutoTerminationMinutes}
-    
-    If ($PSBoundParameters.ContainsKey('SparkEnvVars')) {
-        $SparkEnvVars2 = $SparkEnvVars | ConvertFrom-Json
+
+    If ($PythonVersion -eq 3){
+        $SparkEnvVars += '{"key":"PYSPARK_PYTHON","value":"/databricks/python3/bin/python3"}'
+    }
+
+    If ($SparkEnvVars.Count -gt 0) {
+        If ($SparkEnvVars.Count -eq 1) {
+            $SparkEnvVars += '{"DummyKey":"1"}'
+        }
+        $SparkEnvVars2 =  $SparkEnvVars | ConvertFrom-Json 
         $Body['spark_env_vars'] = $SparkEnvVars2
     }
     Try {
         $BodyText = $Body | ConvertTo-Json -Depth 10
+        $BodyText = Remove-DummyKey($BodyText)
         Write-Verbose $BodyText
         Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/$Mode" -Headers @{Authorization = $InternalBearerToken}
     }

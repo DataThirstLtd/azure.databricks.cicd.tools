@@ -1,11 +1,3 @@
-Function Remove-DatabricksDBFSItem
-{ 
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $false)][string]$Path
-    ) 
 <#
 .SYNOPSIS
 Delete a file or folder within DBFS
@@ -26,6 +18,16 @@ The Databricks DBFS folder to delete
 Author: Simon D'Morias / Data Thirst Ltd 
 
 #>  
+
+Function Remove-DatabricksDBFSItem
+{ 
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory = $true)][string]$BearerToken, 
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$Path
+    ) 
+
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
     $Region = $Region.Replace(" ","")

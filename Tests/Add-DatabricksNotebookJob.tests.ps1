@@ -1,3 +1,7 @@
+param(
+    [bool] $removeCreatedJob = $true
+)
+
 Import-Module "$PSScriptRoot\..\azure.databricks.cicd.tools.psm1" -Force
 $BearerToken = Get-Content "$PSScriptRoot\MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
 
@@ -27,7 +31,6 @@ Describe "Add-DatabricksNotebookJob" {
             -NotebookParametersJson $NotebookParametersJson `
             -Libraries $Libraries
 
-        Write-Host $JobId
         $JobId | Should -BeGreaterThan 0
     }
 
@@ -40,7 +43,8 @@ Describe "Add-DatabricksNotebookJob" {
             -Libraries $Libraries
 
         $JobId | Should -BeGreaterThan 0
+        if($removeCreatedJob) {
+            Remove-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId $JobId
+        }
     }
 }
-
-

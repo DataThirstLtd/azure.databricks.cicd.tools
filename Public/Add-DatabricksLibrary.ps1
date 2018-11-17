@@ -1,12 +1,3 @@
-Function Add-DatabricksLibrary {  
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
-        [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran')][string]$LibraryType,
-        [parameter(Mandatory = $true)][string]$LibrarySettings,
-        [parameter(Mandatory = $true)][string]$ClusterId
-    ) 
 <#
 .SYNOPSIS
 Installs a library to a Databricks cluster.
@@ -17,6 +8,7 @@ happens async. See Get-DatabricksLibraries.
 Also note that libraries installed via the API do not show in UI. Again see Get-DatabricksLibraries. This
 is a known Databricks issue which maybe addressed in the future.
 Note the API does not support the auto install to all clusters option as yet.
+Cluster must not be in a terminated state (PENDING is ok).
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Databricks WebUI)
@@ -25,37 +17,39 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER LibraryType
-Spark version for cluster. Example: 4.0.x-scala2.11
-See Get-DatabricksSparkVersions
+egg, jar, pypi etc
     
 .PARAMETER LibrarySettings
-Type of worker for cluster. Example: Standard_D3_v2
-See Get-DatabricksNodeTypes
+Settings can by path to jar (starting dbfs), pypi name (optionally with repo), or egg
 
 .PARAMETER ClusterId
 The cluster to install the library to. Note that the API does not support auto installing to
 all clusters. See Get-DatabricksClusters. 
 
 .EXAMPLE
-$ClusterId = (Get-DatabricksClusters -BearerToken $BearerToken -Region $Region).cluster_id[0]
-$Settings = 'dbfs:/mnt/libraries/library.jar'
+C:\PS> Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region -LibraryType "jar" -LibrarySettings "dbfs:/mnt/libraries/library.jar" -ClusterId "bob-1234"
 
-Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region `
-    -LibraryType "jar" -LibrarySettings $Settings `
-    -ClusterId $ClusterId
+This example installs a library from a jar which exists in dbfs.
 
-.EXAMPLE
-$ClusterId = (Get-DatabricksClusters -BearerToken $BearerToken -Region $Region).cluster_id[0]
-$Settings = 'simplejson'
+.EXAMPLE 
+C:\PS> Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region -LibraryType "pypi" -LibrarySettings 'simplejson2' -ClusterId 'Bob-1234'
 
-Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region `
-    -LibraryType "pypi" -LibrarySettings $Settings `
-    -ClusterId $ClusterId
+The above example applies a pypi library to a cluster by id
 
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
 
 #>
+Function Add-DatabricksLibrary {  
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory = $true)][string]$BearerToken,    
+        [parameter(Mandatory = $true)][string]$Region,
+        [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran')][string]$LibraryType,
+        [parameter(Mandatory = $true)][string]$LibrarySettings,
+        [parameter(Mandatory = $true)][string]$ClusterId
+    ) 
+
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
     $Region = $Region.Replace(" ","")

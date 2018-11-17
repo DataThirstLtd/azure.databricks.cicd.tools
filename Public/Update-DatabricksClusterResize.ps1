@@ -1,14 +1,3 @@
-Function Update-DatabricksClusterResize
-{ 
-    [cmdletbinding()]
-    param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $true)][string]$ClusterId,
-        [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
-        [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers
-    ) 
-    
 <#
 .SYNOPSIS
 Resize number of workers in a Databricks cluster
@@ -32,6 +21,18 @@ Max number of workers for cluster that will run the job. If the same as $MinNumb
 Author: Simon D'Morias / Data Thirst Ltd
 
 #>
+Function Update-DatabricksClusterResize
+{ 
+    [cmdletbinding()]
+    param (
+        [parameter(Mandatory = $true)][string]$BearerToken, 
+        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $true)][string]$ClusterId,
+        [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
+        [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers
+    ) 
+    
+
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
