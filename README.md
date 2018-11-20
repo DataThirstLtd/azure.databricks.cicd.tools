@@ -17,7 +17,7 @@ You can also use these tools to promote code between environments as part of you
 
 The tools are now being extended to include more management functions, such as creating, starting & stopping your clusters.
 
-Supports Powershell Core 6.1+
+Supports Windows PowerShell 5 and Powershell Core 6.1+
 
 See the [Wiki](https://github.com/DataThirstLtd/azure.databricks.cicd.tools/wiki) for command help.
 

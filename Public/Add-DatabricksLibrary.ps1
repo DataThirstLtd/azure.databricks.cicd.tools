@@ -58,13 +58,13 @@ Function Add-DatabricksLibrary {
 
     $Body = @{"cluster_id"=$ClusterId}
 
-    if (($LibrarySettings -notcontains '{') -and ($LibraryType -eq "pypi")) {
+    if (($LibrarySettings -notmatch '{') -and ($LibraryType -eq "pypi")) {
         #Pypi and only string passed - try as simple name
         Write-Verbose "Converting to pypi JSON request"
         $LibrarySettings = '{package: "' + $LibrarySettings + '"}'
     }
 
-    if ($LibrarySettings -contains '{'){
+    if ($LibrarySettings -match '{'){
         # Settings are JSON else assume String (name of library)
         Write-Verbose "Request is in JSON"
         $Libraries = @()
