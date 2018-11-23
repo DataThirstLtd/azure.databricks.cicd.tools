@@ -85,6 +85,6 @@ Function Add-DatabricksLibrary {
     $BodyText = $Body | ConvertTo-Json -Depth 10
 
     Write-Verbose "Request Body: $BodyText"
-    Write-Output "Installing library $LibraryType with setting $LibrarySettings to REST API: $uri"
+    Write-Verbose "Installing library $LibraryType with setting $LibrarySettings to REST API: $uri"
     Invoke-RestMethod -Uri $uri -Body $BodyText -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
 }
