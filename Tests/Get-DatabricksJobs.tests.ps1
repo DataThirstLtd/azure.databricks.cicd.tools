@@ -27,11 +27,11 @@ Describe "Get-DatabricksJobs" {
     }
     It "Simple Fetch" {
         $global:jobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
-        $global:jobs.job_id | Should -BeGreaterThan 0
+        $global:jobs.job_id[0] | Should -BeGreaterThan 0
     }
 
     AfterAll{
-        Remove-DatabricksJob -Region $Region -BearerToken $BearerToken -JobId $global:jobs.job_id
+        Remove-DatabricksJob -Region $Region -BearerToken $BearerToken -JobId $global:jobs.job_id[0]
     }
 }
 
