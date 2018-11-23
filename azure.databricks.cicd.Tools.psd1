@@ -12,7 +12,7 @@
     RootModule = 'azure.databricks.cicd.Tools.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.1.4'
+    ModuleVersion = '1.1.5'
 
     # ID used to uniquely identify this module
     GUID = 'b277a688-f588-434c-a1dc-a44ff2105279'
@@ -73,7 +73,8 @@
         'Set-DatabricksSecret', 'Get-DatabricksClusters', 'Get-DatabricksNodeTypes', 'Get-DatabricksSparkVersions', 
         'New-DatabricksCluster', 'Remove-DatabricksCluster', 'Start-DatabricksCluster', 'Stop-DatabricksCluster', 
         'Update-DatabricksClusterResize', 'Add-DatabricksDBFSFile', 'Add-DatabricksLibrary', 'Add-DatabricksNotebookJob',
-        'Get-DatabricksDBFSFolder', 'Get-DatabricksJobs', 'Get-DatabricksLibraries'
+        'Get-DatabricksDBFSFolder', 'Get-DatabricksJobs', 'Get-DatabricksLibraries', 'Remove-DatabricksDBFSItem',
+        'Remove-DatabricksJob'
 
     # Variables to export from this module
     VariablesToExport = '*'
