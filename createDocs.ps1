@@ -9,5 +9,5 @@ if ($reset){
     New-MarkdownHelp -Module azure.databricks.cicd.tools -OutputFolder ..\azure.databricks.cicd.tools.wiki -force -WithModulePage
 }
 else {
-    Update-MarkdownHelp ..\md
+    Update-MarkdownHelp ..\azure.databricks.cicd.tools.wiki
 }
