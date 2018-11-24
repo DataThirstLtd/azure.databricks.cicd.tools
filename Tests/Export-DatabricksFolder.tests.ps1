@@ -1,11 +1,11 @@
-Import-Module "$PSScriptRoot\..\azure.databricks.cicd.tools.psm1" -Force
-
-$BearerToken = Get-Content "$PSScriptRoot\MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
+Set-Location $PSScriptRoot
+Import-Module "..\" -Force
+$BearerToken = Get-Content "MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
 $Region = "westeurope"
+
 $ExportPath = "/Shared/UnitTest"
 $LocalOutputPath = "Output"
 
-Set-Location $PSScriptRoot
 
 Describe "Export-DatabricksFolder"{
     BeforeAll {

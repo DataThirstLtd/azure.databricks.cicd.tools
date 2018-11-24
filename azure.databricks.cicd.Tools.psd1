@@ -27,7 +27,7 @@
     Copyright = 'Data Thirst Ltd 2018'
 
     # Description of the functionality provided by this module
-    Description = 'PowerShell module to help with Azure Databricks CI & CD Scenarios. See https://github.com/DataThirstLtd/azure.databricks.cicd.tools & https://datathirst.net'
+    Description = 'PowerShell module to help with Azure Databricks CI & CD Scenarios by simplifying the API or CLI calls into idempotent commands. See https://github.com/DataThirstLtd/azure.databricks.cicd.tools & https://datathirst.net'
 
     # Minimum version of the Windows PowerShell engine required by this module
     PowerShellVersion = '5.0'
@@ -66,15 +66,15 @@
     # NestedModules = @()
 
     # Functions to export from this module
-    FunctionsToExport = '*'
+    FunctionsToExport = 'Add-DatabricksSecretScope', 'Export-DatabricksFolder', 'Import-DatabricksFolder', 
+    'Set-DatabricksSecret', 'Get-DatabricksClusters', 'Get-DatabricksNodeTypes', 'Get-DatabricksSparkVersions', 
+    'New-DatabricksCluster', 'Remove-DatabricksCluster', 'Start-DatabricksCluster', 'Stop-DatabricksCluster', 
+    'Update-DatabricksClusterResize', 'Add-DatabricksDBFSFile', 'Add-DatabricksLibrary', 'Add-DatabricksNotebookJob',
+    'Get-DatabricksDBFSFolder', 'Get-DatabricksJobs', 'Get-DatabricksLibraries', 'Remove-DatabricksDBFSItem',
+    'Remove-DatabricksJob'
 
     # Cmdlets to export from this module
-    CmdletsToExport = 'Add-DatabricksSecretScope', 'Export-DatabricksFolder', 'Import-DatabricksFolder', 
-        'Set-DatabricksSecret', 'Get-DatabricksClusters', 'Get-DatabricksNodeTypes', 'Get-DatabricksSparkVersions', 
-        'New-DatabricksCluster', 'Remove-DatabricksCluster', 'Start-DatabricksCluster', 'Stop-DatabricksCluster', 
-        'Update-DatabricksClusterResize', 'Add-DatabricksDBFSFile', 'Add-DatabricksLibrary', 'Add-DatabricksNotebookJob',
-        'Get-DatabricksDBFSFolder', 'Get-DatabricksJobs', 'Get-DatabricksLibraries', 'Remove-DatabricksDBFSItem',
-        'Remove-DatabricksJob'
+    CmdletsToExport = '*'
 
     # Variables to export from this module
     VariablesToExport = '*'
