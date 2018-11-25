@@ -7,9 +7,19 @@ function Remove-DummyKey ([string]$s) {
 
 function Remove-DummyKeyHelper ([string]$s){
     $key = $s.IndexOf("DummyKey",0)
-    $start = $s.LastIndexOfAny(",",$key)
-    $end = $s.IndexOf("}",$key)
-    $res = $s.Remove($start,$end-$start+1)
+    $startComma = $s.LastIndexOfAny(",",$key)
+    $startBracket = $s.LastIndexOfAny("[",$key)
+    if($startComma -gt $startBracket){
+        # Not the first item in array
+        $end = $s.IndexOf("}",$key)
+        $res = $s.Remove($startComma,$end-$startComma+1)
+    }
+    else {
+        # First in array
+        $end = $s.IndexOf("}",$key)
+        $res = $s.Remove($startBracket+1,$end-$startBracket+2)
+    }
 
     return $res
 }
+
