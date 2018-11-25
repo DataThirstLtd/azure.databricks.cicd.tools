@@ -1,5 +1,6 @@
-$reset=$false
+$reset=$true
 
+Install-Module platyPS -Scope CurrentUser
 Import-Module platyPS
 Set-Location $PSScriptRoot
 
