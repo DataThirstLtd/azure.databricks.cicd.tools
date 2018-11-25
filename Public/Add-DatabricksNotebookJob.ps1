@@ -64,6 +64,23 @@ Optional parameters that will be provided to Notebook when Job is executed. Exam
 .PARAMETER Libraries
 Optional. Array of json strings. Example: '{"pypi":{package:"simplejson"}}', '{"jar", "DBFS:/mylibraries/test.jar"}'
 
+.PARAMETER PythonVersion
+2 or 3 - defaults to 2.
+
+.PARAMETER InitScripts
+Init scripts to run post creation. Example: "dbfs:/script/script1", "dbfs:/script/script2"
+
+.PARAMETER SparkEnvVars
+An object containing a set of optional, user-specified environment variable key-value pairs. Key-value pairs of the form (X,Y) are exported as is (i.e., export X='Y') while launching the driver and workers.
+Example: '@{SPARK_WORKER_MEMORY="29000m";SPARK_LOCAL_DIRS="/local_disk0"}
+
+.PARAMETER Spark_conf
+Hashtable. 
+Example @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
+
+.PARAMETER CustomTags
+Custom Tags to set, provide hash table of tags. Example: @{CreatedBy="SimonDM";NumOfNodes=2;CanDelete=$true}
+
 .EXAMPLE
 PS C:\> Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -NotebookPath "/Shared/Test" -NotebookParametersJson '{"key": "value", "name": "test2"}' -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
 
@@ -92,7 +109,12 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][string]$Timezone,
         [parameter(Mandatory = $true)][string]$NotebookPath,
         [parameter(Mandatory = $false)][string]$NotebookParametersJson,
-        [parameter(Mandatory = $false)][string[]]$Libraries
+        [parameter(Mandatory = $false)][string[]]$Libraries,
+        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2,
+        [parameter(Mandatory = $false)][hashtable]$Spark_conf,
+        [parameter(Mandatory = $false)][hashtable]$CustomTags,
+        [parameter(Mandatory = $false)][string[]]$InitScripts,
+        [parameter(Mandatory = $false)][hashtable]$SparkEnvVars
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -119,18 +141,19 @@ Function Add-DatabricksNotebookJob {
         $JobBody['existing_cluster_id'] = $ClusterId
     }
     else {
-        $ClusterDetails = @{}
-        $ClusterDetails['node_type_id'] = $NodeType
-        $DriverNodeType = if ($PSBoundParameters.ContainsKey('DriverNodeType')) { $DriverNodeType } else { $NodeType }
-        $ClusterDetails['driver_node_type_id'] = $DriverNodeType
-        $ClusterDetails['spark_version'] = $SparkVersion
-        If ($MinNumberOfWorkers -eq $MaxNumberOfWorkers){
-            $ClusterDetails['num_workers'] = $MinNumberOfWorkers
-        }
-        else {
-            $ClusterDetails['autoscale'] = @{"min_workers"=$MinNumberOfWorkers;"max_workers"=$MaxNumberOfWorkers}
-        }
-        $JobBody['new_cluster'] = $ClusterDetails
+        $ClusterArgs = @{}
+        $ClusterArgs['SparkVersion'] = $SparkVersion
+        $ClusterArgs['NodeType'] = $NodeType
+        $ClusterArgs['MinNumberOfWorkers'] = $MinNumberOfWorkers
+        $ClusterArgs['MaxNumberOfWorkers'] = $MaxNumberOfWorkers
+        $ClusterArgs['DriverNodeType'] = $DriverNodeType
+        $ClusterArgs['Spark_conf'] = $Spark_conf
+        $ClusterArgs['CustomTags'] = $CustomTags
+        $ClusterArgs['InitScripts'] = $InitScripts
+        $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
+        $ClusterArgs['PythonVersion'] = $PythonVersion
+
+        $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
     }
 
     If ($PSBoundParameters.ContainsKey('Timeout')) {$JobBody['timeout_seconds'] = $Timeout}
