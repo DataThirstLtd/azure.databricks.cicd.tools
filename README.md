@@ -21,6 +21,8 @@ Supports Windows PowerShell 5 and Powershell Core 6.1+
 
 See the [Wiki](https://github.com/DataThirstLtd/azure.databricks.cicd.tools/wiki) for command help.
 
+Here is some more detail on use cases for these https://datathirst.net/blog/2019/1/18/powershell-for-azure-databricks
+
 ## Install-Module
 
 https://www.powershellgallery.com/packages/azure.databricks.cicd.tools
