@@ -12,7 +12,7 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .EXAMPLE
-PS C:\> Get-DatabricksGroups -BearerToken $BearerToken -Region $Region -GroupName acme
+PS C:\> Get-DatabricksGroups -BearerToken $BearerToken -Region $Region
 
 .NOTES
 Author: Tadeusz Balcer.
