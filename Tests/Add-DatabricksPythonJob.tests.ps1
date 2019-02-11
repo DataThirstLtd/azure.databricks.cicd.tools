@@ -49,6 +49,17 @@ Describe "Add-DatabricksPythonJob" {
         $global:jobid | Should -BeGreaterThan 0
     }
 
+    It "Execute Immediate Run" {
+        $global:res = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Immediate Job" `
+            -Timeout $Timeout -MaxRetries $MaxRetries `
+            -ScheduleCronExpression $ScheduleCronExpression `
+            -Timezone $Timezone -PythonPath $PythonPath `
+            -PythonParameters $PythonParameters -ClusterId $ClusterId `
+            -Libraries $Libraries -Spark_conf $Spark_conf -RunImmediate
+
+        $global:res | Should -BeGreaterThan 0
+    }
+
     AfterAll{
         Remove-DatabricksDBFSItem -BearerToken $BearerToken -Region $Region -Path '/pythonjobtest'
         Remove-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId $global:jobid
