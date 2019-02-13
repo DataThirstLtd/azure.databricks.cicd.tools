@@ -38,14 +38,17 @@ Function Get-DatabricksGroupMembers
     
     Try {
         $Members = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/list-members?group_name=$GroupName" -Headers @{Authorization = $InternalBearerToken}
+        Return $Members.members
     }
     Catch {
-        Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
-        Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
-        Write-Error $_.ErrorDetails.Message
+        if ($_.Exception.Response -eq $null) {
+            Write-Error $_.Exception.Message
+        } else {
+            Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
+            Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
+            Write-Error $_.ErrorDetails.Message   
+        }  
     }
-
-    Return $Members.members
 }
 
 New-Alias -Name Get-GroupMembers -Value Get-DatabricksGroupMembers

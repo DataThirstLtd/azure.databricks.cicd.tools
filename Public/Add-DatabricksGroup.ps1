@@ -43,26 +43,20 @@ Function Add-DatabricksGroup
 
     Try
     {
-        Get-Databricks
-
         $body = '{"group_name": "' + $GroupName + '"  }'
 
-        Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/create" -Headers @{Authorization = $InternalBearerToken} -OutFile $OutFile
-        Write-Output "Group $GroupName created"
+        Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/create" -Headers @{Authorization = $InternalBearerToken}
+        Write-Output "Group $GroupName has been created"
     }
-    Catch
-    {
-        $err = $_.ErrorDetails.Message
-        if ($err.Contains('already exists'))
-        {
-            Write-Verbose $err
-        }
-        else
-        {
-            throw
+    Catch {
+        if ($_.Exception.Response -eq $null) {
+            Write-Error $_.Exception.Message
+        } else {
+            Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
+            Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
+            Write-Error $_.ErrorDetails.Message   
         }
     }
-
 }
 
 # Command was renamed to align prefixes

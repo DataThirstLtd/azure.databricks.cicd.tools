@@ -58,12 +58,14 @@ Function Add-DatabricksMemberToGroup
         Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/add-member" -Headers @{Authorization = $InternalBearerToken} -OutFile $OutFile
         Write-Output "User $UserName added to $Parent group"
     }
-    Catch
-    {   
-        $err = $_.ErrorDetails.Message
-        Write-Verbose $err
-
-        throw
+    Catch {
+        if ($_.Exception.Response -eq $null) {
+            Write-Error $_.Exception.Message
+        } else {
+            Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
+            Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
+            Write-Error $_.ErrorDetails.Message   
+        }  
     }
 }
 
