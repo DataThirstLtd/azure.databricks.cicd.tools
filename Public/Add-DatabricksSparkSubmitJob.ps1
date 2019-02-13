@@ -1,10 +1,12 @@
 <#
 .SYNOPSIS
-Creates Notebook Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create  
+Creates Spark-Submit Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create  
 
 .DESCRIPTION
-Creates Notebook Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create
+Creates Spark-Submit Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create
 If the job name exists it will be updated instead of creating a new job.
+Spark-Submit does not support including libraries on the cluster. Instead, use --jars in the SparkSubmitParameters.
+Spark-Submit does not support using existing clusters.
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
@@ -16,31 +18,23 @@ Azure Region - must match the URL of your Databricks workspace, example: northeu
 Name of the job that will appear in the Job list. If a job with this name exists
 it will be updated.
 
-.PARAMETER ClusterId
-The ClusterId of an existing cluster to use. Optional.
-
 .PARAMETER SparkVersion
 Spark version for cluster that will run the job. Example: 4.0.x-scala2.11
-Note: Ignored if ClusterId is populated.
     
 .PARAMETER NodeType
 Type of worker for cluster that will run the job. Example: Standard_D3_v2.
-Note: Ignored if ClusterId is populated.
 
 .PARAMETER DriverNodeType
 Type of driver for cluster that will run the job. Example: Standard_D3_v2.
 If not provided the NodeType will be used.
-Note: Ignored if ClusterId is populated.
 
 .PARAMETER MinNumberOfWorkers
 Number of workers for cluster that will run the job.
 Note: If Min & Max Workers are the same autoscale is disabled.
-Note: Ignored if ClusterId is populated.
 
 .PARAMETER MaxNumberOfWorkers
 Number of workers for cluster that will run the job.
 Note: If Min & Max Workers are the same autoscale is disabled.
-Note: Ignored if ClusterId is populated.
 
 .PARAMETER Timeout
 Timeout, in seconds, applied to each run of the job. If not set, there will be no timeout. 
@@ -55,14 +49,8 @@ By default, job will run when triggered using Jobs UI or sending API request to 
 Timezone for Cron Schedule Expression. Required if ScheduleCronExpression provided. See here for all possible timezones: http://joda-time.sourceforge.net/timezones.html
 Example: UTC
 
-.PARAMETER NotebookPath
-Path to the Notebook in Databricks that will be executed by this Job. 
-
-.PARAMETER NotebookParameters
-Optional parameters that will be provided to Notebook when Job is executed. Example: {"name":"john doe","age":"35"}
-
-.PARAMETER Libraries
-Optional. Array of json strings. Example: '{"pypi":{package:"simplejson"}}', '{"jar", "DBFS:/mylibraries/test.jar"}'
+.PARAMETER SparkSubmitParameters
+Array for parameters for job, for example "--pyFiles", "dbfs:/myscript.py", "myparam"
 
 .PARAMETER PythonVersion
 2 or 3 - defaults to 2.
@@ -82,34 +70,30 @@ Example @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 Custom Tags to set, provide hash table of tags. Example: @{CreatedBy="SimonDM";NumOfNodes=2;CanDelete=$true}
 
 .EXAMPLE
-PS C:\> Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -NotebookPath "/Shared/Test" -NotebookParametersJson '{"key": "value", "name": "test2"}' -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
+PS C:\> Add-DatabricksSparkSubmitJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -SparkSubmitParameters "--pyFiles", "dbfs:/myscript.py", "myparam" -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
 
 The above example create a job on a new cluster.
     
 .NOTES
-Author: Tadeusz Balcer
-Extended: Simon D'Morias / Data Thirst Ltd
+Author: Simon D'Morias / Data Thirst Ltd
 #>
 
-Function Add-DatabricksNotebookJob {  
+Function Add-DatabricksSparkSubmitJob {  
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true)][string]$BearerToken,    
         [parameter(Mandatory = $true)][string]$Region,
         [parameter(Mandatory = $true)][string]$JobName,
-        [parameter(Mandatory = $false)][string]$ClusterId,
-        [parameter(Mandatory = $false)][string]$SparkVersion,
-        [parameter(Mandatory = $false)][string]$NodeType,
+        [parameter(Mandatory = $true)][string]$SparkVersion,
+        [parameter(Mandatory = $true)][string]$NodeType,
         [parameter(Mandatory = $false)][string]$DriverNodeType,
-        [parameter(Mandatory = $false)][int]$MinNumberOfWorkers,
-        [parameter(Mandatory = $false)][int]$MaxNumberOfWorkers,
+        [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
+        [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers,
         [parameter(Mandatory = $false)][int]$Timeout,
         [parameter(Mandatory = $false)][int]$MaxRetries,
         [parameter(Mandatory = $false)][string]$ScheduleCronExpression,
         [parameter(Mandatory = $false)][string]$Timezone,
-        [parameter(Mandatory = $true)][string]$NotebookPath,
-        [parameter(Mandatory = $false)][string]$NotebookParametersJson,
-        [parameter(Mandatory = $false)][string[]]$Libraries,
+        [parameter(Mandatory = $true)][string[]]$SparkSubmitParameters,
         [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2,
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
@@ -162,20 +146,12 @@ Function Add-DatabricksNotebookJob {
         $JobBody['schedule'] = @{"quartz_cron_expression"=$ScheduleCronExpression;"timezone_id"=$Timezone}
     }
     
-    $Notebook = @{}
-    $Notebook['notebook_path'] = $NotebookPath
-    If ($PSBoundParameters.ContainsKey('NotebookParametersJson')) {
-        $Notebook['base_parameters'] = $NotebookParametersJson | ConvertFrom-Json
+    $Params = @{}
+    If ($SparkSubmitParameters.Count -eq 1) {
+        $SparkSubmitParameters += '{"DummyKey":"1"}'
     }
-
-    $JobBody['notebook_task'] = $Notebook
-
-    If ($PSBoundParameters.ContainsKey('Libraries')) {
-        If ($Libraries.Count -eq 1) {
-            $Libraries += '{"DummyKey":"1"}'
-        }
-        $JobBody['libraries'] = $Libraries | ConvertFrom-Json
-    }
+    $Params['parameters'] = $SparkSubmitParameters
+    $JobBody['spark_submit_task'] = $Params
 
     If ($Mode -eq 'create'){
         $Body = $JobBody

@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Creates Notebook Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create  
+Creates Jar Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create  
 
 .DESCRIPTION
-Creates Notebook Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create
+Creates Jar Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create
 If the job name exists it will be updated instead of creating a new job.
 
 .PARAMETER BearerToken
@@ -55,17 +55,17 @@ By default, job will run when triggered using Jobs UI or sending API request to 
 Timezone for Cron Schedule Expression. Required if ScheduleCronExpression provided. See here for all possible timezones: http://joda-time.sourceforge.net/timezones.html
 Example: UTC
 
-.PARAMETER NotebookPath
-Path to the Notebook in Databricks that will be executed by this Job. 
+.PARAMETER JarPath
+Path to the Jar in Databricks that will be executed by this Job. Path is relative to dbfs:/FileStore/job-jars
 
-.PARAMETER NotebookParameters
-Optional parameters that will be provided to Notebook when Job is executed. Example: {"name":"john doe","age":"35"}
+.PARAMETER JarMainClass
+Class within Jar to execute. Example "org.apache.spark.examples.SparkPi"
+
+.PARAMETER JarParameters
+Optional parameters that will be provided to script when Job is executed. Example: "val1", "val2"
 
 .PARAMETER Libraries
 Optional. Array of json strings. Example: '{"pypi":{package:"simplejson"}}', '{"jar", "DBFS:/mylibraries/test.jar"}'
-
-.PARAMETER PythonVersion
-2 or 3 - defaults to 2.
 
 .PARAMETER InitScripts
 Init scripts to run post creation. Example: "dbfs:/script/script1", "dbfs:/script/script2"
@@ -82,16 +82,15 @@ Example @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 Custom Tags to set, provide hash table of tags. Example: @{CreatedBy="SimonDM";NumOfNodes=2;CanDelete=$true}
 
 .EXAMPLE
-PS C:\> Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -NotebookPath "/Shared/Test" -NotebookParametersJson '{"key": "value", "name": "test2"}' -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
+PS C:\> Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -JarPath "folder/Test.jar" -JarMainClass 'com.test.me' -JarParameters "val1", "val2" -Libraries '{"jar": "DBFS:/mylibraries/test.jar"}'
 
 The above example create a job on a new cluster.
     
 .NOTES
-Author: Tadeusz Balcer
-Extended: Simon D'Morias / Data Thirst Ltd
+Author: Simon D'Morias / Data Thirst Ltd
 #>
 
-Function Add-DatabricksNotebookJob {  
+Function Add-DatabricksJarJob {  
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true)][string]$BearerToken,    
@@ -107,10 +106,10 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][int]$MaxRetries,
         [parameter(Mandatory = $false)][string]$ScheduleCronExpression,
         [parameter(Mandatory = $false)][string]$Timezone,
-        [parameter(Mandatory = $true)][string]$NotebookPath,
-        [parameter(Mandatory = $false)][string]$NotebookParametersJson,
+        [parameter(Mandatory = $true)][string]$JarPath,
+        [parameter(Mandatory = $true)][string]$JarMainClass,
+        [parameter(Mandatory = $false)][string[]]$JarParameters,
         [parameter(Mandatory = $false)][string[]]$Libraries,
-        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2,
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
@@ -151,7 +150,7 @@ Function Add-DatabricksNotebookJob {
         $ClusterArgs['CustomTags'] = $CustomTags
         $ClusterArgs['InitScripts'] = $InitScripts
         $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
-        $ClusterArgs['PythonVersion'] = $PythonVersion
+        $ClusterArgs['PythonVersion'] = 2
 
         $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
     }
@@ -161,16 +160,19 @@ Function Add-DatabricksNotebookJob {
     If ($PSBoundParameters.ContainsKey('ScheduleCronExpression')) {
         $JobBody['schedule'] = @{"quartz_cron_expression"=$ScheduleCronExpression;"timezone_id"=$Timezone}
     }
-    
-    $Notebook = @{}
-    $Notebook['notebook_path'] = $NotebookPath
-    If ($PSBoundParameters.ContainsKey('NotebookParametersJson')) {
-        $Notebook['base_parameters'] = $NotebookParametersJson | ConvertFrom-Json
+
+    $Jar = @{}
+    $Jar['jar_uri'] = $JarPath
+    If (($PSBoundParameters.ContainsKey('JarParameters')) -and ($null -ne $JarParameters)) {
+        If ($JarParameters.Count -eq 1) {
+            $JarParameters += '{"DummyKey":"1"}'
+        }
+        $Jar['parameters'] = $JarParameters
     }
+    $Jar['main_class_name'] = $JarMainClass
+    $JobBody['spark_jar_task'] = $Jar
 
-    $JobBody['notebook_task'] = $Notebook
-
-    If ($PSBoundParameters.ContainsKey('Libraries')) {
+    If (($PSBoundParameters.ContainsKey('Libraries')) -and ($null -ne $Libraries)) {
         If ($Libraries.Count -eq 1) {
             $Libraries += '{"DummyKey":"1"}'
         }

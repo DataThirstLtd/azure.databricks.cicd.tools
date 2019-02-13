@@ -17,9 +17,11 @@ You can also use these tools to promote code between environments as part of you
 
 The tools are now being extended to include more management functions, such as creating, starting & stopping your clusters.
 
-Supports Powershell Core 6.1+
+Supports Windows PowerShell 5 and Powershell Core 6.1+
 
 See the [Wiki](https://github.com/DataThirstLtd/azure.databricks.cicd.tools/wiki) for command help.
+
+Here is some more detail on use cases for these https://datathirst.net/blog/2019/1/18/powershell-for-azure-databricks
 
 ## Install-Module
 
@@ -105,10 +107,11 @@ Deploy a folder of scripts from a local folder (Git repo) to a specific folder i
 ## Jobs
 
 - Add-DatabricksNotebookJob - Schedule a job based on a Notebook.
-- Add-DatabricksNotebookJob - Schedule a job based on a Python script (stored in DBFS).
+- Add-DatabricksPythonJob - Schedule a job based on a Python script (stored in DBFS).
+- Add-DatabricksJarJob - Schedule a job based on a Jar (stored in DBFS).
+- Add-DatabricksSparkSubmitJob - Schedule a job based on a spark-submit command.
 - Remove-DatabricksJob
 
-Note: There is currently no support for Jar jobs or Spark Submit in this module - it may come in the future (please express an interest in Issues if you would like this). Python jobs do not work in Databricks (see the Jobs UI it is missing as an option). Generally in Azure we would recommend using ADF to execute jobs rather using Databricks jobs.
 
 ## Libraries
 
@@ -130,6 +133,8 @@ Deployment tasks exist here: https://marketplace.visualstudio.com/items?itemName
 
 Note that not all commandlets are available as tasks. Instead you may want to import the module and create PowerShell scripts that use these.
 
+## Contribute
+Contributions are welcomed! Please create a pull request with changes/additions.
 
 
 

@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Creates Notebook Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create  
+Creates Python Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create  
 
 .DESCRIPTION
-Creates Notebook Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create
+Creates Python Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create
 If the job name exists it will be updated instead of creating a new job.
 
 .PARAMETER BearerToken
@@ -55,11 +55,11 @@ By default, job will run when triggered using Jobs UI or sending API request to 
 Timezone for Cron Schedule Expression. Required if ScheduleCronExpression provided. See here for all possible timezones: http://joda-time.sourceforge.net/timezones.html
 Example: UTC
 
-.PARAMETER NotebookPath
-Path to the Notebook in Databricks that will be executed by this Job. 
+.PARAMETER PythonPath
+Path to the py script in Databricks that will be executed by this Job. Must be a DBFS location from root, example "dbfs:/folder/file.py".
 
-.PARAMETER NotebookParameters
-Optional parameters that will be provided to Notebook when Job is executed. Example: {"name":"john doe","age":"35"}
+.PARAMETER PythonParameters
+Optional parameters that will be provided to script when Job is executed. Example: "val1", "val2"
 
 .PARAMETER Libraries
 Optional. Array of json strings. Example: '{"pypi":{package:"simplejson"}}', '{"jar", "DBFS:/mylibraries/test.jar"}'
@@ -81,17 +81,21 @@ Example @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 .PARAMETER CustomTags
 Custom Tags to set, provide hash table of tags. Example: @{CreatedBy="SimonDM";NumOfNodes=2;CanDelete=$true}
 
+.PARAMETER RunImmediate
+Switch.
+Performs a Run Now task instead of creating a job. The process is executed immediately in an async process.
+Setting this option returns a RunId.
+
 .EXAMPLE
-PS C:\> Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -NotebookPath "/Shared/Test" -NotebookParametersJson '{"key": "value", "name": "test2"}' -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
+PS C:\> Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -PythonPath "/Shared/TestPython.py" -PythonParameters "val1", "val2" -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
 
 The above example create a job on a new cluster.
     
 .NOTES
-Author: Tadeusz Balcer
-Extended: Simon D'Morias / Data Thirst Ltd
+Author: Simon D'Morias / Data Thirst Ltd
 #>
 
-Function Add-DatabricksNotebookJob {  
+Function Add-DatabricksPythonJob {  
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true)][string]$BearerToken,    
@@ -107,14 +111,15 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][int]$MaxRetries,
         [parameter(Mandatory = $false)][string]$ScheduleCronExpression,
         [parameter(Mandatory = $false)][string]$Timezone,
-        [parameter(Mandatory = $true)][string]$NotebookPath,
-        [parameter(Mandatory = $false)][string]$NotebookParametersJson,
+        [parameter(Mandatory = $true)][string]$PythonPath,
+        [parameter(Mandatory = $false)][string[]]$PythonParameters,
         [parameter(Mandatory = $false)][string[]]$Libraries,
         [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2,
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
-        [parameter(Mandatory = $false)][hashtable]$SparkEnvVars
+        [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
+        [parameter(Mandatory = $false)][switch]$RunImmediate
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -135,7 +140,13 @@ Function Add-DatabricksNotebookJob {
     }
 
     $JobBody = @{}
-    $JobBody['name'] = $JobName
+
+    if ($RunImmediate.IsPresent){
+        $JobBody['run_name'] = $JobName
+    }
+    else{
+        $JobBody['name'] = $JobName
+    }
 
     If ($ClusterId){
         $JobBody['existing_cluster_id'] = $ClusterId
@@ -161,16 +172,19 @@ Function Add-DatabricksNotebookJob {
     If ($PSBoundParameters.ContainsKey('ScheduleCronExpression')) {
         $JobBody['schedule'] = @{"quartz_cron_expression"=$ScheduleCronExpression;"timezone_id"=$Timezone}
     }
-    
-    $Notebook = @{}
-    $Notebook['notebook_path'] = $NotebookPath
-    If ($PSBoundParameters.ContainsKey('NotebookParametersJson')) {
-        $Notebook['base_parameters'] = $NotebookParametersJson | ConvertFrom-Json
+
+    $Python = @{}
+    $Python['python_file'] = $PythonPath
+    If (($PSBoundParameters.ContainsKey('PythonParameters')) -and ($null -ne $PythonParameters)) {
+        If ($PythonParameters.Count -eq 1) {
+            $PythonParameters += '{"DummyKey":"1"}'
+        }
+        $Python['parameters'] = $PythonParameters
     }
 
-    $JobBody['notebook_task'] = $Notebook
+    $JobBody['spark_python_task'] = $Python
 
-    If ($PSBoundParameters.ContainsKey('Libraries')) {
+    If (($PSBoundParameters.ContainsKey('Libraries')) -and ($null -ne $Libraries)) {
         If ($Libraries.Count -eq 1) {
             $Libraries += '{"DummyKey":"1"}'
         }
@@ -192,7 +206,13 @@ Function Add-DatabricksNotebookJob {
     Write-Verbose $BodyText
   
     Try {
-        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/$Mode" -Headers @{Authorization = $InternalBearerToken}
+        if ($RunImmediate.IsPresent){
+            $Url = "jobs/runs/submit"
+        }
+        else{
+            $Url = "jobs/$Mode"
+        }        
+        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/$Url" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
@@ -200,10 +220,17 @@ Function Add-DatabricksNotebookJob {
         Write-Error $_.ErrorDetails.Message
     }
 
-    if ($Mode -eq "create") {
-        Return $JobDetails.job_id
+    if ($RunImmediate.IsPresent){
+        Return $JobDetails.run_id
     }
-    else {
-        Return $JobId
-    }
+    else{
+        if ($Mode -eq "create") {
+            Return $JobDetails.job_id
+        }
+        else {
+            Return $JobId
+        }
+    }   
+
+    
 }

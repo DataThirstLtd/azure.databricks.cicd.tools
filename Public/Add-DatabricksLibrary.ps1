@@ -17,7 +17,7 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER LibraryType
-egg, jar, pypi etc
+egg, jar, pypi, whl, cran, maven
     
 .PARAMETER LibrarySettings
 Settings can by path to jar (starting dbfs), pypi name (optionally with repo), or egg
@@ -45,7 +45,7 @@ Function Add-DatabricksLibrary {
     param (
         [parameter(Mandatory = $true)][string]$BearerToken,    
         [parameter(Mandatory = $true)][string]$Region,
-        [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran')][string]$LibraryType,
+        [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran', 'whl')][string]$LibraryType,
         [parameter(Mandatory = $true)][string]$LibrarySettings,
         [parameter(Mandatory = $true)][string]$ClusterId
     ) 
@@ -58,13 +58,13 @@ Function Add-DatabricksLibrary {
 
     $Body = @{"cluster_id"=$ClusterId}
 
-    if (($LibrarySettings -notcontains '{') -and ($LibraryType -eq "pypi")) {
+    if (($LibrarySettings -notmatch '{') -and ($LibraryType -eq "pypi")) {
         #Pypi and only string passed - try as simple name
         Write-Verbose "Converting to pypi JSON request"
         $LibrarySettings = '{package: "' + $LibrarySettings + '"}'
     }
 
-    if ($LibrarySettings -contains '{'){
+    if ($LibrarySettings -match '{'){
         # Settings are JSON else assume String (name of library)
         Write-Verbose "Request is in JSON"
         $Libraries = @()
@@ -85,6 +85,6 @@ Function Add-DatabricksLibrary {
     $BodyText = $Body | ConvertTo-Json -Depth 10
 
     Write-Verbose "Request Body: $BodyText"
-    Write-Output "Installing library $LibraryType with setting $LibrarySettings to REST API: $uri"
+    Write-Verbose "Installing library $LibraryType with setting $LibrarySettings to REST API: $uri"
     Invoke-RestMethod -Uri $uri -Body $BodyText -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
 }
