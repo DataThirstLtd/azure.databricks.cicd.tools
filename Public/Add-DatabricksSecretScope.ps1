@@ -39,7 +39,7 @@ Function Add-DatabricksSecretScope
     
     $InternalBearerToken = Format-BearerToken($BearerToken)
     $Region = $Region.Replace(" ","")
-    $body = '{"scope": "' + $ScopeName + '"}'
+    $body = '{"scope": "' + $ScopeName + '", "initial_manage_principal": "users"}'
 
     Try
     {
