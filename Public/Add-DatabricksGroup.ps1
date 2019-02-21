@@ -47,17 +47,17 @@ Function Add-DatabricksGroup
 
         Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/create" -Headers @{Authorization = $InternalBearerToken}
         Write-Output "Group $GroupName has been created"
-    }
-    Catch {
-        if ($_.Exception.Response -eq $null) {
-            Write-Error $_.Exception.Message
-        } else {
-            Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
-            Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
-            Write-Error $_.ErrorDetails.Message   
+    } 
+    Catch
+    {
+        $err = $_.ErrorDetails.Message
+        if ($err.Contains('RESOURCE_ALREADY_EXISTS'))
+        {
+            Write-Verbose $err
+        }
+        else
+        {
+            throw
         }
     }
 }
-
-# Command was renamed to align prefixes
-New-Alias -Name Add-Group -Value Add-DatabricksGroup

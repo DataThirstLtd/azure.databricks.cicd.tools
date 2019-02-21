@@ -45,7 +45,7 @@ Function Add-DatabricksMemberToGroup
 
     Try
     {
-        $groups = Get-DatabricksGroups -BearerToken $InternalBearerToken -Region $Region
+        $groups = Get-DatabricksGroups -BearerToken $BearerToken -Region $Region
         If ($groups.Contains($Member)) 
         {
             $body = '{"group_name": "' + $Member + '", "parent_name": "' + $Parent + '"   }'    
@@ -56,7 +56,7 @@ Function Add-DatabricksMemberToGroup
         }
 
         Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/add-member" -Headers @{Authorization = $InternalBearerToken} -OutFile $OutFile
-        Write-Output "User $UserName added to $Parent group"
+        Write-Verbose "User $UserName added to $Parent group"
     }
     Catch {
         if ($_.Exception.Response -eq $null) {
@@ -68,6 +68,3 @@ Function Add-DatabricksMemberToGroup
         }  
     }
 }
-
-# Command was renamed to align prefixes
-New-Alias -Name Add-UserToGroup -Value Add-DatabricksUserToGroup
