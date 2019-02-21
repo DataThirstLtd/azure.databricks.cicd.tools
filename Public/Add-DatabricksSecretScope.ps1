@@ -5,6 +5,7 @@
 
 .DESCRIPTION
     Create a scope to store Databricks secret in. Note the the Set-DatabricksSecret command creates the scope if it does not exist.
+    Note that from version 1.9 all scopes are created with a generic permission to allow all users to access it.
 
 .PARAMETER BearerToken
     Your Databricks Bearer token to authenticate to your workspace (see User Settings in Databricks WebUI)
