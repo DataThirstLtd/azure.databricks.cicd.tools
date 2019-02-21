@@ -6,6 +6,10 @@ $GroupName = "acme"
 
 Describe "Add-DatabricksGroup" {
     It "Simple addition"{
-        Add-DatabricksUserGroup -BearerToken $BearerToken -Region $Region -GroupName $GroupName -Verbose
+        Add-DatabricksGroup -BearerToken $BearerToken -Region $Region -GroupName $GroupName 
+    }
+
+    AfterAll{
+        Remove-DatabricksGroup -BearerToken $BearerToken -Region $Region -GroupName $GroupName -Verbose
     }
 }

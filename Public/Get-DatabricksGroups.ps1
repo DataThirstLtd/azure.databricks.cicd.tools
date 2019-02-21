@@ -48,5 +48,4 @@ Function Get-DatabricksGroups
     Return $Groups.group_names
 }
 
-New-Alias -Name Get-Groups -Value Get-DatabricksGroups
     
