@@ -47,5 +47,4 @@ Function Set-DatabricksSecret
     Write-Output "Secret $SecretName Set"
 }
 
-New-Alias -Name Set-Secret -Value Set-DatabricksSecret
 
