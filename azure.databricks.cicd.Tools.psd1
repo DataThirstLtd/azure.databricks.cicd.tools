@@ -74,7 +74,7 @@
     'Remove-DatabricksJob', 'Add-DatabricksSparkSubmitJob', 'Add-DatabricksPythonJob', 'Add-DatabricksJarJob',
     'Add-DatabricksDBFSFolder', 'Get-DatabricksDBFSFile', 'Get-DatabricksRun', 'Get-DatabricksJobId',
     'Add-DatabricksGroup', 'Add-DatabricksMemberToGroup', 'Get-DatabricksGroupMembers', 'Get-DatabricksGroups',
-    'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster'
+    'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster', 'Connect-Databricks'
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'

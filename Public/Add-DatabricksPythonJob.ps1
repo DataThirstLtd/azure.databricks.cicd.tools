@@ -114,7 +114,7 @@ Function Add-DatabricksPythonJob {
         [parameter(Mandatory = $true)][string]$PythonPath,
         [parameter(Mandatory = $false)][string[]]$PythonParameters,
         [parameter(Mandatory = $false)][string[]]$Libraries,
-        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2,
+        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
@@ -201,6 +201,7 @@ Function Add-DatabricksPythonJob {
     }
 
     $BodyText = $Body | ConvertTo-Json -Depth 10
+    Write-Verbose $BodyText
     $BodyText = Remove-DummyKey $BodyText
 
     Write-Verbose $BodyText

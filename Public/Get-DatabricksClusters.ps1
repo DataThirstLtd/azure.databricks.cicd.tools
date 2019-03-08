@@ -28,17 +28,16 @@ Function Get-DatabricksClusters
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken, 
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $false)][string]$ClusterId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
-    $Region = $Region.Replace(" ","")
-    
+    $Headers = GetHeaders
+    Write-Host "Hi"
     Try {
-        $Clusters = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/list" -Headers @{Authorization = $InternalBearerToken}
+        $Clusters = Invoke-RestMethod -Method Get -Uri "$script:DatabricksURI/api/2.0/clusters/list" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
