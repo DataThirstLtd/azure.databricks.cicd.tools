@@ -43,7 +43,7 @@ Author: Simon D'Morias / Data Thirst Ltd
 Function Add-DatabricksLibrary {  
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
+        [parameter(Mandatory = $false)][string]$BearerToken,    
         [parameter(Mandatory = $true)][string]$Region,
         [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran', 'whl')][string]$LibraryType,
         [parameter(Mandatory = $true)][string]$LibrarySettings,

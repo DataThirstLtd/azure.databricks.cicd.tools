@@ -81,7 +81,7 @@ Author: Simon D'Morias / Data Thirst Ltd
 Function Add-DatabricksSparkSubmitJob {  
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
+        [parameter(Mandatory = $false)][string]$BearerToken,    
         [parameter(Mandatory = $true)][string]$Region,
         [parameter(Mandatory = $true)][string]$JobName,
         [parameter(Mandatory = $true)][string]$SparkVersion,

@@ -40,7 +40,7 @@ Function Add-DatabricksSecretScope
 {
     [cmdletbinding()]
     param (
-        [parameter(Mandatory=$true)][string]$BearerToken,
+        [parameter(Mandatory=$false)][string]$BearerToken,
         [parameter(Mandatory=$true)][string]$Region,
         [parameter(Mandatory=$true)][string]$ScopeName,
         [parameter(Mandatory=$false)][string]$KeyVaultResourceId,

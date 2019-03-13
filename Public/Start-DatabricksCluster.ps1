@@ -25,7 +25,7 @@ Author: Simon D'Morias / Data Thirst Ltd
 Function Start-DatabricksCluster {  
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
+        [parameter(Mandatory = $false)][string]$BearerToken,    
         [parameter(Mandatory = $true)][string]$Region,
         [parameter(Mandatory = $false)][string]$ClusterName,
         [parameter(Mandatory = $false)][string]$ClusterId
