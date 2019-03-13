@@ -12,7 +12,7 @@ function Remove-DummyKeyHelper ([string]$s){
     if($startComma -gt $startBracket){
         # Not the first item in array
         $end = $s.IndexOf("}",$key)
-        $res = $s.Remove($startComma,$end-$startComma+1)
+        $res = $s.Remove($startComma,$end-$startComma+2)
     }
     else {
         # First in array

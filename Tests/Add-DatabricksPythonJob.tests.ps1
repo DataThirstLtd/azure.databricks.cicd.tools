@@ -49,6 +49,47 @@ Describe "Add-DatabricksPythonJob" {
         $global:jobid | Should -BeGreaterThan 0
     }
 
+    It "Job Single Library pypi package" {
+        $Libraries = '{"pypi":{package:"simplejson"}}'
+
+        $global:jobid = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Libary Test1" `
+            -Timeout $Timeout -MaxRetries $MaxRetries `
+            -ScheduleCronExpression $ScheduleCronExpression `
+            -Timezone $Timezone -PythonPath $PythonPath `
+            -PythonParameters $PythonParameters -ClusterId $ClusterId `
+            -Libraries $Libraries -Spark_conf $Spark_conf
+
+        $global:jobid | Should -BeGreaterThan 0
+    }
+
+    It "Job Single Library jar" {
+        $Libraries = '{"jar": "DBFS:/mylibraries/test.jar"}'
+
+        $global:jobid = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Libary Test2" `
+            -Timeout $Timeout -MaxRetries $MaxRetries `
+            -ScheduleCronExpression $ScheduleCronExpression `
+            -Timezone $Timezone -PythonPath $PythonPath `
+            -PythonParameters $PythonParameters -ClusterId $ClusterId `
+            -Libraries $Libraries -Spark_conf $Spark_conf
+
+        $global:jobid | Should -BeGreaterThan 0
+    }
+
+    It "Job Single Library egg dbfs" {
+        $Libraries = '{"egg": "DBFS:/mylibraries/test.egg"}'
+
+        $global:jobid = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Libary Test2" `
+            -Timeout $Timeout -MaxRetries $MaxRetries `
+            -ScheduleCronExpression $ScheduleCronExpression `
+            -Timezone $Timezone -PythonPath $PythonPath `
+            -PythonParameters $PythonParameters -ClusterId $ClusterId `
+            -Libraries $Libraries -Spark_conf $Spark_conf
+
+        $global:jobid | Should -BeGreaterThan 0
+    }
+
+    
+
     It "Execute Immediate Run" {
         $global:res = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Immediate Job" `
             -Timeout $Timeout -MaxRetries $MaxRetries `
