@@ -12,7 +12,7 @@
     RootModule = 'azure.databricks.cicd.Tools.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.1.12'
+    ModuleVersion = '2.0.0'
 
     # ID used to uniquely identify this module
     GUID = 'b277a688-f588-434c-a1dc-a44ff2105279'
@@ -24,7 +24,7 @@
     CompanyName = 'Data Thirst Ltd'
 
     # Copyright statement for this module
-    Copyright = 'Data Thirst Ltd 2018'
+    Copyright = 'Data Thirst Ltd'
 
     # Description of the functionality provided by this module
     Description = 'PowerShell module to help with Azure Databricks CI & CD Scenarios by simplifying the API or CLI calls into idempotent commands. See https://github.com/DataThirstLtd/azure.databricks.cicd.tools & https://datathirst.net'

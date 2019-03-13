@@ -10,14 +10,6 @@ Describe "Get-DatabricksRun" {
     
     BeforeAll{
         $Region = "westeurope"
-$global:Expires = $null
-$global:DatabricksOrgId = $null
-$global:RefeshToken = $null    
-        $JobName = "UnitTestJob-PythonJob"
-        $SparkVersion = "5.3.x-scala2.11"
-        $NodeType = "Standard_D3_v2"
-        $MinNumberOfWorkers = 1
-        $MaxNumberOfWorkers = 1
         $Timeout = 1000
         $MaxRetries = 1
         $ScheduleCronExpression = "0 15 22 ? * *"
@@ -26,7 +18,6 @@ $global:RefeshToken = $null
         $PythonParameters = "val1", "val2"
         $ClusterId = "0926-081131-crick762"
         $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
-        $InitScripts = 'dbfs:/pythonjobtestFile2.py'
         $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 
         $global:RunID = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Immediate Job" `
