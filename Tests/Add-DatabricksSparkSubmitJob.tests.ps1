@@ -13,7 +13,7 @@ $global:RefeshToken = $null
 Describe "Add-DatabricksSparkSubmitJob" {
     $Region = "westeurope"
     $JobName = "UnitTestJob-SparkSubmit"
-    $SparkVersion = "4.1.x-scala2.11"
+    $SparkVersion = "5.3.x-scala2.11"
     $NodeType = "Standard_D3_v2"
     $MinNumberOfWorkers = 1
     $MaxNumberOfWorkers = 4

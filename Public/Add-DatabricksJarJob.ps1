@@ -82,7 +82,7 @@ Example @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 Custom Tags to set, provide hash table of tags. Example: @{CreatedBy="SimonDM";NumOfNodes=2;CanDelete=$true}
 
 .EXAMPLE
-PS C:\> Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -JarPath "folder/Test.jar" -JarMainClass 'com.test.me' -JarParameters "val1", "val2" -Libraries '{"jar": "DBFS:/mylibraries/test.jar"}'
+PS C:\> Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.3.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -JarPath "folder/Test.jar" -JarMainClass 'com.test.me' -JarParameters "val1", "val2" -Libraries '{"jar": "DBFS:/mylibraries/test.jar"}'
 
 The above example create a job on a new cluster.
     

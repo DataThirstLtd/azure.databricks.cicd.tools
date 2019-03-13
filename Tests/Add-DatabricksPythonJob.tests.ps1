@@ -8,7 +8,7 @@ $global:RefeshToken = $null
 Describe "Add-DatabricksPythonJob" {
     $Region = "westeurope" 
     $JobName = "UnitTestJob-PythonJob"
-    $SparkVersion = "4.1.x-scala2.11"
+    $SparkVersion = "5.3.x-scala2.11"
     $NodeType = "Standard_D3_v2"
     $MinNumberOfWorkers = 1
     $MaxNumberOfWorkers = 1
@@ -114,7 +114,7 @@ Describe "Add-DatabricksPythonJob" {
 Describe "Add-DatabricksPythonJob - No bearer" {
     $Region = "westeurope"
     $JobName = "UnitTestJob-PythonJob"
-    $SparkVersion = "4.1.x-scala2.11"
+    $SparkVersion = "5.3.x-scala2.11"
     $NodeType = "Standard_D3_v2"
     $MinNumberOfWorkers = 1
     $MaxNumberOfWorkers = 1
