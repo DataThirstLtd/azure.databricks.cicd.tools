@@ -50,7 +50,7 @@ Function Add-DatabricksSecretScope
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
     $body = @{}
     $body['scope'] = $ScopeName
 

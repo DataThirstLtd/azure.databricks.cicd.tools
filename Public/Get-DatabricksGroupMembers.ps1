@@ -34,7 +34,7 @@ Function Get-DatabricksGroupMembers
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
     $Headers = GetHeaders $PSBoundParameters 
-    $Region = $Region.Replace(" ","")
+    
     
     Try {
         $Members = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/groups/list-members?group_name=$GroupName" -Headers $Headers

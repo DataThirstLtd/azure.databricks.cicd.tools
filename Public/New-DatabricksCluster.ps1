@@ -84,7 +84,7 @@ Function New-DatabricksCluster {
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
     $Mode = "create"
     $Body = @{"cluster_name"=$ClusterName}
     $ClusterArgs = @{}

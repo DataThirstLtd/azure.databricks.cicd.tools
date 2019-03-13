@@ -30,7 +30,7 @@ Function Remove-DatabricksDBFSItem
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters 
-    $Region = $Region.Replace(" ","")
+    
     
     $Body = @{}
     $Body['path'] = $Path

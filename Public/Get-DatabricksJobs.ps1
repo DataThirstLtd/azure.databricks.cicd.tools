@@ -29,7 +29,7 @@ Function Get-DatabricksJobs
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters 
-    $Region = $Region.Replace(" ","")
+    
     
     Try {
         $Jobs = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/jobs/list" -Headers $Headers

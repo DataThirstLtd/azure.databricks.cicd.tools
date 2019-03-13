@@ -118,7 +118,7 @@ Function Add-DatabricksJarJob {
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
 
     $ExistingJobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
 

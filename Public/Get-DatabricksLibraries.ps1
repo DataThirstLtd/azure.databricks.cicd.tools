@@ -33,7 +33,7 @@ Function Get-DatabricksLibraries
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters 
-    $Region = $Region.Replace(" ","")
+    
     
     $Uri = "$global:DatabricksURI/api/2.0/libraries/cluster-status?cluster_id=$ClusterId"
 

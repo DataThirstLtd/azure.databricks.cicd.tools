@@ -37,7 +37,7 @@ Function Set-DatabricksSecret
     )
 
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
 
     Add-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName
 

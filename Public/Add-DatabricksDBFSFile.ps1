@@ -52,7 +52,7 @@ Function Add-DatabricksDBFSFile {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
     $size = 1200000
     $LocalRootFolder = Resolve-Path $LocalRootFolder
     Write-Verbose $LocalRootFolder

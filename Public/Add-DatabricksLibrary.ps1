@@ -52,7 +52,7 @@ Function Add-DatabricksLibrary {
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
 
     $uri ="$global:DatabricksURI/api/2.0/libraries/install"
 

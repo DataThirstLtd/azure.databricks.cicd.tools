@@ -10,6 +10,7 @@
 
         If ($Params.ContainsKey('Region')) {
             $Region = $Params['Region']
+            $Region = $Region.Replace(" ","")
         }
         else {
             $Region = $null

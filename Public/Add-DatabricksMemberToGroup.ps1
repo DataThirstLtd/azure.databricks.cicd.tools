@@ -41,7 +41,7 @@ Function Add-DatabricksMemberToGroup
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
 
     Try
     {

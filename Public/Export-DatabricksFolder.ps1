@@ -43,7 +43,7 @@ Function Export-DatabricksFolder
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
 
     $outJSON = Get-FolderContents $ExportPath $Region $InternalBearerToken
     Get-Notebooks $outJSON $ExportPath $Region $InternalBearerToken $LocalOutputPath

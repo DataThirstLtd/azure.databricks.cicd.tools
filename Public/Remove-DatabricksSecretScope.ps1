@@ -32,7 +32,7 @@ Function Remove-DatabricksSecretScope
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters 
-    $Region = $Region.Replace(" ","")
+    
     
     $Body = @{}
     $Body['scope'] = $ScopeName

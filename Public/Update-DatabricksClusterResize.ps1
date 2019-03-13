@@ -34,7 +34,7 @@ Function Update-DatabricksClusterResize
     
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters 
-    $Region = $Region.Replace(" ","")
+    
     $Body = @{}
 
     $Body['cluster_id'] = $ClusterId

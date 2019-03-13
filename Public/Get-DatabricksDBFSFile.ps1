@@ -35,7 +35,7 @@ param(
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
     $size = 1048576
 
     $body = @{'path' = $DBFSFile}

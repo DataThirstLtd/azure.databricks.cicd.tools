@@ -36,7 +36,7 @@ Function Remove-DatabricksCluster {
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
     
     $body = @{}
     $ClusterIds = @()

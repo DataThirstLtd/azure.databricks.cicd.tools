@@ -37,7 +37,7 @@ Function Import-DatabricksFolder
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-    $Region = $Region.Replace(" ","")
+    
 
     Push-Location
     $Files = Get-ChildItem $LocalPath -Recurse -Attributes !D
