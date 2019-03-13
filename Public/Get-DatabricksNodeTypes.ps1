@@ -32,7 +32,7 @@ Function Get-DatabricksNodeTypes
     $Region = $Region.Replace(" ","")
     
     Try {
-        $Nodes = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/list-node-types" -Headers @{Authorization = $InternalBearerToken}
+        $Nodes = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/clusters/list-node-types" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

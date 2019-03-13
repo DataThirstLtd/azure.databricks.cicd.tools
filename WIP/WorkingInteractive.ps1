@@ -6,10 +6,10 @@ $resourceId = "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d"
 
 $Manual = "https://login.microsoftonline.com/$tenantId/oauth2/authorize?client_id=$clientId&response_type=code&redirect_url=$redirectUrl&response_mode=query&resource=$resourceId&state=123456"
 
-write-output $Manual
+Write-output $Manual
 
-$code = "AQABAAIAAACEfexXxjamQb3OeGQ4GugvhtBfectIzIY965MUSm3trpeejCM6yMFS78YJkAX0g2epQ6RJFpCtfPEMHegfJ3_ZxzC-QY6DKxBNcVPqV63hyu9sPNz6e6tWUBv-4A-kruZwrpsnIHjQG6tlYDdkHmPKO7xe--m7kTUB__nF4BvlhcK9GRFNe_nLfHsIM0iNp6pJWn4C8RymG_6LaqBuOUOS-ssHfz5tWhuocLn38G_wWj_MoJmuoFU1qUjMHU1UEJTZM09jFNNOdJD-Xh85as8vJ5b13RdKviSyUVD5jaKZiy9azMLwwgChpxQxKz2p15N49AaY8doM9rjPQDS34dEMyc68DDHOBISQTBbxlJZWPFj-BCQtdxodz8Kv3q1hRzOzILFgSThWl-GEQYF0AN2-hlmAn_334Hm5EFKEyfJeqgDt_dwmTN0dSSrzSDeeBliUvAI3EC4OZIBGhxXufM999aSj711QyWZ0kK4rE5MPFYM3K7jTrcRWJ4z1ZDe95RRV67mFAID-7YH6EdjUqPQh98iDXksDlwzWhEqYty5L3KTcIYAEAeYJus4S3LW8ZQ7fL0ZOYSjhJ3KQEbrxtdeis8cSmkZyTb3niP_Q-ptoAyAA"
 
+$code = "AQABAAIAAACEfexXxjamQb3OeGQ4GugvQ2B-wK8OsJkx3qN42y0ciMLhTfGbcnpeltmBxPkeUjS9vpnjdUUbCq3gKOheC-HVrM1ddBfTqRFNH95qFmmwydvwS2gzcM18hhWKPNnjar4TnSphuLmcgkwwnWNw3eBoBVTRwUVtZ93n_qMdAHGRu0Dbxg-vCPDM3ys0DJfTob9Zczp2KJYxT99nMe2O5jWtMz_aE-SnBZACvr8da8xMpXYT_rpRzTCCF1loG2KQenzXY4VkvdEW_mu17rszYmMd_COzAehEWk76bv_Ar97Xh4VUFpPug_q8ndwmNtCyB-FtIMcUwJBxfzDGRPgwYoh08Lh-jKSCcUkB4chqCfTSzzwO9DdiYNI4NBSLUGREy5Jggm5mcxmGP6cSLpe05gjkGvyp6E0cNlgBWhObzdyx51oH6cozkaVaij2SmgO9w-HJMQvwyVoFcEdVgx0fJ8mnPM3tGq2R9D27k5Y2fyHiiYHEcbuDS1kxvhrLJVYQ7iKwTN0T89jh4QOMw4xyWAUSHUvbP_t-s4qLJllCOl6WmsTEUUntoHtIbszul-OyjsSAHiu884TGDjjP4NQ60eRf7PDPNiTYu29vyQRNrZmmUyAA"
 
 $BodyText="grant_type=authorization_code&client_id=$clientId&code=$code&redirect_uri=$redirectUrl&resource=$resourceId"
 $URI = "https://login.microsoftonline.com/$tenantId/oauth2/token/"
@@ -27,3 +27,10 @@ $URI = "https://$Region.azuredatabricks.net/api/2.0/clusters/list"
 $Clusters = Invoke-RestMethod -Method Get -Uri $URI -Headers @{Authorization = $token; "X-Databricks-Org-Id" = "2930652350087280"}
 
 $Response 
+
+
+$Res = "http://localhost/?code=AQABAAIAAACEfexXxjamQb3OeGQ4GugvsLppJphrH__3hHd9O7DL6q7VOfD8tAsVpr1-htMfnxP_uhE5YZIUY6WSsMUxI0dJ8aL8R-UqGQPE7rxxcjOZ1d5GHZeWp1043g7hn10KaoAAw7Ccv_wfrfU9tDsHFnTLs3yLx-rUOKMs-crhlSjPwPGneCytA33lViZvEt__LJza5RcpmKyrh8unlgPmN2zP7-YVANjd7OpGoxikMEmWEpRi9n8RJsW5jxYekVcwq_2PyQaJxuZqcaKLzvD52H1d8Kt8KONS9v-1wViunVQr9ddXXV-DUNoLEiIflIypFzfT6MrrYcoHe8PNcvbg7kg3T2FuMD5sUyPovjXzLgDVsNDpBBKHuKhWOwEPeN0I4a8RFEXsvUgkJSCa_qWLJVAwQUT5QLsFBeBuFNAc-C12ujYEp2nKG56WTtX5Rr2S3jQ2uV7BTTJXgSdPk_AfCS8MCAMjb7L4Vt4D-6LvQcmMRlq7mA6gkZJH0wEmbYisl8FU2KTKjaAl7Ggtvz_DEg7-L_Xe6KURGfwNeUxwB8HzK4U_TlgulAq-HVebwkrXwsJRljpSQVirOcgnVmvHw7IJC13fWTJ4xbzJTI5ZlVVxLCAA&state=987654321&session_state=8059940e-763a-49ef-b8b9-80db9e807f09"
+
+$sCode = $Res.Substring($Res.IndexOf("?code=") + 6, ($Res.Length - ($Res.IndexOf("?code=") + 6) ) )
+
+

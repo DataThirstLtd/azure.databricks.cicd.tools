@@ -71,7 +71,7 @@ Function Add-DatabricksSecretScope
 
     Try
     {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/secrets/scopes/create" -Headers @{Authorization = $InternalBearerToken} -OutFile $OutFile
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/secrets/scopes/create" -Headers @{Authorization = $InternalBearerToken} -OutFile $OutFile
         Write-Verbose "Secret Scope $ScopeName created"
     }
     Catch

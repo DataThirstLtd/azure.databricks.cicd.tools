@@ -1,5 +1,5 @@
 function Set-LocalNotebook ($DatabricksFile, $Language, $Region, $InternalBearerToken, $LocalOutputPath){
-    $uri = "https://$Region.azuredatabricks.net/api/2.0/workspace/export?path=" + $DatabricksFile + "&format=SOURCE&direct_download=true"
+    $uri = "$global:DatabricksURI/api/2.0/workspace/export?path=" + $DatabricksFile + "&format=SOURCE&direct_download=true"
     $FileExtentions = @{"PYTHON"=".py"; "SCALA"=".scala"; "SQL"=".sql"; "R"=".r" }
     
     $LocalExportPath = $DatabricksFile.Replace($ExportPath + "/","") + $FileExtentions[$Language]

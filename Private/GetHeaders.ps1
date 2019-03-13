@@ -1,14 +1,29 @@
 
-    function GetHeaders(){
-        if (!($script:Expires) -or ((Get-Date) -gt $script:Expires)){
-            Throw "Not connected - run command Connect-Databricks"
+    function GetHeaders($Params){
+
+        If ($Params.ContainsKey('Bearer')) {
+            $BearerToken = $Params['Bearer']
+        }
+        else {
+            $BearerToken = $null
+        }
+
+        If ($Params.ContainsKey('Region')) {
+            $Region = $Params['Region']
+        }
+        else {
+            $Region = $null
+        }
+
+        if (!($global:Expires) -or ((Get-Date) -gt $global:Expires)){
+            Connect-Databricks -BearerToken $BearerToken -Region $Region | Out-Null
         }
 
         $Headers = @{}
-        $Headers['Authorization'] = $script:DatabricksBearerToken
+        $Headers['Authorization'] = $global:DatabricksBearerToken
 
-        if (!($script:DatabricksOrgId)){
-            $Headers['X-Databricks-Org-Id'] = $script:DatabricksOrgId
+        if ($global:DatabricksOrgId){
+            $Headers['X-Databricks-Org-Id'] = $global:DatabricksOrgId
         }
 
         return $Headers

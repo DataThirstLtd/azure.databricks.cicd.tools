@@ -28,16 +28,22 @@ Function Get-DatabricksClusters
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $false)][string]$BearerToken, 
-        [parameter(Mandatory = $false)][string]$Region,
-        [parameter(Mandatory = $false)][string]$ClusterId
+        [parameter(Mandatory = $true, ParameterSetName='Bearer')]
+        [string]$BearerToken, 
+
+        [parameter(Mandatory = $true, ParameterSetName='Bearer')]
+        [parameter(Mandatory = $false, ParameterSetName='AAD')]
+        [string]$Region,
+        
+        [parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [string]$ClusterId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $Headers = GetHeaders
-    Write-Host "Hi"
+    $Headers = GetHeaders $PSBoundParameters
+
     Try {
-        $Clusters = Invoke-RestMethod -Method Get -Uri "$script:DatabricksURI/api/2.0/clusters/list" -Headers $Headers
+        $Clusters = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/clusters/list" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

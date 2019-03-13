@@ -11,7 +11,7 @@ Function Add-DatabricksFolder {
 
     Try
     {
-        Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/workspace/mkdirs" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $body -Uri "$global:DatabricksURI/api/2.0/workspace/mkdirs" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch
     {

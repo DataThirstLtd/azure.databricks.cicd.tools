@@ -35,7 +35,7 @@ Function Add-DatabricksDBFSFolder {
     $InternalBearerToken = Format-BearerToken($BearerToken)
     $Region = $Region.Replace(" ","")
 
-    $uri ="https://$Region.azuredatabricks.net/api/2.0/dbfs/mkdirs"
+    $uri ="$global:DatabricksURI/api/2.0/dbfs/mkdirs"
 
     $Body = @{"path"= $FolderPath}
 

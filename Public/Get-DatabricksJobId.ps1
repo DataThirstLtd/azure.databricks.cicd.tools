@@ -37,7 +37,7 @@ Function Get-DatabricksJobId
     $Region = $Region.Replace(" ","")
     
     Try {
-        $Jobs = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/list" -Headers @{Authorization = $InternalBearerToken}
+        $Jobs = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/jobs/list" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

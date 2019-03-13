@@ -41,7 +41,7 @@ Function Get-DatabricksRun
     $Region = $Region.Replace(" ","")
     
     Try {
-        $Run = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/runs/get?run_id=$RunId" -Headers @{Authorization = $InternalBearerToken}
+        $Run = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/jobs/runs/get?run_id=$RunId" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

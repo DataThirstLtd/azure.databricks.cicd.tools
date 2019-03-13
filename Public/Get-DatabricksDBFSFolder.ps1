@@ -35,7 +35,7 @@ Function Get-DatabricksDBFSFolder
     $Region = $Region.Replace(" ","")
     
     Try {
-        $Files = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/list?path=$Path" -Headers @{Authorization = $InternalBearerToken}
+        $Files = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/dbfs/list?path=$Path" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

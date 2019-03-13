@@ -51,7 +51,7 @@ Function Update-DatabricksClusterResize
     Try {
         $BodyText = $Body | ConvertTo-Json -Depth 10
         Write-Verbose $BodyText
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/resize" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/resize" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

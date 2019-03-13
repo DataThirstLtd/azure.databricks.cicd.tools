@@ -43,7 +43,7 @@ Function Set-DatabricksSecret
 
     $body = '{ "scope": "' + $ScopeName + '", "key": "' + $SecretName + '", "string_value": "' + $SecretValue + '"}'
 
-    Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/secrets/put" -Headers @{Authorization = $InternalBearerToken}
+    Invoke-RestMethod -Method Post -Body $body -Uri "$global:DatabricksURI/api/2.0/secrets/put" -Headers @{Authorization = $InternalBearerToken}
     Write-Output "Secret $SecretName Set"
 }
 

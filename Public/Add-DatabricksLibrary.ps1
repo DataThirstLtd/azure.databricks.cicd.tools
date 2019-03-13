@@ -54,7 +54,7 @@ Function Add-DatabricksLibrary {
     $InternalBearerToken = Format-BearerToken($BearerToken)
     $Region = $Region.Replace(" ","")
 
-    $uri ="https://$Region.azuredatabricks.net/api/2.0/libraries/install"
+    $uri ="$global:DatabricksURI/api/2.0/libraries/install"
 
     $Body = @{"cluster_id"=$ClusterId}
 

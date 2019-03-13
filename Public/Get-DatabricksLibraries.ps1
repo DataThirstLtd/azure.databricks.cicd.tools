@@ -35,7 +35,7 @@ Function Get-DatabricksLibraries
     $InternalBearerToken =  Format-BearerToken($BearerToken) 
     $Region = $Region.Replace(" ","")
     
-    $Uri = "https://$Region.azuredatabricks.net/api/2.0/libraries/cluster-status?cluster_id=$ClusterId"
+    $Uri = "$global:DatabricksURI/api/2.0/libraries/cluster-status?cluster_id=$ClusterId"
 
     Try {
         $Libraries = Invoke-RestMethod -Method Get -Uri $Uri -Headers @{Authorization = $InternalBearerToken}

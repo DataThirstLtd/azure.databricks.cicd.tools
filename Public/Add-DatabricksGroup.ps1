@@ -45,7 +45,7 @@ Function Add-DatabricksGroup
     {
         $body = '{"group_name": "' + $GroupName + '"  }'
 
-        Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/create" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $body -Uri "$global:DatabricksURI/api/2.0/groups/create" -Headers @{Authorization = $InternalBearerToken}
         Write-Output "Group $GroupName has been created"
     } 
     Catch

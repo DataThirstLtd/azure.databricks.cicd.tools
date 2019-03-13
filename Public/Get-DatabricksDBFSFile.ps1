@@ -49,7 +49,7 @@ param(
         $body['offset'] = $chunkStart
         $body['length'] = $size
         $BodyText = $Body | ConvertTo-Json -Depth 10
-        $chunk = Invoke-RestMethod -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/read" -Body $BodyText -Method 'GET' -Headers @{Authorization = $InternalBearerToken}
+        $chunk = Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/read" -Body $BodyText -Method 'GET' -Headers @{Authorization = $InternalBearerToken}
 
         $finalFile += [Convert]::FromBase64String($chunk.data)
 

@@ -40,7 +40,7 @@ Function Remove-DatabricksGroup
     $BodyText = $Body | ConvertTo-Json -Depth 10
     
     Try {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/delete" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/groups/delete" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         $err = $_.ErrorDetails.Message

@@ -33,7 +33,7 @@ Function Get-DatabricksGroups
     $Region = $Region.Replace(" ","")
     
     Try {
-        $Groups = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/list" -Headers @{Authorization = $InternalBearerToken}
+        $Groups = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/groups/list" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         if ($_.Exception.Response -eq $null) {
