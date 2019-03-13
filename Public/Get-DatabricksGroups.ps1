@@ -24,7 +24,7 @@ Function Get-DatabricksGroups
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $false)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region
+        [parameter(Mandatory = $false)][string]$Region
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12

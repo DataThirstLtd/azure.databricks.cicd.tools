@@ -28,7 +28,7 @@ Function Get-DatabricksDBFSFile
 {
 param(
     [parameter(Mandatory = $false)][string]$BearerToken,
-    [parameter(Mandatory = $true)][string]$Region,
+    [parameter(Mandatory = $false)][string]$Region,
     [parameter(Mandatory = $true)][string]$DBFSFile,
     [parameter(Mandatory = $true)][string]$TargetFile
 )

@@ -24,7 +24,7 @@ Function Remove-DatabricksDBFSItem
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $false)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $false)][string]$Path
     ) 
 

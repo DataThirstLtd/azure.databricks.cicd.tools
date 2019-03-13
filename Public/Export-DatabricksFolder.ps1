@@ -30,7 +30,7 @@ Function Export-DatabricksFolder
     [cmdletbinding()]
     param (
         [parameter(Mandatory=$false)][string]$BearerToken,
-        [parameter(Mandatory=$true)][string]$Region,
+        [parameter(Mandatory=$false)][string]$Region,
         [parameter(Mandatory=$true)][string]$ExportPath,
         [parameter(Mandatory=$false)][string]$LocalOutputPath
     )

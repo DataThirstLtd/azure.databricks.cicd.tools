@@ -31,7 +31,7 @@ Function Get-DatabricksClusters
         [parameter(Mandatory = $true, ParameterSetName='Bearer')]
         [string]$BearerToken, 
 
-        [parameter(Mandatory = $true, ParameterSetName='Bearer')]
+        [parameter(Mandatory = $false, ParameterSetName='Bearer')]
         [parameter(Mandatory = $false, ParameterSetName='AAD')]
         [string]$Region,
         

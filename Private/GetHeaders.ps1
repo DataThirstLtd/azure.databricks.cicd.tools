@@ -2,8 +2,8 @@
     function GetHeaders($Params){
 
         If ($null -ne $Params){
-            If ($Params.ContainsKey('Bearer')) {
-                $BearerToken = $Params['Bearer']
+            If ($Params.ContainsKey('BearerToken')) {
+                $BearerToken = $Params['BearerToken']
             }
             else {
                 $BearerToken = $null

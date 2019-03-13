@@ -29,7 +29,7 @@ Function Remove-DatabricksCluster {
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $false)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $false)][string]$ClusterName,
         [parameter(Mandatory = $false)][string]$ClusterId
         )

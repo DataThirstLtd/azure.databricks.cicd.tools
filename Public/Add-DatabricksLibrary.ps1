@@ -44,7 +44,7 @@ Function Add-DatabricksLibrary {
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $false)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$Region,
         [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran', 'whl')][string]$LibraryType,
         [parameter(Mandatory = $true)][string]$LibrarySettings,
         [parameter(Mandatory = $true)][string]$ClusterId

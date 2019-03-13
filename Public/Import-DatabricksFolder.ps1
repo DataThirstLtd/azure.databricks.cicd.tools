@@ -30,7 +30,7 @@ Function Import-DatabricksFolder
     [cmdletbinding()]
     param (
         [parameter(Mandatory=$false)][string]$BearerToken,
-        [parameter(Mandatory=$true)][string]$Region,
+        [parameter(Mandatory=$false)][string]$Region,
         [parameter(Mandatory=$true)][string]$LocalPath,
         [parameter(Mandatory=$true)][string]$DatabricksPath
     )

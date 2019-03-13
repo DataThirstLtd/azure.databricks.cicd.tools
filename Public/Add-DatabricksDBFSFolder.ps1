@@ -28,7 +28,7 @@ Function Add-DatabricksDBFSFolder {
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $false)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$Region,
         [Parameter(Mandatory = $true)][string]$FolderPath
     )
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
