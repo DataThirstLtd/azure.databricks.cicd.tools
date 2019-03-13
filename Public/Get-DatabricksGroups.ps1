@@ -29,11 +29,11 @@ Function Get-DatabricksGroups
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
+    $Headers = GetHeaders $PSBoundParameters 
     $Region = $Region.Replace(" ","")
     
     Try {
-        $Groups = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/groups/list" -Headers @{Authorization = $InternalBearerToken}
+        $Groups = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/groups/list" -Headers $Headers
     }
     Catch {
         if ($_.Exception.Response -eq $null) {

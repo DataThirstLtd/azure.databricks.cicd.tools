@@ -33,11 +33,11 @@ Function Get-DatabricksGroupMembers
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
+    $Headers = GetHeaders $PSBoundParameters 
     $Region = $Region.Replace(" ","")
     
     Try {
-        $Members = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/groups/list-members?group_name=$GroupName" -Headers @{Authorization = $InternalBearerToken}
+        $Members = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/groups/list-members?group_name=$GroupName" -Headers $Headers
         Return $Members.members
     }
     Catch {

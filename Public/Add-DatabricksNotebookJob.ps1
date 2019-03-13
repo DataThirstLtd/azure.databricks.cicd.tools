@@ -118,7 +118,7 @@ Function Add-DatabricksNotebookJob {
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Headers = GetHeaders $PSBoundParameters
     $Region = $Region.Replace(" ","")
 
     $ExistingJobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
@@ -192,7 +192,7 @@ Function Add-DatabricksNotebookJob {
     Write-Verbose $BodyText
   
     Try {
-        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/jobs/$Mode" -Headers @{Authorization = $InternalBearerToken}
+        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/jobs/$Mode" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

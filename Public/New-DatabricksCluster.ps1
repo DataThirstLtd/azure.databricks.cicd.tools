@@ -83,7 +83,7 @@ Function New-DatabricksCluster {
         [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Headers = GetHeaders $PSBoundParameters
     $Region = $Region.Replace(" ","")
     $Mode = "create"
     $Body = @{"cluster_name"=$ClusterName}
@@ -123,7 +123,7 @@ Function New-DatabricksCluster {
     $BodyText = Remove-DummyKey $BodyText
     Write-Verbose $BodyText
     Try {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/$Mode" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/$Mode" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

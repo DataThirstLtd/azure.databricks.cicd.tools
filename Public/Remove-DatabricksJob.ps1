@@ -31,7 +31,7 @@ Function Remove-DatabricksJob
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
+    $Headers = GetHeaders $PSBoundParameters 
     $Region = $Region.Replace(" ","")
     
     $Body = @{}
@@ -40,7 +40,7 @@ Function Remove-DatabricksJob
     $BodyText = $Body | ConvertTo-Json -Depth 10
     
     Try {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/jobs/delete" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/jobs/delete" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

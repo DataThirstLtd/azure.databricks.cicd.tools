@@ -36,7 +36,7 @@ Function Import-DatabricksFolder
     )
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Headers = GetHeaders $PSBoundParameters
     $Region = $Region.Replace(" ","")
 
     Push-Location
@@ -85,7 +85,7 @@ Function Import-DatabricksFolder
         }
         else{
             Write-Verbose "Pushing file $FileToPush to $TargetPath"
-            Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/import" -Body $Body -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
+            Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/import" -Body $Body -Method 'POST' -Headers $Headers
         }
     }
 

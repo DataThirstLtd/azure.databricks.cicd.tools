@@ -32,13 +32,13 @@ Function Get-DatabricksLibraries
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
+    $Headers = GetHeaders $PSBoundParameters 
     $Region = $Region.Replace(" ","")
     
     $Uri = "$global:DatabricksURI/api/2.0/libraries/cluster-status?cluster_id=$ClusterId"
 
     Try {
-        $Libraries = Invoke-RestMethod -Method Get -Uri $Uri -Headers @{Authorization = $InternalBearerToken}
+        $Libraries = Invoke-RestMethod -Method Get -Uri $Uri -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

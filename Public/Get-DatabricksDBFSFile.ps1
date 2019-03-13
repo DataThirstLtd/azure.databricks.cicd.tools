@@ -34,7 +34,7 @@ param(
 )
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Headers = GetHeaders $PSBoundParameters
     $Region = $Region.Replace(" ","")
     $size = 1048576
 
@@ -49,7 +49,7 @@ param(
         $body['offset'] = $chunkStart
         $body['length'] = $size
         $BodyText = $Body | ConvertTo-Json -Depth 10
-        $chunk = Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/read" -Body $BodyText -Method 'GET' -Headers @{Authorization = $InternalBearerToken}
+        $chunk = Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/read" -Body $BodyText -Method 'GET' -Headers $Headers
 
         $finalFile += [Convert]::FromBase64String($chunk.data)
 

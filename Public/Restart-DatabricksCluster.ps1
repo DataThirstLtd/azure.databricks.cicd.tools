@@ -33,7 +33,7 @@ Function Restart-DatabricksCluster {
         )
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Headers = GetHeaders $PSBoundParameters
     $Region = $Region.Replace(" ","")
     
     $body = @{}
@@ -60,7 +60,7 @@ Function Restart-DatabricksCluster {
         $Body['cluster_id'] = $ClusterId
         Try {
             $BodyText = $Body | ConvertTo-Json -Depth 10
-            Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/restart" -Headers @{Authorization = $InternalBearerToken}
+            Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/restart" -Headers $Headers
         }
         Catch {
             Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

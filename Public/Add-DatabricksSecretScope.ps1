@@ -49,7 +49,7 @@ Function Add-DatabricksSecretScope
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     
-    $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Headers = GetHeaders $PSBoundParameters
     $Region = $Region.Replace(" ","")
     $body = @{}
     $body['scope'] = $ScopeName
@@ -71,7 +71,7 @@ Function Add-DatabricksSecretScope
 
     Try
     {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/secrets/scopes/create" -Headers @{Authorization = $InternalBearerToken} -OutFile $OutFile
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/secrets/scopes/create" -Headers $Headers -OutFile $OutFile
         Write-Verbose "Secret Scope $ScopeName created"
     }
     Catch

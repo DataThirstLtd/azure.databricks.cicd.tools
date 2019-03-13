@@ -40,7 +40,7 @@ Function Add-DatabricksMemberToGroup
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-    $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Headers = GetHeaders $PSBoundParameters
     $Region = $Region.Replace(" ","")
 
     Try
@@ -55,7 +55,7 @@ Function Add-DatabricksMemberToGroup
             $body = '{"user_name": "' + $Member + '", "parent_name": "' + $Parent + '"   }'
         }
 
-        Invoke-RestMethod -Method Post -Body $body -Uri "$global:DatabricksURI/api/2.0/groups/add-member" -Headers @{Authorization = $InternalBearerToken} -OutFile $OutFile
+        Invoke-RestMethod -Method Post -Body $body -Uri "$global:DatabricksURI/api/2.0/groups/add-member" -Headers $Headers -OutFile $OutFile
         Write-Verbose "User $UserName added to $Parent group"
     }
     Catch {

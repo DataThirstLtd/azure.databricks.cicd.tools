@@ -32,7 +32,7 @@ Function Add-DatabricksDBFSFolder {
         [Parameter(Mandatory = $true)][string]$FolderPath
     )
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Headers = GetHeaders $PSBoundParameters
     $Region = $Region.Replace(" ","")
 
     $uri ="$global:DatabricksURI/api/2.0/dbfs/mkdirs"
@@ -42,5 +42,5 @@ Function Add-DatabricksDBFSFolder {
     $BodyText = $Body | ConvertTo-Json -Depth 10
 
     Write-Verbose "Request Body: $BodyText"
-    Invoke-RestMethod -Uri $uri -Body $BodyText -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
+    Invoke-RestMethod -Uri $uri -Body $BodyText -Method 'POST' -Headers $Headers
 }

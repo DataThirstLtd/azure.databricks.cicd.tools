@@ -3,7 +3,7 @@ function Get-FolderContents ($Path, $Region, $InternalBearerToken){
     {
         $uri = "https://$Region.azuredatabricks.net/api/2.0/workspace/list?path=$Path"
         Write-verbose "Requesting URI $uri"
-        $Response = Invoke-RestMethod -Method Get -Uri $uri -Headers @{Authorization = $InternalBearerToken} 
+        $Response = Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers 
     }
     Catch
     {

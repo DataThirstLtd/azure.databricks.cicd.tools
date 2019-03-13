@@ -28,11 +28,11 @@ Function Get-DatabricksJobs
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
+    $Headers = GetHeaders $PSBoundParameters 
     $Region = $Region.Replace(" ","")
     
     Try {
-        $Jobs = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/jobs/list" -Headers @{Authorization = $InternalBearerToken}
+        $Jobs = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/jobs/list" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

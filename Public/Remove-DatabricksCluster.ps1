@@ -35,7 +35,7 @@ Function Remove-DatabricksCluster {
         )
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Headers = GetHeaders $PSBoundParameters
     $Region = $Region.Replace(" ","")
     
     $body = @{}
@@ -62,7 +62,7 @@ Function Remove-DatabricksCluster {
         $Body['cluster_id'] = $ClusterId
         Try {
             $BodyText = $Body | ConvertTo-Json -Depth 10
-            Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/permanent-delete" -Headers @{Authorization = $InternalBearerToken}
+            Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/permanent-delete" -Headers $Headers
         }
         Catch {
             Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
