@@ -37,7 +37,6 @@ Function Import-DatabricksFolder
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-    
 
     Push-Location
     $Files = Get-ChildItem $LocalPath -Recurse -Attributes !D
@@ -60,7 +59,7 @@ Function Import-DatabricksFolder
         $Path = $Path.Replace("/./","/")
 
         # Create folder in Databricks
-        Add-DatabricksFolder -Bearer $BearerToken -Region $Region -Path $Path
+        Add-DatabricksFolder -Path $Path
         Write-Verbose "Path: $Path"
 
         $BinaryContents = [System.IO.File]::ReadAllBytes($FileToPush.FullName)

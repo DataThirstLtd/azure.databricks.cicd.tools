@@ -1,8 +1,6 @@
 Function Add-DatabricksFolder {    
     [cmdletbinding()]
     param (
-        [parameter(Mandatory=$true)][string]$BearerToken,    
-        [parameter(Mandatory=$true)][string]$Region,
         [parameter(Mandatory=$true)][string]$Path
     ) 
 

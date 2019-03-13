@@ -45,7 +45,7 @@ Function Export-DatabricksFolder
     $Headers = GetHeaders $PSBoundParameters
     
 
-    $outJSON = Get-FolderContents $ExportPath $Region $InternalBearerToken
-    Get-Notebooks $outJSON $ExportPath $Region $InternalBearerToken $LocalOutputPath
+    $outJSON = Get-FolderContents $ExportPath
+    Get-Notebooks $outJSON $ExportPath $LocalOutputPath
 
 }

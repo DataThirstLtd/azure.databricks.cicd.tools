@@ -86,12 +86,12 @@ Function Add-DatabricksDBFSFile {
             While ($i -le ($EncodedContents.length-$size))
             {
                 $part = $EncodedContents.Substring($i,$size)
-                Add-DatabricksChunk -part $part -InternalBearerToken $InternalBearerToken -Region $Region -handle $handle.handle
+                Add-DatabricksChunk -part $part -handle $handle.handle
                 $i += $size
                 Write-Verbose "Uploaded $i bytes"
             }
             $part = $EncodedContents.Substring($i)
-            Add-DatabricksChunk -part $part -InternalBearerToken $InternalBearerToken -Region $Region -handle $handle.handle   
+            Add-DatabricksChunk -part $part -handle $handle.handle   
 
             $Body = @{"handle"= $handle.handle}
             $BodyText = $Body | ConvertTo-Json -Depth 10
