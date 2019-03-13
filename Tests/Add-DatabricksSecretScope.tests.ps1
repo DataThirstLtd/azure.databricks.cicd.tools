@@ -2,6 +2,9 @@ Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $BearerToken = Get-Content "MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
 $Region = "westeurope"
+$global:Expires = $null
+$global:DatabricksOrgId = $null
+$global:RefeshToken = $null
 $ResID = "/subscriptions/b146ae31-d42f-4c88-889b-318f2cc23f98/resourceGroups/dataThirstDBTools-RG/providers/Microsoft.KeyVault/vaults/dataThirstcicdtoolkv"
 
 Describe "Add-DatabricksSecretScope" {

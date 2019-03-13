@@ -2,9 +2,16 @@ Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $BearerToken = Get-Content "MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
 $Region = "westeurope"
+$global:Expires = $null
+$global:DatabricksOrgId = $null
+$global:RefeshToken = $null
+
+
+
+
 
 Describe "Add-DatabricksSparkSubmitJob" {
-    $Region = "westeurope"    
+    $Region = "westeurope"
     $JobName = "UnitTestJob-SparkSubmit"
     $SparkVersion = "4.1.x-scala2.11"
     $NodeType = "Standard_D3_v2"
@@ -23,8 +30,7 @@ Describe "Add-DatabricksSparkSubmitJob" {
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone `
-            -SparkSubmitParameters $SparkSubmitParameters `
-            -Verbose
+            -SparkSubmitParameters $SparkSubmitParameters 
 
         $global:jobId | Should -BeGreaterThan 0
     }
@@ -37,8 +43,7 @@ Describe "Add-DatabricksSparkSubmitJob" {
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone `
-            -SparkSubmitParameters $SparkSubmitParameters `
-            -Verbose
+            -SparkSubmitParameters $SparkSubmitParameters 
 
         $global:jobId | Should -BeGreaterThan 0
     }

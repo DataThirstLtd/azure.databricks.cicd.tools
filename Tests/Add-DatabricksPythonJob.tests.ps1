@@ -2,8 +2,11 @@ Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $BearerToken = Get-Content "MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
 $Region = "westeurope"
+$global:Expires = $null
+$global:DatabricksOrgId = $null
+$global:RefeshToken = $null
 Describe "Add-DatabricksPythonJob" {
-    $Region = "westeurope"    
+    $Region = "westeurope" 
     $JobName = "UnitTestJob-PythonJob"
     $SparkVersion = "4.1.x-scala2.11"
     $NodeType = "Standard_D3_v2"
@@ -32,7 +35,7 @@ Describe "Add-DatabricksPythonJob" {
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
             -PythonParameters $PythonParameters `
-            -Libraries $Libraries -PythonVersion 3 -InitScripts $InitScripts -Verbose
+            -Libraries $Libraries -PythonVersion 3 -InitScripts $InitScripts
 
         $global:jobid | Should -BeGreaterThan 0
     }
@@ -109,7 +112,7 @@ Describe "Add-DatabricksPythonJob" {
 
 
 Describe "Add-DatabricksPythonJob - No bearer" {
-    $Region = "westeurope"    
+    $Region = "westeurope"
     $JobName = "UnitTestJob-PythonJob"
     $SparkVersion = "4.1.x-scala2.11"
     $NodeType = "Standard_D3_v2"
@@ -139,7 +142,7 @@ Describe "Add-DatabricksPythonJob - No bearer" {
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
             -PythonParameters $PythonParameters `
-            -Libraries $Libraries -PythonVersion 3 -InitScripts $InitScripts -Verbose
+            -Libraries $Libraries -PythonVersion 3 -InitScripts $InitScripts
 
         $global:jobid | Should -BeGreaterThan 0
     }
