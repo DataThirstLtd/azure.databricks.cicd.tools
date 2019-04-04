@@ -17,6 +17,9 @@ The Databricks folder to export, for example /Shared or /Users/simon@datathirst.
 .PARAMETER LocalOutputPath
 Path to your repo/local you would like to export the scripts to
 
+.PARAMETER Format
+Defaults to SOURCE. Options DBC, HTML, JUPYTER
+
 .EXAMPLE
 PS C:\> Export-DatabricksFolder -ExportPath $ExportPath -BearerToken $BearerToken -Region $Region -LocalOutputPath $LocalOutputPath -Verbose
 
@@ -33,10 +36,10 @@ Function Export-DatabricksFolder
         [parameter(Mandatory=$true)][string]$Region,
         [parameter(Mandatory=$true)][string]$ExportPath,
         [parameter(Mandatory=$false)][string]$LocalOutputPath,
-        [parameter(Mandatory=$false)][string]$Format="SOURCE"
+        [parameter(Mandatory=$false)]
+        [ValidateSet('SOURCE','DBC', 'JUPYTER', 'HTML')]
+        [string]$Format="SOURCE"
     )
-
-
 
     if ($LocalOutputPath -ne [System.IO.Path]::GetFullPath($LocalOutputPath)){
         $LocalOutputPath = Join-Path (Get-Location) $LocalOutputPath

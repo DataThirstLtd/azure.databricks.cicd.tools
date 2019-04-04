@@ -17,7 +17,6 @@ function Set-LocalNotebook ($DatabricksFile, $Language, $Region, $InternalBearer
         }
     }
         
-    
     $LocalExportPath = $DatabricksFile.Replace($ExportPath + "/","") + $FileExt
     $LocalExportPath = Join-Path $LocalOutputPath $LocalExportPath
     
