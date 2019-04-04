@@ -32,7 +32,8 @@ Function Export-DatabricksFolder
         [parameter(Mandatory=$true)][string]$BearerToken,
         [parameter(Mandatory=$true)][string]$Region,
         [parameter(Mandatory=$true)][string]$ExportPath,
-        [parameter(Mandatory=$false)][string]$LocalOutputPath
+        [parameter(Mandatory=$false)][string]$LocalOutputPath,
+        [parameter(Mandatory=$false)][string]$Format="SOURCE"
     )
 
 
@@ -46,6 +47,6 @@ Function Export-DatabricksFolder
     $Region = $Region.Replace(" ","")
 
     $outJSON = Get-FolderContents $ExportPath $Region $InternalBearerToken
-    Get-Notebooks $outJSON $ExportPath $Region $InternalBearerToken $LocalOutputPath
+    Get-Notebooks $outJSON $ExportPath $Region $InternalBearerToken $LocalOutputPath $Format
 
 }

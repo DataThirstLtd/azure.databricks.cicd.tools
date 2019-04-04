@@ -1,4 +1,4 @@
-Function Get-Notebooks ($FolderContents, $OriginalPath, $Region, $InternalBearerToken, $LocalOutputPath ) {
+Function Get-Notebooks ($FolderContents, $OriginalPath, $Region, $InternalBearerToken, $LocalOutputPath, $Format="SOURCE" ) {
 
     $FolderContent = $FolderContents.objects
 
@@ -9,14 +9,14 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $Region, $InternalBearer
             $FolderName = ($Object.path).Replace($OriginalPath,"")
             Write-Verbose "Folder Name: $FolderName!"
             $SubfolderContents = Get-FolderContents $Object.path $Region $InternalBearerToken
-            Get-Notebooks $SubfolderContents ($Object.path + "/") $Region $InternalBearerToken $LocalOutputPath
+            Get-Notebooks $SubfolderContents ($Object.path + "/") $Region $InternalBearerToken $LocalOutputPath $Format
         }
         elseif ($Object.object_type -eq "NOTEBOOK")
         {
             $Notebook = $Object.path
             $NotebookLanguage = $Object.language
             Write-Verbose "Calling Writing of $Notebook ($NotebookLanguage)"
-            Set-LocalNotebook $Notebook $NotebookLanguage $Region $InternalBearerToken $LocalOutputPath
+            Set-LocalNotebook $Notebook $NotebookLanguage $Region $InternalBearerToken $LocalOutputPath $Format
         }
         else {
             Write-Warning "Unknown Type $Object.object_type"

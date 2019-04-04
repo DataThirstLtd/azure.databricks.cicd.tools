@@ -6,6 +6,8 @@ $Region = "westeurope"
 $ExportPath = "/Shared/UnitTest"
 $LocalOutputPath = "Output"
 
+Export-DatabricksFolder -ExportPath $ExportPath -BearerToken $BearerToken -Region $Region -LocalOutputPath $LocalOutputPath -Verbose -Format "JUPYTER"
+Return
 
 Describe "Export-DatabricksFolder"{
     BeforeAll {
@@ -13,7 +15,7 @@ Describe "Export-DatabricksFolder"{
         Import-DatabricksFolder -BearerToken $BearerToken -Region $Region -LocalPath 'Samples\DummyNotebooks' -DatabricksPath $ExportPath
     }
     It "Folder of files is exported" {
-        Export-DatabricksFolder -ExportPath $ExportPath -BearerToken $BearerToken -Region $Region -LocalOutputPath $LocalOutputPath -Verbose
+        Export-DatabricksFolder -ExportPath $ExportPath -BearerToken $BearerToken -Region $Region -LocalOutputPath $LocalOutputPath -Verbose -Format "DBC"
         $Count = (Get-ChildItem -Path $LocalOutputPath).Count
         $Count | Should -Be 3
     }
