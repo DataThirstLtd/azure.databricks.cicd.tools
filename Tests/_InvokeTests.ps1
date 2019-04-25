@@ -1,4 +1,4 @@
-Install-Module Pester -MinimumVersion 4.4.2 -Force -Scope CurrentUser -SkipPublisherCheck
+Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck
 Import-Module Pester -MinimumVersion 4.4.2
 
 Set-Location $PSScriptRoot

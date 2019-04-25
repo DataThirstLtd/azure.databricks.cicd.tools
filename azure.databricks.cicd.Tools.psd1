@@ -24,7 +24,7 @@
     CompanyName = 'Data Thirst Ltd'
 
     # Copyright statement for this module
-    Copyright = 'Data Thirst Ltd'
+    Copyright = 'Data Thirst Ltd 2019'
 
     # Description of the functionality provided by this module
     Description = 'PowerShell module to help with Azure Databricks CI & CD Scenarios by simplifying the API or CLI calls into idempotent commands. See https://github.com/DataThirstLtd/azure.databricks.cicd.tools & https://datathirst.net'
@@ -74,7 +74,8 @@
     'Remove-DatabricksJob', 'Add-DatabricksSparkSubmitJob', 'Add-DatabricksPythonJob', 'Add-DatabricksJarJob',
     'Add-DatabricksDBFSFolder', 'Get-DatabricksDBFSFile', 'Get-DatabricksRun', 'Get-DatabricksJobId',
     'Add-DatabricksGroup', 'Add-DatabricksMemberToGroup', 'Get-DatabricksGroupMembers', 'Get-DatabricksGroups',
-    'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster', 'Connect-Databricks'
+    'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster', 'Connect-Databricks',
+    'Get-DatabricksSecretScopes'
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'

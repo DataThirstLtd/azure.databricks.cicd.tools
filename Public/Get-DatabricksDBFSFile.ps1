@@ -33,9 +33,13 @@ param(
     [parameter(Mandatory = $true)][string]$TargetFile
 )
 
+    if ($PSVersionTable.PSVersion.Major -le 6){
+        Throw "This command requires PowerShell 6 or higher"
+    }
+
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-    
+
     $size = 1048576
 
     $body = @{'path' = $DBFSFile}

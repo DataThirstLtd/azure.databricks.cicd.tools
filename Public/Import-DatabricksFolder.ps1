@@ -66,25 +66,54 @@ Function Import-DatabricksFolder
         $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
         $TargetPath = $Path + '/'+ $FileToPush.BaseName
 
-        $FileType = @{".py"="PYTHON";".scala"="SCALA";".r"="R";".sql"="SQL" }
-        $FileFormat = $FileType[$FileToPush.Extension]
+        $Body = @{}
+        $Body['content'] = $EncodedContents
+        $Body['path'] = $TargetPath
+        $Body['overwrite'] = "true"
+        switch ($FileToPush.Extension){
+            ".py" {
+                $Body['format'] = "SOURCE"
+                $Body['language'] = "PYTHON"
+            }
 
-        $Body = @"
-{
-    "format": "SOURCE",
-    "content": "$EncodedContents",
-    "path": "$TargetPath",
-    "overwrite": "true",
-    "language": "$FileFormat"
-}
-"@
-        if($null -eq $FileFormat)
+            ".scala" {
+                $Body['format'] = "SOURCE"
+                $Body['language'] = "SCALA"
+            }
+
+            ".r" {
+                $Body['format'] = "SOURCE"
+                $Body['language'] = "R"
+            }
+
+            ".sql" {
+                $Body['format'] = "SOURCE"
+                $Body['language'] = "SQL"
+            }
+
+            ".dbc" {
+                $Body['format'] = "DBC"
+            }
+
+            ".ipynb" {
+                $Body['format'] = "JUPYTER"
+            }
+
+            ".html" {
+                $Body['format'] = "HTML"
+            }
+
+        }
+
+        $BodyText = $Body | ConvertTo-Json -Depth 10
+
+        if($null -eq $Body['format'])
         {
             Write-Warning "File $FileToPush has an unknown extension - skipping file"
         }
         else{
             Write-Verbose "Pushing file $FileToPush to $TargetPath"
-            Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/import" -Body $Body -Method 'POST' -Headers $Headers
+            Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/import" -Body $BodyText -Method 'POST' -Headers $Headers
         }
     }
 

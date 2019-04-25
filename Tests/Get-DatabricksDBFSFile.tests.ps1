@@ -6,7 +6,8 @@ $global:Expires = $null
 $global:DatabricksOrgId = $null
 $global:RefeshToken = $null
 
-Describe "Get-DatabricksClusters"{
+
+Describe "Get-DatabricksDBFSFile"{
     
     BeforeAll{
         Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder "Samples" -FilePattern "Test.jar"  -TargetLocation '/test' -Verbose
