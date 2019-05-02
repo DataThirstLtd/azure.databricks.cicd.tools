@@ -55,7 +55,7 @@ If it does exist an error will be thrown making the script idempotent. Defaults 
 Switch. If the cluster name exist then update the configuration to this one. Defaults to False.
 
 .PARAMETER PythonVersion
-2 or 3 - defaults to 2.
+2 or 3 - defaults to 3.
 
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
@@ -80,7 +80,7 @@ Function New-DatabricksCluster {
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
         [parameter(Mandatory = $false)][switch]$UniqueNames,
         [parameter(Mandatory = $false)][switch]$Update,
-        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2
+        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters

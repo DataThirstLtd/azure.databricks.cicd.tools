@@ -7,11 +7,13 @@ $global:DatabricksOrgId = $null
 $global:RefeshToken = $null
 
 
+
+
 Describe "Get-DatabricksClusters"{
     
     It "Get all clusters"{
         $json = Get-DatabricksClusters -BearerToken $BearerToken -Region $Region
-        $Json.clusters.Count | Should -BeGreaterThan 1
+        $Json.Count | Should -BeGreaterThan 1
     }
 
     It "Search for cluster by id"{
