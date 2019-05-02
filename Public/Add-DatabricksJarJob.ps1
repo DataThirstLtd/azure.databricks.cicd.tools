@@ -150,7 +150,7 @@ Function Add-DatabricksJarJob {
         $ClusterArgs['CustomTags'] = $CustomTags
         $ClusterArgs['InitScripts'] = $InitScripts
         $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
-        $ClusterArgs['PythonVersion'] = 2
+        $ClusterArgs['PythonVersion'] = 3
 
         $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
     }

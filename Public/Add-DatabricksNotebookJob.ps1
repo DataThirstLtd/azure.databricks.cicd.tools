@@ -110,7 +110,7 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $true)][string]$NotebookPath,
         [parameter(Mandatory = $false)][string]$NotebookParametersJson,
         [parameter(Mandatory = $false)][string[]]$Libraries,
-        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2,
+        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
