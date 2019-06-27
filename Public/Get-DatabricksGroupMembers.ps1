@@ -51,5 +51,4 @@ Function Get-DatabricksGroupMembers
     }
 }
 
-New-Alias -Name Get-GroupMembers -Value Get-DatabricksGroupMembers
     

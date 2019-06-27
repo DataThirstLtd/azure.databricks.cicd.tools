@@ -1,20 +1,18 @@
 <#
 .SYNOPSIS
-Installs a library to a Databricks cluster.
+Remove a library from a cluster - note the cluster must be restarted to complete the uninstall (this command will NOT restart the cluster for you)
 
 .DESCRIPTION
-Attempts install of library. Note you must check if the install completes successfully as the install
-happens async. See Get-DatabricksLibraries.
-Also note that libraries installed via the API do not show in UI. Again see Get-DatabricksLibraries. This
-is a known Databricks issue which maybe addressed in the future.
-Note the API does not support the auto install to all clusters option as yet.
-Cluster must not be in a terminated state (PENDING is ok).
+Remove a library from a cluster - note the cluster must be restarted to complete the uninstall (this command will NOT restart the cluster for you)
 
 .PARAMETER BearerToken
-Your Databricks Bearer token to authenticate to your workspace (see User Settings in Databricks WebUI)
+Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
 
 .PARAMETER Region
 Azure Region - must match the URL of your Databricks workspace, example northeurope
+
+.PARAMETER ClusterId
+ClusterId for existing Databricks cluster. Does not need to be running. See Get-DatabricksClusters.
 
 .PARAMETER LibraryType
 egg, jar, pypi, whl, cran, maven
@@ -34,39 +32,30 @@ If maven, specification of a Maven library to be installed. For example: { "coor
 
 If cran, specification of a CRAN library to be installed.
 
-.PARAMETER ClusterId
-The cluster to install the library to. Note that the API does not support auto installing to
-all clusters. See Get-DatabricksClusters. 
-
 .EXAMPLE
-C:\PS> Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region -LibraryType "jar" -LibrarySettings "dbfs:/mnt/libraries/library.jar" -ClusterId "bob-1234"
-
-This example installs a library from a jar which exists in dbfs.
-
-.EXAMPLE 
-C:\PS> Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region -LibraryType "pypi" -LibrarySettings 'simplejson2' -ClusterId 'Bob-1234'
-
-The above example applies a pypi library to a cluster by id
+PS C:\> Remove-DatabricksLibrary -BearerToken $BearerToken -Region $Region -ClusterId 'Bob-1234'
 
 .NOTES
-Author: Simon D'Morias / Data Thirst Ltd
+Author: Simon D'Morias / Data Thirst Ltd 
 
-#>
-Function Add-DatabricksLibrary {  
+#>  
+
+Function Remove-DatabricksLibrary
+{ 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
+        [parameter(Mandatory = $true)][string]$BearerToken, 
         [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $true)][string]$ClusterId,
         [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran', 'whl')][string]$LibraryType,
-        [parameter(Mandatory = $true)][string]$LibrarySettings,
-        [parameter(Mandatory = $true)][string]$ClusterId
+        [parameter(Mandatory = $true)][string]$LibrarySettings
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
     $Region = $Region.Replace(" ","")
 
-    $uri ="https://$Region.azuredatabricks.net/api/2.0/libraries/install"
+    $uri ="https://$Region.azuredatabricks.net/api/2.0/libraries/uninstall"
 
     $Body = @{"cluster_id"=$ClusterId}
 
@@ -97,6 +86,6 @@ Function Add-DatabricksLibrary {
     $BodyText = $Body | ConvertTo-Json -Depth 10
 
     Write-Verbose "Request Body: $BodyText"
-    Write-Verbose "Installing library $LibraryType with setting $LibrarySettings to REST API: $uri"
+    Write-Verbose "Uninstalling library $LibraryType with setting $LibrarySettings to REST API: $uri"
     Invoke-RestMethod -Uri $uri -Body $BodyText -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
 }
