@@ -44,6 +44,17 @@ Describe "Add-DatabricksNotebookJob" {
         $global:JobId | Should -BeGreaterThan 0
     }
 
+    It "With run now" {
+        $global:RunId = Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+            -Timeout $Timeout -MaxRetries $MaxRetries `
+            -Timezone $Timezone -NotebookPath $NotebookPath `
+            -ClusterId $ClusterId `
+            -NotebookParametersJson $NotebookParametersJson `
+            -RunImmediate -Verbose
+
+        $global:RunId | Should -BeGreaterThan 0
+    }
+
     AfterAll{
         Remove-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId $JobId
     }

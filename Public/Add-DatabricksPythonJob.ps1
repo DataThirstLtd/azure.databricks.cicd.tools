@@ -130,7 +130,7 @@ Function Add-DatabricksPythonJob {
 
     $ExistingJobDetail = $ExistingJobs | Where-Object {$_.settings.name -eq $JobName} | Select-Object job_id -First 1
 
-    if ($ExistingJobDetail){
+    if (($ExistingJobDetail) -and (!($RunImmediate.IsPresent))){
         $JobId = $ExistingJobDetail.job_id[0]
         Write-Verbose "Updating JobId: $JobId"
         $Mode = "reset"
