@@ -81,6 +81,11 @@ Example @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 .PARAMETER CustomTags
 Custom Tags to set, provide hash table of tags. Example: @{CreatedBy="SimonDM";NumOfNodes=2;CanDelete=$true}
 
+.PARAMETER RunImmediate
+Switch.
+Performs a Run Now task instead of creating a job. The process is executed immediately in an async process.
+Setting this option returns a RunId.
+
 .EXAMPLE
 PS C:\> Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -NotebookPath "/Shared/Test" -NotebookParametersJson '{"key": "value", "name": "test2"}' -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
 
@@ -114,7 +119,8 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
-        [parameter(Mandatory = $false)][hashtable]$SparkEnvVars
+        [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
+        [parameter(Mandatory = $false)][switch]$RunImmediate
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -135,7 +141,12 @@ Function Add-DatabricksNotebookJob {
     }
 
     $JobBody = @{}
-    $JobBody['name'] = $JobName
+    if ($RunImmediate.IsPresent){
+        $JobBody['run_name'] = $JobName
+    }
+    else{
+        $JobBody['name'] = $JobName
+    }
 
     If ($ClusterId){
         $JobBody['existing_cluster_id'] = $ClusterId
@@ -192,18 +203,29 @@ Function Add-DatabricksNotebookJob {
     Write-Verbose $BodyText
   
     Try {
-        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/$Mode" -Headers @{Authorization = $InternalBearerToken}
+        if ($RunImmediate.IsPresent){
+            $Url = "jobs/runs/submit"
+        }
+        else{
+            $Url = "jobs/$Mode"
+        }   
+        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/$Url" -Headers @{Authorization = $InternalBearerToken}
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
         Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
         Write-Error $_.ErrorDetails.Message
     }
-
-    if ($Mode -eq "create") {
-        Return $JobDetails.job_id
+    
+    if ($RunImmediate.IsPresent){
+        Return $JobDetails.run_id
     }
-    else {
-        Return $JobId
-    }
+    else{
+        if ($Mode -eq "create") {
+            Return $JobDetails.job_id
+        }
+        else {
+            Return $JobId
+        }
+    }   
 }
