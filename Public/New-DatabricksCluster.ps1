@@ -104,21 +104,21 @@ Function New-DatabricksCluster {
             }
         }
     }
-    else{
-        $ClusterArgs['SparkVersion'] = $SparkVersion
-        $ClusterArgs['NodeType'] = $NodeType
-        $ClusterArgs['MinNumberOfWorkers'] = $MinNumberOfWorkers
-        $ClusterArgs['MaxNumberOfWorkers'] = $MaxNumberOfWorkers
-        $ClusterArgs['DriverNodeType'] = $DriverNodeType
-        $ClusterArgs['AutoTerminationMinutes'] = $AutoTerminationMinutes
-        $ClusterArgs['Spark_conf'] = $Spark_conf
-        $ClusterArgs['CustomTags'] = $CustomTags
-        $ClusterArgs['InitScripts'] = $InitScripts
-        $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
-        $ClusterArgs['PythonVersion'] = $PythonVersion
 
-        $Body += GetNewClusterCluster @ClusterArgs
-    }
+    $ClusterArgs['SparkVersion'] = $SparkVersion
+    $ClusterArgs['NodeType'] = $NodeType
+    $ClusterArgs['MinNumberOfWorkers'] = $MinNumberOfWorkers
+    $ClusterArgs['MaxNumberOfWorkers'] = $MaxNumberOfWorkers
+    $ClusterArgs['DriverNodeType'] = $DriverNodeType
+    $ClusterArgs['AutoTerminationMinutes'] = $AutoTerminationMinutes
+    $ClusterArgs['Spark_conf'] = $Spark_conf
+    $ClusterArgs['CustomTags'] = $CustomTags
+    $ClusterArgs['InitScripts'] = $InitScripts
+    $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
+    $ClusterArgs['PythonVersion'] = $PythonVersion
+
+    $Body += GetNewClusterCluster @ClusterArgs
+
     $BodyText = $Body | ConvertTo-Json -Depth 10
     $BodyText = Remove-DummyKey $BodyText
     Write-Verbose $BodyText
