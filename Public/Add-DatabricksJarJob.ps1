@@ -118,7 +118,8 @@ Function Add-DatabricksJarJob {
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
-        [parameter(Mandatory = $false)][string]$ClusterLogPath
+        [parameter(Mandatory = $false)][string]$ClusterLogPath,
+        [parameter(Mandatory = $false)][string]$InstancePoolId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -157,6 +158,7 @@ Function Add-DatabricksJarJob {
         $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
         $ClusterArgs['PythonVersion'] = 3
         $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
+        $ClusterArgs['InstancePoolId'] = $InstancePoolId
 
         $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
     }

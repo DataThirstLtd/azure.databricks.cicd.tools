@@ -125,7 +125,8 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][string[]]$InitScripts,
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
         [parameter(Mandatory = $false)][switch]$RunImmediate,
-        [parameter(Mandatory = $false)][string]$ClusterLogPath
+        [parameter(Mandatory = $false)][string]$ClusterLogPath,
+        [parameter(Mandatory = $false)][string]$InstancePoolId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -169,6 +170,7 @@ Function Add-DatabricksNotebookJob {
         $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
         $ClusterArgs['PythonVersion'] = $PythonVersion
         $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
+        $ClusterArgs['InstancePoolId'] = $InstancePoolId
 
         $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
     }

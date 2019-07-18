@@ -12,7 +12,8 @@ Function GetNewClusterCluster {
         [parameter(Mandatory = $false)][string[]]$InitScripts,
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
         [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
-        [parameter(Mandatory = $false)][string]$ClusterLogPath
+        [parameter(Mandatory = $false)][string]$ClusterLogPath,
+        [parameter(Mandatory = $false)][string]$InstancePoolId
     ) 
     
     $Body = @{}
@@ -57,6 +58,10 @@ Function GetNewClusterCluster {
 
     If ($PSBoundParameters.ContainsKey('ClusterLogPath') -and (!([string]::IsNullOrEmpty($ClusterLogPath)))) {
         $Body['cluster_log_conf'] = @{dbfs=@{destination=$ClusterLogPath}}
+    }
+
+    If ($PSBoundParameters.ContainsKey('InstancePoolId') -and (!([string]::IsNullOrEmpty($InstancePoolId)))) {
+        $Body['instance_pool_id'] = $InstancePoolId
     }
     
     Return $Body
