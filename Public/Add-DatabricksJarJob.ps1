@@ -20,7 +20,7 @@ it will be updated.
 The ClusterId of an existing cluster to use. Optional.
 
 .PARAMETER SparkVersion
-Spark version for cluster that will run the job. Example: 4.0.x-scala2.11
+Spark version for cluster that will run the job. Example: 5.3.x-scala2.11
 Note: Ignored if ClusterId is populated.
     
 .PARAMETER NodeType
@@ -81,8 +81,12 @@ Example @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 .PARAMETER CustomTags
 Custom Tags to set, provide hash table of tags. Example: @{CreatedBy="SimonDM";NumOfNodes=2;CanDelete=$true}
 
+.PARAMETER ClusterLogPath
+DBFS Location for Cluster logs - must start with dbfs:/
+Example dbfs:/logs/mycluster
+
 .EXAMPLE
-PS C:\> Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -JarPath "folder/Test.jar" -JarMainClass 'com.test.me' -JarParameters "val1", "val2" -Libraries '{"jar": "DBFS:/mylibraries/test.jar"}'
+PS C:\> Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.3.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -JarPath "folder/Test.jar" -JarMainClass 'com.test.me' -JarParameters "val1", "val2" -Libraries '{"jar": "DBFS:/mylibraries/test.jar"}'
 
 The above example create a job on a new cluster.
     
@@ -113,7 +117,8 @@ Function Add-DatabricksJarJob {
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
-        [parameter(Mandatory = $false)][hashtable]$SparkEnvVars
+        [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
+        [parameter(Mandatory = $false)][string]$ClusterLogPath
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -151,6 +156,7 @@ Function Add-DatabricksJarJob {
         $ClusterArgs['InitScripts'] = $InitScripts
         $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
         $ClusterArgs['PythonVersion'] = 3
+        $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
 
         $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
     }

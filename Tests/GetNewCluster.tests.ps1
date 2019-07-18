@@ -2,7 +2,7 @@ Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psm1" -Force
 Describe "GetNewCluster" {
         It "Multi Value Settings"{
-                $SparkVersion="4.0.x-scala2.11"
+                $SparkVersion="5.3.x-scala2.11"
                 $NodeType="Standard_D3_v2"
                 $MinNumberOfWorkers=1
                 $MaxNumberOfWorkers=1
@@ -27,7 +27,7 @@ Describe "GetNewCluster" {
                         -PythonVersion $PythonVersion 
 
                 $s = $res | ConvertTo-Json -Depth 10
-                $res['spark_version'] | Should -be "4.0.x-scala2.11"
+                $res['spark_version'] | Should -be "5.3.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
                 $res['spark_env_vars'].Count | Should -be 2
                 $res['custom_tags'].Count | Should -be 2
@@ -37,7 +37,7 @@ Describe "GetNewCluster" {
         }
 
         It "Single Value Settings"{
-                $SparkVersion="4.0.x-scala2.11"
+                $SparkVersion="5.3.x-scala2.11"
                 $NodeType="Standard_D3_v2"
                 $MinNumberOfWorkers=1
                 $MaxNumberOfWorkers=1
@@ -63,7 +63,7 @@ Describe "GetNewCluster" {
 
                 $s = $res | ConvertTo-Json -Depth 10
                 $BodyText = Remove-DummyKey $s
-                $res['spark_version'] | Should -be "4.0.x-scala2.11"
+                $res['spark_version'] | Should -be "5.3.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
                 $res['spark_env_vars'].Count | Should -be 2
                 $res['custom_tags'].Count | Should -be 2
@@ -74,7 +74,7 @@ Describe "GetNewCluster" {
         }
 
         It "Up Python Version"{
-                $SparkVersion="4.0.x-scala2.11"
+                $SparkVersion="5.3.x-scala2.11"
                 $NodeType="Standard_D3_v2"
                 $MinNumberOfWorkers=1
                 $MaxNumberOfWorkers=1
@@ -100,7 +100,7 @@ Describe "GetNewCluster" {
 
                 $s = $res | ConvertTo-Json -Depth 10
                 $BodyText = Remove-DummyKey $s
-                $res['spark_version'] | Should -be "4.0.x-scala2.11"
+                $res['spark_version'] | Should -be "5.3.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
                 $res['spark_env_vars'].Count | Should -be 2
                 $res['custom_tags'].Count | Should -be 2
@@ -112,7 +112,7 @@ Describe "GetNewCluster" {
         }
 
         It "Python Version 3 with no other EnvVars"{
-                $SparkVersion="4.0.x-scala2.11"
+                $SparkVersion="5.3.x-scala2.11"
                 $NodeType="Standard_D3_v2"
                 $MinNumberOfWorkers=1
                 $MaxNumberOfWorkers=1
@@ -137,7 +137,7 @@ Describe "GetNewCluster" {
 
                 $s = $res | ConvertTo-Json -Depth 10
                 $BodyText = Remove-DummyKey $s
-                $res['spark_version'] | Should -be "4.0.x-scala2.11"
+                $res['spark_version'] | Should -be "5.3.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
                 $res['spark_env_vars'].Count | Should -be 2
                 $res['custom_tags'].Count | Should -be 2
@@ -149,7 +149,7 @@ Describe "GetNewCluster" {
         }
 
         It "Pass NULL on optional sets"{
-                $SparkVersion="4.0.x-scala2.11"
+                $SparkVersion="5.3.x-scala2.11"
                 $NodeType="Standard_D3_v2"
                 $MinNumberOfWorkers=1
                 $MaxNumberOfWorkers=1
@@ -174,7 +174,7 @@ Describe "GetNewCluster" {
 
                 $s = $res | ConvertTo-Json -Depth 10
                 $BodyText = Remove-DummyKey $s
-                $res['spark_version'] | Should -be "4.0.x-scala2.11"
+                $res['spark_version'] | Should -be "5.3.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
                 $res['spark_env_vars'].Count | Should -be 0
                 $res['custom_tags'].Count | Should -be 0
@@ -186,7 +186,7 @@ Describe "GetNewCluster" {
 
 
         It "Do not pass optional params"{
-                $SparkVersion="4.0.x-scala2.11"
+                $SparkVersion="5.3.x-scala2.11"
                 $NodeType="Standard_D3_v2"
                 $MinNumberOfWorkers=1
                 $MaxNumberOfWorkers=2
@@ -199,7 +199,7 @@ Describe "GetNewCluster" {
                         
                 $s = $res | ConvertTo-Json -Depth 10
                 $BodyText = Remove-DummyKey $s
-                $res['spark_version'] | Should -be "4.0.x-scala2.11"
+                $res['spark_version'] | Should -be "5.3.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
                 $res['spark_env_vars'].Count | Should -be 0
                 $res['custom_tags'].Count | Should -be 0

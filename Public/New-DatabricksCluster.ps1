@@ -12,7 +12,7 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER SparkVersion
-Spark version for cluster. Example: 4.0.x-scala2.11
+Spark version for cluster. Example: 5.3.x-scala2.11
 See Get-DatabricksSparkVersions
     
 .PARAMETER NodeType
@@ -57,6 +57,10 @@ Switch. If the cluster name exist then update the configuration to this one. Def
 .PARAMETER PythonVersion
 2 or 3 - defaults to 3.
 
+.PARAMETER ClusterLogPath
+DBFS Location for Cluster logs - must start with dbfs:/
+Example dbfs:/logs/mycluster
+
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
 
@@ -80,7 +84,8 @@ Function New-DatabricksCluster {
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
         [parameter(Mandatory = $false)][switch]$UniqueNames,
         [parameter(Mandatory = $false)][switch]$Update,
-        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3
+        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
+        [parameter(Mandatory = $false)][string]$ClusterLogPath
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
@@ -116,6 +121,7 @@ Function New-DatabricksCluster {
     $ClusterArgs['InitScripts'] = $InitScripts
     $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
     $ClusterArgs['PythonVersion'] = $PythonVersion
+    $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
 
     $Body += GetNewClusterCluster @ClusterArgs
 
