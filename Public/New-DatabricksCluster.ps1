@@ -61,6 +61,10 @@ Switch. If the cluster name exist then update the configuration to this one. Def
 DBFS Location for Cluster logs - must start with dbfs:/
 Example dbfs:/logs/mycluster
 
+.PARAMETER InstancePoolId
+If you would liek to use nodes from an instance pool set the pool id 
+https://docs.azuredatabricks.net/user-guide/instance-pools/index.html#instance-pools
+
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
 
@@ -85,7 +89,8 @@ Function New-DatabricksCluster {
         [parameter(Mandatory = $false)][switch]$UniqueNames,
         [parameter(Mandatory = $false)][switch]$Update,
         [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
-        [parameter(Mandatory = $false)][string]$ClusterLogPath
+        [parameter(Mandatory = $false)][string]$ClusterLogPath,
+        [parameter(Mandatory = $false)][string]$InstancePoolId
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $InternalBearerToken = Format-BearerToken($BearerToken)
@@ -122,7 +127,8 @@ Function New-DatabricksCluster {
     $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
     $ClusterArgs['PythonVersion'] = $PythonVersion
     $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
-
+    $ClusterArgs['InstancePoolId'] = $InstancePoolId
+    
     $Body += GetNewClusterCluster @ClusterArgs
 
     $BodyText = $Body | ConvertTo-Json -Depth 10
