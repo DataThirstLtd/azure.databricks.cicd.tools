@@ -19,7 +19,7 @@ Name of the job that will appear in the Job list. If a job with this name exists
 it will be updated.
 
 .PARAMETER SparkVersion
-Spark version for cluster that will run the job. Example: 4.0.x-scala2.11
+Spark version for cluster that will run the job. Example: 5.3.x-scala2.11
     
 .PARAMETER NodeType
 Type of worker for cluster that will run the job. Example: Standard_D3_v2.
@@ -70,7 +70,7 @@ Example @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 Custom Tags to set, provide hash table of tags. Example: @{CreatedBy="SimonDM";NumOfNodes=2;CanDelete=$true}
 
 .EXAMPLE
-PS C:\> Add-DatabricksSparkSubmitJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "4.1.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -SparkSubmitParameters "--pyFiles", "dbfs:/myscript.py", "myparam" -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
+PS C:\> Add-DatabricksSparkSubmitJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.3.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -SparkSubmitParameters "--pyFiles", "dbfs:/myscript.py", "myparam" -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
 
 The above example create a job on a new cluster.
     

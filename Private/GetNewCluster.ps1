@@ -11,7 +11,8 @@ Function GetNewClusterCluster {
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
-        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=2
+        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
+        [parameter(Mandatory = $false)][string]$ClusterLogPath
     ) 
     
     $Body = @{}
@@ -52,6 +53,10 @@ Function GetNewClusterCluster {
             $SparkEnvVars.Add('DummyKey', 1)
         }
         $Body['spark_env_vars'] = GetKeyValues $SparkEnvVars
+    }
+
+    If ($PSBoundParameters.ContainsKey('ClusterLogPath') -and (!([string]::IsNullOrEmpty($ClusterLogPath)))) {
+        $Body['cluster_log_conf'] = @{dbfs=@{destination=$ClusterLogPath}}
     }
     
     Return $Body
