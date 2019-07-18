@@ -201,7 +201,7 @@ Describe "GetNewCluster" {
                 $BodyText = Remove-DummyKey $s
                 $res['spark_version'] | Should -be "5.3.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
-                $res['spark_env_vars'].Count | Should -be 0
+                $res['spark_env_vars'].Count | Should -be 2
                 $res['custom_tags'].Count | Should -be 0
                 $res['init_scripts'].Count | Should -be 0
                 $res['spark_conf'].Count | Should -be 0
