@@ -12,7 +12,7 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER SparkVersion
-Spark version for cluster. Example: 4.0.x-scala2.11
+Spark version for cluster. Example: 5.3.x-scala2.11
 See Get-DatabricksSparkVersions
     
 .PARAMETER NodeType
@@ -57,6 +57,14 @@ Switch. If the cluster name exist then update the configuration to this one. Def
 .PARAMETER PythonVersion
 2 or 3 - defaults to 3.
 
+.PARAMETER ClusterLogPath
+DBFS Location for Cluster logs - must start with dbfs:/
+Example dbfs:/logs/mycluster
+
+.PARAMETER InstancePoolId
+If you would liek to use nodes from an instance pool set the pool id 
+https://docs.azuredatabricks.net/user-guide/instance-pools/index.html#instance-pools
+
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
 
@@ -80,7 +88,9 @@ Function New-DatabricksCluster {
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
         [parameter(Mandatory = $false)][switch]$UniqueNames,
         [parameter(Mandatory = $false)][switch]$Update,
-        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3
+        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
+        [parameter(Mandatory = $false)][string]$ClusterLogPath,
+        [parameter(Mandatory = $false)][string]$InstancePoolId
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
@@ -104,21 +114,23 @@ Function New-DatabricksCluster {
             }
         }
     }
-    else{
-        $ClusterArgs['SparkVersion'] = $SparkVersion
-        $ClusterArgs['NodeType'] = $NodeType
-        $ClusterArgs['MinNumberOfWorkers'] = $MinNumberOfWorkers
-        $ClusterArgs['MaxNumberOfWorkers'] = $MaxNumberOfWorkers
-        $ClusterArgs['DriverNodeType'] = $DriverNodeType
-        $ClusterArgs['AutoTerminationMinutes'] = $AutoTerminationMinutes
-        $ClusterArgs['Spark_conf'] = $Spark_conf
-        $ClusterArgs['CustomTags'] = $CustomTags
-        $ClusterArgs['InitScripts'] = $InitScripts
-        $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
-        $ClusterArgs['PythonVersion'] = $PythonVersion
 
-        $Body += GetNewClusterCluster @ClusterArgs
-    }
+    $ClusterArgs['SparkVersion'] = $SparkVersion
+    $ClusterArgs['NodeType'] = $NodeType
+    $ClusterArgs['MinNumberOfWorkers'] = $MinNumberOfWorkers
+    $ClusterArgs['MaxNumberOfWorkers'] = $MaxNumberOfWorkers
+    $ClusterArgs['DriverNodeType'] = $DriverNodeType
+    $ClusterArgs['AutoTerminationMinutes'] = $AutoTerminationMinutes
+    $ClusterArgs['Spark_conf'] = $Spark_conf
+    $ClusterArgs['CustomTags'] = $CustomTags
+    $ClusterArgs['InitScripts'] = $InitScripts
+    $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
+    $ClusterArgs['PythonVersion'] = $PythonVersion
+    $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
+    $ClusterArgs['InstancePoolId'] = $InstancePoolId
+    
+    $Body += GetNewClusterCluster @ClusterArgs
+
     $BodyText = $Body | ConvertTo-Json -Depth 10
     $BodyText = Remove-DummyKey $BodyText
     Write-Verbose $BodyText

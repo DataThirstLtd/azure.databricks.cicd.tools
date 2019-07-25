@@ -19,7 +19,7 @@ Name of the job that will appear in the Job list. If a job with this name exists
 it will be updated.
 
 .PARAMETER SparkVersion
-Spark version for cluster that will run the job. Example: 4.0.x-scala2.11
+Spark version for cluster that will run the job. Example: 5.3.x-scala2.11
     
 .PARAMETER NodeType
 Type of worker for cluster that will run the job. Example: Standard_D3_v2.
@@ -98,7 +98,9 @@ Function Add-DatabricksSparkSubmitJob {
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
-        [parameter(Mandatory = $false)][hashtable]$SparkEnvVars
+        [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
+        [parameter(Mandatory = $false)][string]$ClusterLogPath,
+        [parameter(Mandatory = $false)][string]$InstancePoolId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -136,6 +138,8 @@ Function Add-DatabricksSparkSubmitJob {
         $ClusterArgs['InitScripts'] = $InitScripts
         $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
         $ClusterArgs['PythonVersion'] = $PythonVersion
+        $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
+        $ClusterArgs['InstancePoolId'] = $InstancePoolId
 
         $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
     }

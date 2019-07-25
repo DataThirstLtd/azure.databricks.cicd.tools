@@ -20,7 +20,7 @@ it will be updated.
 The ClusterId of an existing cluster to use. Optional.
 
 .PARAMETER SparkVersion
-Spark version for cluster that will run the job. Example: 4.0.x-scala2.11
+Spark version for cluster that will run the job. Example: 5.3.x-scala2.11
 Note: Ignored if ClusterId is populated.
     
 .PARAMETER NodeType
@@ -86,6 +86,10 @@ Switch.
 Performs a Run Now task instead of creating a job. The process is executed immediately in an async process.
 Setting this option returns a RunId.
 
+.PARAMETER ClusterLogPath
+DBFS Location for Cluster logs - must start with dbfs:/
+Example dbfs:/logs/mycluster
+
 .EXAMPLE
 PS C:\> Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.3.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -PythonPath "/Shared/TestPython.py" -PythonParameters "val1", "val2" -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
 
@@ -119,7 +123,9 @@ Function Add-DatabricksPythonJob {
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
-        [parameter(Mandatory = $false)][switch]$RunImmediate
+        [parameter(Mandatory = $false)][switch]$RunImmediate,
+        [parameter(Mandatory = $false)][string]$ClusterLogPath,
+        [parameter(Mandatory = $false)][string]$InstancePoolId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -130,7 +136,7 @@ Function Add-DatabricksPythonJob {
 
     $ExistingJobDetail = $ExistingJobs | Where-Object {$_.settings.name -eq $JobName} | Select-Object job_id -First 1
 
-    if ($ExistingJobDetail){
+    if (($ExistingJobDetail) -and (!($RunImmediate.IsPresent))){
         $JobId = $ExistingJobDetail.job_id[0]
         Write-Verbose "Updating JobId: $JobId"
         $Mode = "reset"
@@ -163,6 +169,8 @@ Function Add-DatabricksPythonJob {
         $ClusterArgs['InitScripts'] = $InitScripts
         $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
         $ClusterArgs['PythonVersion'] = $PythonVersion
+        $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
+        $ClusterArgs['InstancePoolId'] = $InstancePoolId
 
         $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
     }

@@ -9,7 +9,7 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule = 'azure.databricks.cicd.Tools.psm1'
+    RootModule = 'azure.databricks.cicd.tools.psm1'
 
     # Version number of this module.
     ModuleVersion = '2.0.0'
@@ -76,7 +76,8 @@
     'Add-DatabricksGroup', 'Add-DatabricksMemberToGroup', 'Get-DatabricksGroupMembers', 'Get-DatabricksGroups',
     'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster', 'Connect-Databricks',
     'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster', 'Get-DatabricksSecretScopes',
-    'Start-DatabricksJob', 'Get-DatabricksJobRun', 'Get-DatabricksJobRunList'
+    'Start-DatabricksJob', 'Get-DatabricksJobRun', 'Get-DatabricksJobRunList', 'Remove-DatabricksNotebook',
+    'Remove-DatabricksLibrary'
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'

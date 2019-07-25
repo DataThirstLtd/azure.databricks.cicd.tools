@@ -3,7 +3,7 @@ Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $BearerToken = Get-Content "MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
 $Region = "westeurope"
 $JobName = "StartJobTest"
-$SparkVersion = "4.1.x-scala2.11"
+$SparkVersion = "5.3.x-scala2.11"
 $NodeType = "Standard_D3_v2"
 $MinNumberOfWorkers = 1
 $MaxNumberOfWorkers = 1
