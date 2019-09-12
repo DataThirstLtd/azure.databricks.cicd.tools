@@ -53,7 +53,7 @@ Function Connect-Databricks {
         $global:DatabricksAccessToken = "Bearer $BearerToken"
         # Basically do not expire the token
         $global:DatabricksTokenExpires = (Get-Date).AddDays(90)
-        $global:Headers = @{"Authorization"="Bearer $global:DatabricksAccessToken"}
+        $global:Headers = @{"Authorization"="$global:DatabricksAccessToken"}
     }
     elseif($PSCmdlet.ParameterSetName -eq "AADwithOrgId"){
         Get-AADDatabricksToken

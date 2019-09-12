@@ -33,7 +33,7 @@ param(
     [parameter(Mandatory = $true)][string]$TargetFile
 )
 
-    if ($PSVersionTable.PSVersion.Major -le 6){
+    if ($PSVersionTable.PSVersion.Major -lt 6){
         Throw "This command requires PowerShell 6 or higher"
     }
 

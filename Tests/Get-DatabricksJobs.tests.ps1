@@ -1,7 +1,9 @@
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
-$BearerToken = Get-Content "MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
-$Region = "westeurope"
+$Config = (Get-Content '.\config.json' | ConvertFrom-Json)
+$BearerToken = $Config.BearerToken
+$Region = $Config.Region
+
 $global:Expires = $null
 $global:DatabricksOrgId = $null
 $global:RefeshToken = $null
@@ -21,7 +23,7 @@ Describe "Get-DatabricksJobs" {
         $NotebookPath = "/Shared/Test"
         $NotebookParametersJson = '{"key": "value", "name": "test2"}'
 
-        $JobId = Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+        $global:JobId = Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
             -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Timeout $Timeout -MaxRetries $MaxRetries `
@@ -30,12 +32,12 @@ Describe "Get-DatabricksJobs" {
             -NotebookParametersJson $NotebookParametersJson 
     }
     It "Simple Fetch" {
-        $global:jobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
-        $global:jobs.job_id[0] | Should -BeGreaterThan 0
+        $jobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
+        $jobs.job_id[0] | Should -BeGreaterThan 0
     }
 
     AfterAll{
-        Remove-DatabricksJob -Region $Region -BearerToken $BearerToken -JobId $global:jobs.job_id[0]
+        Remove-DatabricksJob -Region $Region -BearerToken $BearerToken -JobId $global:JobId
     }
 }
 

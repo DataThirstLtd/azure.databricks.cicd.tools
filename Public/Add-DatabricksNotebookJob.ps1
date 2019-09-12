@@ -217,7 +217,7 @@ Function Add-DatabricksNotebookJob {
         else{
             $Url = "jobs/$Mode"
         }   
-        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/$Url" -Headers @{Authorization = $InternalBearerToken}
+        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/$Url" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

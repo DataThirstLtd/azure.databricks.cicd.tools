@@ -46,8 +46,8 @@ Function Get-DatabricksClusters
         $Clusters = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/clusters/list" -Headers $Headers
     }
     Catch {
-        Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
-        Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
+        Write-Error "StatusCode:" $_.Exception.Response.StatusCode.value__ 
+        Write-Error "StatusDescription:" $_.Exception.Response.StatusDescription
         Write-Error $_.ErrorDetails.Message
     }
 

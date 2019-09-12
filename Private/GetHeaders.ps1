@@ -16,8 +16,12 @@
                 $Region = $null
             }
 
-            if (DatabricksTokenState -ne "Valid"){
+            if ($BearerToken -and $Region){
                 Connect-Databricks -BearerToken $BearerToken -Region $Region | Out-Null
+            }
+            elseif ((DatabricksTokenState) -ne "Valid"){
+                Write-Error "Your are not connected - please execute Connect-Databricks"
+                Throw "Your are not connected - please execute Connect-Databricks"
             }
         }
 

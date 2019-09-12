@@ -1,5 +1,6 @@
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
+Import-Module "..\Private\ConnectFunctions.ps1" -Force
 
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
@@ -25,14 +26,18 @@ Describe "ConnectFunctions"{
         $global:Headers | Should -Not -Be $null
     }
 
-    It "ClientId AAD Autentication using ResourceId"{
-        Connect-Databricks -Region $Config.Region -ClientId $Config.ClientId -Secret $Config.Secret `
-            -ResourceGroupName $Config.ResourceGroupName `
-            -SubscriptionId $Config.SubscriptionId `
-            -WorkspaceName $Config.WorkspaceName `
-            -TenantId $Config.TenantId
-            $global:DatabricksAccessToken | Should -Not -Be $null
-            $global:ManagementAccessToken | Should -Not -Be $null
-            $global:Headers | Should -Not -Be $null
+    #It "ClientId AAD Autentication using ResourceId"{
+    #    Connect-Databricks -Region $Config.Region -ClientId $Config.ClientId -Secret $Config.Secret `
+    #        -ResourceGroupName $Config.ResourceGroupName `
+    #        -SubscriptionId $Config.SubscriptionId `
+    #        -WorkspaceName $Config.WorkspaceName `
+    #        -TenantId $Config.TenantId
+    #        $global:DatabricksAccessToken | Should -Not -Be $null
+    #        $global:ManagementAccessToken | Should -Not -Be $null
+    #        $global:Headers | Should -Not -Be $null
+    #}
+
+    AfterAll{
+        Set-GlobalsNull
     }
 }

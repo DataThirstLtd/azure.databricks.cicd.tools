@@ -46,7 +46,7 @@ Function Remove-DatabricksNotebook {
     $Body['path'] = $Path
     Try {
         $BodyText = $Body | ConvertTo-Json -Depth 10
-        Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0//workspace/delete" -Body $BodyText -Method 'POST' -Headers $Headers
+        Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/delete" -Body $BodyText -Method 'POST' -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

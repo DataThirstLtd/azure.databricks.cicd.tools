@@ -59,4 +59,8 @@ Describe "ConnectFunctions"{
         $res | Should -Be "Valid"
     }
 
+    AfterAll{
+        Set-GlobalsNull
+    }
+
 }

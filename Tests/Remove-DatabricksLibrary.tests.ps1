@@ -1,7 +1,8 @@
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
-$BearerToken = Get-Content "MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
-$Region = "westeurope"
+$Config = (Get-Content '.\config.json' | ConvertFrom-Json)
+$BearerToken = $Config.BearerToken
+$Region = $Config.Region
 $egg = "dbfs:/eggs/pipelines-0.0.1-py3.5.egg"
 $ClusterId = "0926-081131-crick762"
 
