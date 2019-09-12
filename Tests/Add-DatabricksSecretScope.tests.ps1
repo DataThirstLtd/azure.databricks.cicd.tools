@@ -27,15 +27,15 @@ Describe "Add-DatabricksSecretScope" {
         Add-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName "NormalWithPermissions" -AllUserAccess  -Verbose
     }
 
-    It "Key Vault addition"{
-        Connect-Databricks -Region $Config.Region -ClientId $Config.ClientId -Secret $Config.Secret `
-            -ResourceGroupName $Config.ResourceGroupName `
-            -SubscriptionId $Config.SubscriptionId `
-            -WorkspaceName $Config.WorkspaceName `
-            -TenantId $Config.TenantId
+    #It "Key Vault addition"{
+    #    Connect-Databricks -Region $Config.Region -ClientId $Config.ClientId -Secret $Config.Secret `
+    #        -ResourceGroupName $Config.ResourceGroupName `
+    #        -SubscriptionId $Config.SubscriptionId `
+    #        -WorkspaceName $Config.WorkspaceName `
+    #        -TenantId $Config.TenantId
 
-        Add-DatabricksSecretScope -ScopeName "KVScope" -KeyVaultResourceId $ResID  -Verbose
-    }
+    #    Add-DatabricksSecretScope -ScopeName "KVScope" -KeyVaultResourceId $ResID  -Verbose
+    #}
 
     AfterAll{
         Set-GlobalsNull

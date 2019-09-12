@@ -26,16 +26,16 @@ Describe "ConnectFunctions"{
         $global:Headers | Should -Not -Be $null
     }
 
-    #It "ClientId AAD Autentication using ResourceId"{
-    #    Connect-Databricks -Region $Config.Region -ClientId $Config.ClientId -Secret $Config.Secret `
-    #        -ResourceGroupName $Config.ResourceGroupName `
-    #        -SubscriptionId $Config.SubscriptionId `
-    #        -WorkspaceName $Config.WorkspaceName `
-    #        -TenantId $Config.TenantId
-    #        $global:DatabricksAccessToken | Should -Not -Be $null
-    #        $global:ManagementAccessToken | Should -Not -Be $null
-    #        $global:Headers | Should -Not -Be $null
-    #}
+    It "ClientId AAD Autentication using ResourceId"{
+        Connect-Databricks -Region $Config.Region -ClientId $Config.ClientId -Secret $Config.Secret `
+            -ResourceGroupName $Config.ResourceGroupName `
+            -SubscriptionId $Config.SubscriptionId `
+            -WorkspaceName $Config.WorkspaceName `
+            -TenantId $Config.TenantId
+            $global:DatabricksAccessToken | Should -Not -Be $null
+            $global:ManagementAccessToken | Should -Not -Be $null
+            $global:Headers | Should -Not -Be $null
+    }
 
     AfterAll{
         Set-GlobalsNull
