@@ -6,100 +6,73 @@ Function Connect-Databricks {
         [string]$BearerToken,
 
         [parameter(Mandatory = $true, ParameterSetName='Bearer')]
-        [parameter(Mandatory = $true, ParameterSetName='AAD')]
+        [parameter(Mandatory = $true, ParameterSetName='AADwithOrgId')]
+        [parameter(Mandatory = $true, ParameterSetName='AADwithResource')]
         [string]$Region,
 
-        [parameter(Mandatory = $true, ParameterSetName='AAD')]
+        [parameter(Mandatory = $true, ParameterSetName='AADwithOrgId')]
+        [parameter(Mandatory = $true, ParameterSetName='AADwithResource')]
         [string]$ClientId,
-        [parameter(Mandatory = $false, ParameterSetName='AAD')]
-        [string]$RedirectUri="http%3A%2F%2Flocalhost",
-        [parameter(Mandatory = $true, ParameterSetName='AAD')]
+        [parameter(Mandatory = $true, ParameterSetName='AADwithOrgId')]
+        [parameter(Mandatory = $true, ParameterSetName='AADwithResource')]
+        [string]$Secret,
+
+        [parameter(Mandatory = $true, ParameterSetName='AADwithOrgId')]
         [string]$DatabricksOrgId,
-        [parameter(Mandatory = $true, ParameterSetName='AAD')]
+
+        [parameter(Mandatory = $true, ParameterSetName='AADwithOrgId')]
+        [parameter(Mandatory = $true, ParameterSetName='AADwithResource')]
         [string]$TenantId,
-        [parameter(Mandatory = $false, ParameterSetName='AAD')]
+        [parameter(Mandatory = $true, ParameterSetName='AADwithResource')]
+        [string]$SubscriptionId,
+        [parameter(Mandatory = $true, ParameterSetName='AADwithResource')]
+        [string]$ResourceGroupName,
+        [parameter(Mandatory = $true, ParameterSetName='AADwithResource')]
+        [string]$WorkspaceName,
+
+        [parameter(Mandatory = $false, ParameterSetName='AADwithOrgId')]
+        [parameter(Mandatory = $false, ParameterSetName='AADwithResource')]
         [switch]$Force
     ) 
 
     Write-Verbose "Globals at start of Connect:" 
-    Write-Verbose "DatabricksBearerToken: $global:DatabricksBearerToken"
-    Write-Verbose "RefeshToken: $global:RefeshToken "
-    Write-Verbose "DatabricksOrgId: $global:DatabricksOrgId "
-    Write-Verbose "Expires: $global:Expires"
+    Write-Globals
 
     if ($Force){
         Write-Verbose "-Force set - clearing global variables"
-        $global:Expires = $null
-        $global:DatabricksOrgId = $null
-        $global:RefeshToken = $null
+        Set-GlobalsNull
     }
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $AzureRegion = $Region.Replace(" ","")
-    $global:DatabricksURI = "https://$AzureRegion.azuredatabricks.net" 
-    $resourceId = "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d"
     $URI = "https://login.microsoftonline.com/$tenantId/oauth2/token/"
 
-    if ($BearerToken){
+    if ($PSCmdlet.ParameterSetName -eq "Bearer"){
+        Set-GlobalsNull
         # Use Databricks Bearer Token Method
-        $global:DatabricksBearerToken = "Bearer $BearerToken"
+        $global:DatabricksAccessToken = "Bearer $BearerToken"
         # Basically do not expire the token
-        $global:Expires = (Get-Date).AddDays(90)
-        $global:DatabricksOrgId = $null
-        $global:RefeshToken = $null
+        $global:DatabricksTokenExpires = (Get-Date).AddDays(90)
+        $global:Headers = @{"Authorization"="Bearer $global:DatabricksAccessToken"}
     }
-    else{
-        try{
-            # We have a token and it is not expired
-            if (($global:Expires -and ((Get-Date) -lt  $global:Expires))){
-                Write-Verbose "AAD Token is valid"
-            }
-            # Token has expired - try to refresh
-            else{
-                if (($global:Expires) -and ((Get-Date) -gt $global:Expires)){
-                    Write-Verbose "Refreshing Token"
-                    $Refresh = $global:RefeshToken
-                    $Body = "grant_type=refresh_token&client_id=$ClientID&redirect_uri=$RedirectUri&refresh_token=$Refresh&resource=$resourceId"
-                    $Response = Invoke-RestMethod -Method Post -Uri $URI -Body $Body -ContentType application/x-www-form-urlencoded
-                }
-                elseif (!($global:Expires)){
-                    # Get Access Code
-                    $ManualURL = "https://login.microsoftonline.com/$TenantId/oauth2/authorize?client_id=$ClientId&response_type=code&redirect_url=$RedirectUri&response_mode=query&resource=$ResourceId&state=987654321"
-                    $code = Read-Host "Please open the URL $ManualURL in your browser - copy the code from the * URL RESPONSE * and paste the code here"
-                    
-                    # In case they entered the full URL try and find the code
-                    if ($code -like "http*"){
-                        $Start = $code.IndexOf("?code=") + 6
-                        $Start
-                        $End = $code.IndexOf("&", $Start) 
-                        $code = $code.Substring($Start,$End-$Start)
-                    }
-
-                    # Get Token
-                    Write-Verbose "Getting Token"
-                    $BodyText="grant_type=authorization_code&client_id=$clientId&code=$code&redirect_uri=$redirectUri&resource=$resourceId"
-                    $Response = Invoke-RestMethod -Method Post -Body $BodyText -Uri $URI -ContentType application/x-www-form-urlencoded
-                }
-
-                $global:DatabricksBearerToken = "Bearer " + $Response.access_token
-                $global:RefeshToken = $Response.refresh_token
-                $global:DatabricksOrgId = $DatabricksOrgId
-                # Refresh in 15 minutes
-                $global:Expires = (Get-Date).AddMinutes(15)
-            }
+    elseif($PSCmdlet.ParameterSetName -eq "AADwithOrgId"){
+        Get-AADDatabricksToken
+        $global:Headers = @{"Authorization"="Bearer $DatabricksAccessToken";
+            "X-Databricks-Org-Id"="$DatabricksOrgId"
         }
-        catch{
-            Write-Verbose "Error"
-            Write-Error $_
-            $global:Expires = $null
-            $global:DatabricksOrgId = $null
-            $global:RefeshToken = $null
+        $global:DatabricksOrgId = $DatabricksOrgId
+    }
+    elseif($PSCmdlet.ParameterSetName -eq "AADwithResource"){
+        Get-AADManagementToken
+        Get-AADDatabricksToken
+        $global:Headers = @{"Authorization"="Bearer $global:DatabricksAccessToken";
+            "X-Databricks-Azure-SP-Management-Token"=$global:ManagementAccessToken;
+            "X-Databricks-Azure-Workspace-Resource-Id"="/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroupName/providers/Microsoft.Databricks/workspaces/$WorkspaceName"
         }
     }
+
+    $global:DatabricksURI = "https://$AzureRegion.azuredatabricks.net" 
 
     Write-Verbose "Globals at end of Connect:" 
-    Write-Verbose "DatabricksBearerToken: $global:DatabricksBearerToken"
-    Write-Verbose "RefeshToken: $global:RefeshToken "
-    Write-Verbose "DatabricksOrgId: $global:DatabricksOrgId "
-    Write-Verbose "Expires: $global:Expires"
+    Write-Globals
 }
