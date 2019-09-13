@@ -35,9 +35,10 @@ Update-Module -Name azure.databricks.cicd.tools
 # Connecting
 
 ## Using AAD Service Principals (PREVIEW)
+Please note the use of AAD Authentication and Service Principals with Databricks is in Preview only, and thus so is version 2 of these tools. These commands are liable to change and/or break at any time. 
 
 ## Install
-You must install version 2 or higher of azure.databricks.cicd.tools
+You must install version 2 (Preview) or higher of azure.databricks.cicd.tools
 ```powershell
 Import-Module -Name azure.databricks.cicd.tools -RequiredVersion 2.0.0-preview -AllowPreview
 ```
@@ -55,11 +56,11 @@ You must first create a connection to Databricks. Currently there are three meth
 * Provide the ClientId/Secret and the Databricks OrganisationId for your workspace - known as **DIRECT**
   * This is the o=1234567890 number in the URL when you use your workspace
 * Provide the ClientId/Secret and the SubscriptionID, Resource Group Name & Workspace Name - known as **MANAGEMENT**
-* Provide a Bearer token connect as your own user account **BEARER**
+* Provide a Bearer token connect as your own user account - known as **BEARER**
   * This is the classic method and not recommended for automated processes
   * It is however still useful for running adhoc commands from your desktop
 
-**NOTE**: The first time a service principal connects it must use the MANAGEMENT method as this provisions the service principal in the workspace. Therefore after you can use the DIRECT method.
+**NOTE: The first time a service principal connects it must use the MANAGEMENT method as this provisions the service principal in the workspace. Therefore after you can use the DIRECT method.** Without doing this first you will receive a 403 Unauthorized response on all commands. 
 
 ### Examples
 
@@ -79,7 +80,8 @@ Connect-Databricks -Region "westeurope" -ClientId "8a686772-0e5b-4cdb-ad19-bf1d1
             -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
 ```
 
-You can also use this command to connect using the Bearer token so that you do not have to provide them on every command.
+You can also use this command to connect using the Bearer token so that you do not have to provide them on every command (like you did prior to version 2).
+
 BEARER:
 ```powershell
 Connect-Databricks -BearerToken "dapi1234567890" -Region "westeurope"
