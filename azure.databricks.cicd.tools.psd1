@@ -12,7 +12,7 @@
     RootModule = 'azure.databricks.cicd.tools.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.0.0'
+    ModuleVersion = '2.0.{RELEASENUMBER}'
 
     # ID used to uniquely identify this module
     GUID = 'b277a688-f588-434c-a1dc-a44ff2105279'
@@ -100,7 +100,7 @@
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData = @{
         PSData = @{
-
+            Prerelease = 'preview'
             # Tags applied to this module. These help with module discovery in online galleries.
             Tags = @("Databricks", "Azure", "DevOps", "Deploy", "DBFS", "Cluster", "Jobs")
 
