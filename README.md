@@ -40,8 +40,10 @@ Please note the use of AAD Authentication and Service Principals with Databricks
 ## Install
 You must install version 2 (Preview) or higher of azure.databricks.cicd.tools
 ```powershell
-Import-Module -Name azure.databricks.cicd.tools -RequiredVersion 2.0.0-preview -AllowPreview
+Install-Module -Name azure.databricks.cicd.tools -AllowPrerelease -Force
+Import-Module -Name azure.databricks.cicd.tools -MinimumVersion 2.0.39 -Force
 ```
+If you receive a message that -AllowPrerelease is an unknown parameter please run ```Install-Module PowershellGet -Force``` as Administrator and restart your PowerShell session.
 
 ## Create Service Principal
 [Create a new Service Principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal), you will need the following:
