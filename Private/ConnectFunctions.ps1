@@ -1,5 +1,3 @@
-
-
 Function DatabricksTokenState{ 
     [cmdletbinding()]
     param()
@@ -58,7 +56,7 @@ Function Get-AADDatabricksToken{
     }
     $global:DatabricksAccessToken = $Response.access_token
     $global:DatabricksRefeshToken = $Response.refresh_token
-    $global:DatabricksTokenExpires = (Get-Date).AddMinutes(15)
+    $global:DatabricksTokenExpires = (Get-Date).AddSeconds($Response.expires_in)
 }
 
 Function Get-AADManagementToken{
@@ -88,7 +86,7 @@ Function Get-AADManagementToken{
     }
     $global:ManagementAccessToken = $Response.access_token
     $global:ManagementRefreshToken = $Response.refresh_token
-    $global:ManagementTokenExpires = (Get-Date).AddMinutes(15)
+    $global:ManagementTokenExpires = (Get-Date).AddSeconds($Response.expires_in)
 }
 
 Function Set-GlobalsNull{
