@@ -77,7 +77,7 @@
     'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster', 'Connect-Databricks',
     'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster', 'Get-DatabricksSecretScopes',
     'Start-DatabricksJob', 'Get-DatabricksJobRun', 'Get-DatabricksJobRunList', 'Remove-DatabricksNotebook',
-    'Remove-DatabricksLibrary'
+    'Remove-DatabricksLibrary', 'Get-DatabricksServicePrincipals', 'Add-DatabricksUser'
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'
