@@ -3,21 +3,11 @@
 
 # azure.databricks.cicd.tools
 
-PowerShell Tools for Deploying Databricks Solutions in Azure. These commandlets help you build continuous delivery pipelines and better source control for your scripts.
+PowerShell Tools for Deploying & Managing Databricks Solutions in Azure. These commandlets help you build continuous delivery pipelines and better source control for your scripts.
 
 ## Overview
 
-The CI/CD story in Databricks is complicated. It is designed very much for collaborative working inside the workspace. This probably works well for people doing data science and adhoc queries. But for Data Engineers who what to have build and deployment processes this is usually not good enough.
-
-These tools are designed to help.
-
-These tools should allow you to develop using your preferred methods of Notebooks - in the Databricks Workspace, or via Python or Scala/Java developed in your local IDE. 
-
-You can also use these tools to promote code between environments as part of your build and deploy pipelines.
-
-The tools are now being extended to include more management functions, such as creating, starting & stopping your clusters.
-
-Supports Windows PowerShell 5 and Powershell Core 6.1+
+Supports Windows PowerShell 5 and Powershell Core 6.1+. We generally recommend you use PowerShell Core where possible (it's faster to load modules and downloading large DBFS files may fail in older versions).
 
 See the [Wiki](https://github.com/DataThirstLtd/azure.databricks.cicd.tools/wiki) for command help.
 
@@ -28,13 +18,7 @@ Here is some more detail on use cases for these https://datathirst.net/blog/2019
 https://www.powershellgallery.com/packages/azure.databricks.cicd.tools
 
 ```powershell
-Install-Module -Name azure.databricks.cicd.tools
-```
-
-or
-
-```powershell
-Save-Module -Name azure.databricks.cicd.tools -Path \psmodules
+Install-Module -Name azure.databricks.cicd.tools -Scope CurrentUser
 ```
 
 Followed by:
@@ -48,12 +32,83 @@ To upgrade from a previous version
 ```powershell
 Update-Module -Name azure.databricks.cicd.tools
 ```
+# Connecting
+
+## Using AAD Service Principals (PREVIEW)
+
+## Install
+You must install version 2 or higher of azure.databricks.cicd.tools
+```powershell
+Import-Module -Name azure.databricks.cicd.tools -RequiredVersion 2.0.0-preview -AllowPreview
+```
+
+## Create Service Principal
+[Create a new Service Principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal), you will need the following:
+* ClientId
+* Secret Key
+* TenantId
+
+Make the Service Principal a Contributor on your Databricks Workspace using the Access Control (IAM) blade in the portal.
+
+## Connect-Databricks
+You must first create a connection to Databricks. Currently there are three methods supported:
+* Provide the ClientId/Secret and the Databricks OrganisationId for your workspace - known as **DIRECT**
+  * This is the o=1234567890 number in the URL when you use your workspace
+* Provide the ClientId/Secret and the SubscriptionID, Resource Group Name & Workspace Name - known as **MANAGEMENT**
+* Provide a Bearer token connect as your own user account **BEARER**
+  * This is the classic method and not recommended for automated processes
+  * It is however still useful for running adhoc commands from your desktop
+
+**NOTE**: The first time a service principal connects it must use the MANAGEMENT method as this provisions the service principal in the workspace. Therefore after you can use the DIRECT method.
+
+### Examples
+
+DIRECT:
+```powershell
+Connect-Databricks -Region "westeurope" -ClientId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" `
+            -DatabricksOrgId 1234567 `
+            -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
+```
+
+MANAGEMENT:
+```powershell
+Connect-Databricks -Region "westeurope" -ClientId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" `
+            -ResourceGroupName "MyResourceGroup" `
+            -SubscriptionId "9a686882-0e5b-4edb-cd49-cf1f1e7f34d9" `
+            -WorkspaceName "workspaceName" `
+            -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
+```
+
+You can also use this command to connect using the Bearer token so that you do not have to provide them on every command.
+BEARER:
+```powershell
+Connect-Databricks -BearerToken "dapi1234567890" -Region "westeurope"
+```
+
+You can now execute the commands as required without providing further authication in this PowerShell session:
+```powershell
+Get-DatabricksClusters
+```
+
+## Legacy Bearer Token Method
+You can continue to execute commands using the bearer token in every request (this will override the session connection (if any)):
+```powershell
+ Get-DatabricksClusters -BearerToken "dapi1234567890" -Region "westeurope"
+```
+This is to provide backwards compatibility with version 1 only.  
+
+# Commands
+
+For a full list of commands with help please see the [Wiki](https://github.com/DataThirstLtd/azure.databricks.cicd.tools/wiki).
 
 ## Secrets
 
-### Set-DatabricksSecret
+- Set-DatabricksSecret
+- Add-DatabricksSecretScope
 
 Deploys a Secret value to Databricks, this can be a key to a storage account or a password etc. The secret must be created within a scope which will be created for you if it does not exist.
+
+Please note that the Databricks REST API currently does not support the adding of Key Vault backed scopes so these commands cannot either.
 
 ## Cluster Management
 
@@ -88,8 +143,6 @@ Pull down a folder of scripts from your Databricks workspace so that you can com
 
 **Parameters**
 
--BearerToken: Your API token (see Bearer tokens below)<br>
--Region: The Azure Region that hosts your workspace - get this from the start of the URL for your workspace<br>
 -ExportPath: The folder inside Databricks you would like to clone. Eg /Shared/MyETL. Must start /<br>
 -LocalOutputPath: The local folder to clone the files to. Ideally inside a repo. Can be qualified or relative.<br>
 
@@ -99,8 +152,6 @@ Deploy a folder of scripts from a local folder (Git repo) to a specific folder i
 
 **Parameters**
 
--BearerToken: Your API token (see Bearer tokens below)<br>
--Region: The Azure Region that hosts your workspace - get this from the start of the URL for your workspace<br>
 -LocalPath: The local folder containing the scripts to deploy. Subfolders will also be deployed.<br>
 -DatabricksPath: The folder inside Databricks you would like to deploy into. Eg /Shared/MyETL. Must start /<br>
 
@@ -123,9 +174,7 @@ Deploy a folder of scripts from a local folder (Git repo) to a specific folder i
 See the [Wiki](https://github.com/DataThirstLtd/azure.databricks.cicd.tools/wiki) for help on the commands.
 You can also see more examples in the tests folder.
 
-## Bearer Tokens
-
-All of the API calls require a Bearer token to authenticate you. To create a token login to your workspace and click on the Person icon in the top right corner. From here go into "User Settings" and click on "Generate New Token". Copy the token into your scripts.
+# Misc
 
 ## VSTS/Azure DevOps 
 
@@ -135,6 +184,9 @@ Note that not all commandlets are available as tasks. Instead you may want to im
 
 ## Contribute
 Contributions are welcomed! Please create a pull request with changes/additions.
+
+## Requests
+For any requests on new features please check the [Databricks REST API documentation](https://docs.azuredatabricks.net/api/latest/index.html) to see if it is supported first.
 
 
 
