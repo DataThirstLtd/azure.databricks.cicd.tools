@@ -12,7 +12,7 @@
     RootModule = 'azure.databricks.cicd.tools.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.0.{RELEASENUMBER}'
+    ModuleVersion = '0.0.0'
 
     # ID used to uniquely identify this module
     GUID = 'b277a688-f588-434c-a1dc-a44ff2105279'
