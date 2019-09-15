@@ -5,7 +5,7 @@ $BearerToken = $Config.BearerToken
 $Region = $Config.Region
 
 #TODO - Create dummy cluster
-$ClusterId = "0926-081131-crick762"
+$ClusterId = $Config.ClusterId
 
 Describe "Get-DatabricksLibraries" {
     It "Simple fetch" {
