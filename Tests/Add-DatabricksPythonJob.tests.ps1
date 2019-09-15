@@ -18,7 +18,7 @@ Describe "Add-DatabricksPythonJob" {
     $Timezone = "UTC"
     $PythonPath = "dbfs:/pythonjobtest/File1.py"
     $PythonParameters = "val1", "val2"
-    $ClusterId = "0926-081131-crick762"
+    $ClusterId = $Config.ClusterId
     $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
     $InitScripts = 'dbfs:/pythonjobtestFile2.py'
     $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
@@ -124,7 +124,7 @@ Describe "Add-DatabricksPythonJob - No bearer" {
     $Timezone = "UTC"
     $PythonPath = "dbfs:/pythonjobtest/File1.py"
     $PythonParameters = "val1", "val2"
-    $ClusterId = "0926-081131-crick762"
+    $ClusterId = $Config.ClusterId
     $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
     $InitScripts = 'dbfs:/pythonjobtestFile2.py'
     $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}

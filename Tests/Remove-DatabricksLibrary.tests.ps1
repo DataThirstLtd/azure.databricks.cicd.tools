@@ -4,7 +4,7 @@ $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 $BearerToken = $Config.BearerToken
 $Region = $Config.Region
 $egg = "dbfs:/eggs/pipelines-0.0.1-py3.5.egg"
-$ClusterId = "0926-081131-crick762"
+$ClusterId = $Config.ClusterId
 
 Describe "Add-DatabricksLibrary" {
     BeforeAll{

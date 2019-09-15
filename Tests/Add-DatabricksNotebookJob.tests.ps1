@@ -16,7 +16,7 @@ Describe "Add-DatabricksNotebookJob" {
     $Timezone = "Europe/Warsaw"
     $NotebookPath = "/Shared/Test"
     $NotebookParametersJson = '{"key": "value", "name": "test2"}'
-    $ClusterId = "0926-081131-crick762"
+    $ClusterId = $Config.ClusterId
     $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
     $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 

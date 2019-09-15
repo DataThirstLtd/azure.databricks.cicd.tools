@@ -17,7 +17,7 @@ Describe "Add-DatabricksJarJob" {
     $Timezone = "UTC"
     $JarPath = "test/test1.jar"
     $JarParameters = "val1", "val2"
-    $ClusterId = "0926-081131-crick762"
+    $ClusterId = $Config.ClusterId
     $Libraries = '{"jar": "DBFS:/mylibraries/test.jar"}'
     $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
     $JarMainClass = 'com.test'
