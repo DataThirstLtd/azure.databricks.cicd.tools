@@ -2,6 +2,7 @@
 
 .SYNOPSIS
     Add a user to Databricks workspace with entitlements and groups
+    
 .DESCRIPTION
     Add a user to Databricks workspace with entitlements and groups. If the user exists the error will be ignored but note that the entitlments and groups requested will not be applied
 
@@ -21,9 +22,9 @@
     List of GroupId's to be added to (See Get-DatabricksGroups)
 
 .EXAMPLE 
-C:\PS> Add-DatabricksUser -BearerToken $BearerToken -Region $Region -Username BillyBob@datathirst.net
+    C:\PS> Add-DatabricksUser -BearerToken $BearerToken -Region $Region -Username BillyBob@datathirst.net
 
-This example creates a group called acme
+    This example creates a group called acme
 
 .NOTES
     Author: Simon D'Morias/Data Thirst Ltd

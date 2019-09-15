@@ -4,11 +4,17 @@ Install-Module platyPS -Scope CurrentUser
 Import-Module platyPS
 Set-Location $PSScriptRoot
 
-Import-Module .\azure.databricks.cicd.tools.psm1 -Force
+Import-Module .\azure.databricks.cicd.tools.psd1 -Force
 
 if ($reset){
-    New-MarkdownHelp -Module azure.databricks.cicd.tools -OutputFolder ..\azure.databricks.cicd.tools.wiki -force -WithModulePage
+    $files = Get-ChildItem .\Public -Filter *.ps1
+    foreach ($f in $files){
+        New-MarkdownHelp -Command $f.BaseName -OutputFolder ..\azure.databricks.cicd.tools.wiki -force
+    }
 }
 else {
     Update-MarkdownHelp ..\azure.databricks.cicd.tools.wiki
 }
+
+
+

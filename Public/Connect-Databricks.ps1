@@ -1,3 +1,61 @@
+<#
+
+.SYNOPSIS
+    Connects your current PowerShell session to Azure Databricks.
+
+.DESCRIPTION
+    Connects your current PowerShell session to Azure Databricks.
+    Supports Service Princial AAD authenication or via Databricks Bearer Token
+
+.PARAMETER BearerToken
+    Your Databricks Bearer token to authenticate to your workspace (see User Settings in Databricks WebUI)
+
+.PARAMETER Region
+    Azure Region - must match the URL of your Databricks workspace, example northeurope
+
+.PARAMETER ClientId
+    Azure Active Directory Service Principal Client ID (as known as Application ID)
+    
+.PARAMETER Secret
+    Secret for given Client ID
+
+.PARAMETER DatabricksOrgId
+    Databricks OrganisationID this is found in the URL of your Worksapce as the o parameters (example o=123456789). Note the first time a service principal connects it must use the MANAGEMENT method (ie provide the Resource GRoup Name and Workspace Name - as this provisions the user)
+
+.PARAMETER TenantId
+    Tenant Id (Directory ID) for the AAD owning the ClientId
+
+.PARAMETER SubscriptionId
+    Subscription ID for the Workspace
+
+.PARAMETER ResourceGroupName
+    Resource Group Name for the Workspace
+
+.PARAMETER WorkspaceName
+    Workspace Name
+
+.PARAMETER Force
+    Removes any cached credentials and reconnects
+
+.EXAMPLE 
+    C:\PS> Connect-Databricks -Region "westeurope" -ClientId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" -DatabricksOrgId 1234567 -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
+
+    This example of a DIRECT connection (using the Databricks organisation Id)
+
+.EXAMPLE 
+    C:\PS> Connect-Databricks -Region "westeurope" -ClientId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" -ResourceGroupName "MyResourceGroup" -SubscriptionId "9a686882-0e5b-4edb-cd49-cf1f1e7f34d9" -WorkspaceName "workspaceName" -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
+
+    This example of a MANAGMENT connection (using the Azure resource identifiers to connect)
+
+.EXAMPLE 
+    C:\PS> Connect-Databricks -BearerToken "dapi1234567890" -Region "westeurope"
+
+    This example of a BEARER connection (using the Databricks Bearer token from the Web UI to login as a person)
+
+.NOTES
+    Author: Simon D'Morias / Data Thirst Ltd
+
+#>
 
 Function Connect-Databricks {  
     [cmdletbinding(DefaultParameterSetName='Bearer')]
