@@ -35,12 +35,12 @@ Update-Module -Name azure.databricks.cicd.tools
 # Connecting
 
 ## Using AAD Service Principals (PREVIEW)
-Please note the use of AAD Authentication and Service Principals with Databricks is in Preview only, and thus so is version 2 of these tools. These commands are liable to change and/or break at any time. 
+Please note the use of AAD Authentication and Service Principals with Databricks is in Preview only. These commands are liable to change and/or break at any time.
 
 ## Install
-You must install version 2 (Preview) or higher of azure.databricks.cicd.tools
+You must install version 2 or higher of azure.databricks.cicd.tools
 ```powershell
-Install-Module -Name azure.databricks.cicd.tools -AllowPrerelease -Force
+Install-Module -Name azure.databricks.cicd.tools -MinimumVersion 2.0.39 -Force
 Import-Module -Name azure.databricks.cicd.tools -MinimumVersion 2.0.39 -Force
 ```
 If you receive a message that -AllowPrerelease is an unknown parameter please run ```Install-Module PowershellGet -Force``` as Administrator and restart your PowerShell session.

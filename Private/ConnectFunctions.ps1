@@ -80,7 +80,7 @@ Function Get-AADManagementToken{
         }
         "Missing" {
             Write-Verbose "Getting new AAD Management Token"
-            $BodyText="grant_type=client_credentials&client_id=$ApplicationId&resource=https://management.core.windows.net&client_secret=$Secret"
+            $BodyText="grant_type=client_credentials&client_id=$ApplicationId&resource=https://management.core.windows.net/&client_secret=$Secret"
             $Response = Invoke-RestMethod -Method POST -Body $BodyText -Uri $URI -ContentType application/x-www-form-urlencoded
         }
     }
