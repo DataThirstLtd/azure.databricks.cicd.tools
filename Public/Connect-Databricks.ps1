@@ -14,7 +14,7 @@
     Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER ApplicationId
-    Azure Active Directory Service Principal Client ID (as known as Application ID)
+    Azure Active Directory Service Principal Client ID (also known as Application ID)
     
 .PARAMETER Secret
     Secret for given Client ID
