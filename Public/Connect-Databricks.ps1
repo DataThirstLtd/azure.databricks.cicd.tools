@@ -13,7 +13,7 @@
 .PARAMETER Region
     Azure Region - must match the URL of your Databricks workspace, example northeurope
 
-.PARAMETER ClientId
+.PARAMETER ApplicationId
     Azure Active Directory Service Principal Client ID (as known as Application ID)
     
 .PARAMETER Secret
@@ -23,7 +23,7 @@
     Databricks OrganisationID this is found in the URL of your Worksapce as the o parameters (example o=123456789). Note the first time a service principal connects it must use the MANAGEMENT method (ie provide the Resource GRoup Name and Workspace Name - as this provisions the user)
 
 .PARAMETER TenantId
-    Tenant Id (Directory ID) for the AAD owning the ClientId
+    Tenant Id (Directory ID) for the AAD owning the ApplicationId
 
 .PARAMETER SubscriptionId
     Subscription ID for the Workspace
@@ -38,12 +38,12 @@
     Removes any cached credentials and reconnects
 
 .EXAMPLE 
-    C:\PS> Connect-Databricks -Region "westeurope" -ClientId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" -DatabricksOrgId 1234567 -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
+    C:\PS> Connect-Databricks -Region "westeurope" -ApplicationId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" -DatabricksOrgId 1234567 -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
 
     This example of a DIRECT connection (using the Databricks organisation Id)
 
 .EXAMPLE 
-    C:\PS> Connect-Databricks -Region "westeurope" -ClientId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" -ResourceGroupName "MyResourceGroup" -SubscriptionId "9a686882-0e5b-4edb-cd49-cf1f1e7f34d9" -WorkspaceName "workspaceName" -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
+    C:\PS> Connect-Databricks -Region "westeurope" -ApplicationId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" -ResourceGroupName "MyResourceGroup" -SubscriptionId "9a686882-0e5b-4edb-cd49-cf1f1e7f34d9" -WorkspaceName "workspaceName" -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
 
     This example of a MANAGMENT connection (using the Azure resource identifiers to connect)
 
@@ -70,7 +70,7 @@ Function Connect-Databricks {
 
         [parameter(Mandatory = $true, ParameterSetName='AADwithOrgId')]
         [parameter(Mandatory = $true, ParameterSetName='AADwithResource')]
-        [string]$ClientId,
+        [string]$ApplicationId,
         [parameter(Mandatory = $true, ParameterSetName='AADwithOrgId')]
         [parameter(Mandatory = $true, ParameterSetName='AADwithResource')]
         [string]$Secret,

@@ -28,7 +28,7 @@ Describe "Add-DatabricksSecretScope" {
     }
 
     #It "Key Vault addition"{
-    #    Connect-Databricks -Region $Config.Region -ClientId $Config.ClientId -Secret $Config.Secret `
+    #    Connect-Databricks -Region $Config.Region -ApplicationId $Config.ApplicationId -Secret $Config.Secret `
     #        -ResourceGroupName $Config.ResourceGroupName `
     #        -SubscriptionId $Config.SubscriptionId `
     #        -WorkspaceName $Config.WorkspaceName `

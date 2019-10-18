@@ -47,7 +47,7 @@ If you receive a message that -AllowPrerelease is an unknown parameter please ru
 
 ## Create Service Principal
 [Create a new Service Principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal), you will need the following:
-* ClientId
+* ApplicationId (also known as ClientId)
 * Secret Key
 * TenantId
 
@@ -55,9 +55,9 @@ Make the Service Principal a Contributor on your Databricks Workspace using the 
 
 ## Connect-Databricks
 You must first create a connection to Databricks. Currently there are three methods supported:
-* Provide the ClientId/Secret and the Databricks OrganisationId for your workspace - known as **DIRECT**
+* Provide the ApplicationId/Secret and the Databricks OrganisationId for your workspace - known as **DIRECT**
   * This is the o=1234567890 number in the URL when you use your workspace
-* Provide the ClientId/Secret and the SubscriptionID, Resource Group Name & Workspace Name - known as **MANAGEMENT**
+* Provide the ApplicationId/Secret and the SubscriptionID, Resource Group Name & Workspace Name - known as **MANAGEMENT**
 * Provide a Bearer token connect as your own user account - known as **BEARER**
   * This is the classic method and not recommended for automated processes
   * It is however still useful for running adhoc commands from your desktop
@@ -68,14 +68,14 @@ You must first create a connection to Databricks. Currently there are three meth
 
 DIRECT:
 ```powershell
-Connect-Databricks -Region "westeurope" -ClientId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" `
+Connect-Databricks -Region "westeurope" -ApplicationId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" `
             -DatabricksOrgId 1234567 `
             -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
 ```
 
 MANAGEMENT:
 ```powershell
-Connect-Databricks -Region "westeurope" -ClientId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" `
+Connect-Databricks -Region "westeurope" -ApplicationId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" `
             -ResourceGroupName "MyResourceGroup" `
             -SubscriptionId "9a686882-0e5b-4edb-cd49-cf1f1e7f34d9" `
             -WorkspaceName "workspaceName" `

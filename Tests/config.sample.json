@@ -3,7 +3,7 @@
     "BearerToken": "Legacy Databricks Token from the Workspace UI",
     "Region": "For example WestEurope",
     "TenantId": "Your AAD tenant id",
-    "ClientId": "AAD Client ID with contributor role on your workspace or resource group",
+    "ApplicationId": "AAD Client ID with contributor role on your workspace or resource group",
     "Secret": "Secret for Client Id",
     "DatabricksOrgId": "Organisation Id of your workspace (take from the URL as o=123456)",
     "ResourceGroupName": "Resource group name where your worksapce is",
