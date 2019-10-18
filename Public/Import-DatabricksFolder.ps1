@@ -47,7 +47,7 @@ Function Import-DatabricksFolder
     Set-Location $LocalPath
 
     if ($Clean){
-        Remove-DatabricksNotebook -Path $DatabricksPath -Recursive
+        Remove-DatabricksNotebook -Path $DatabricksPath -Recursive -ErrorAction SilentlyContinue
     }
     
     ForEach ($FileToPush In $Files)
