@@ -12,4 +12,10 @@ Describe "Import-DatabricksFolder"{
             -LocalPath 'Samples\DummyNotebooks' -DatabricksPath $DatabricksPath `
             -Verbose
     }
+
+    It "With Clean" {
+        Import-DatabricksFolder -BearerToken $BearerToken -Region $Region `
+            -LocalPath 'Samples\DummyNotebooks' -DatabricksPath $DatabricksPath -Clean `
+            -Verbose
+    }
 }

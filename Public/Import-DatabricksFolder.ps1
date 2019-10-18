@@ -17,6 +17,9 @@ Path to your repo/local files that you would like to deploy to Databricks (shoul
 .PARAMETER DatabricksPath
 The Databricks folder to target
 
+.PARAMETER Clean
+Optional Switch. Delete the Databricks Workspace folder before copying files
+
 .EXAMPLE
 PS C:\> Import-DatabricksFolder -BearerToken $BearerToken -Region $Region -LocalPath 'Samples\DummyNotebooks' -DatabricksPath 'Shared\ProjectX'
 
@@ -32,7 +35,8 @@ Function Import-DatabricksFolder
         [parameter(Mandatory=$false)][string]$BearerToken,
         [parameter(Mandatory=$false)][string]$Region,
         [parameter(Mandatory=$true)][string]$LocalPath,
-        [parameter(Mandatory=$true)][string]$DatabricksPath
+        [parameter(Mandatory=$true)][string]$DatabricksPath,
+        [parameter(Mandatory=$false)][switch]$Clean
     )
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -41,6 +45,10 @@ Function Import-DatabricksFolder
     Push-Location
     $Files = Get-ChildItem $LocalPath -Recurse -Attributes !D
     Set-Location $LocalPath
+
+    if ($Clean){
+        Remove-DatabricksNotebook -Path $DatabricksPath -Recursive
+    }
     
     ForEach ($FileToPush In $Files)
     {
