@@ -4,7 +4,6 @@ Import-Module "..\Private\ConnectFunctions.ps1" -Force
 
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
-
 Describe "ConnectFunctions"{
     BeforeEach{
         Set-GlobalsNull
@@ -17,8 +16,8 @@ Describe "ConnectFunctions"{
         $global:Headers | Should -Not -Be $null
     }
 
-    It "ClientId AAD Autentication using OrgId"{
-        Connect-Databricks -Region $Config.Region -ClientId $Config.ClientId -Secret $Config.Secret `
+    It "ApplicationId AAD Autentication using OrgId"{
+        Connect-Databricks -Region $Config.Region -ApplicationId $Config.ApplicationId -Secret $Config.Secret `
             -DatabricksOrgId $Config.DatabricksOrgId `
             -TenantId $Config.TenantId
         $global:DatabricksAccessToken | Should -Not -Be $null
@@ -26,8 +25,8 @@ Describe "ConnectFunctions"{
         $global:Headers | Should -Not -Be $null
     }
 
-    It "ClientId AAD Autentication using ResourceId"{
-        Connect-Databricks -Region $Config.Region -ClientId $Config.ClientId -Secret $Config.Secret `
+    It "ApplicationId AAD Autentication using ResourceId"{
+        Connect-Databricks -Region $Config.Region -ApplicationId $Config.ApplicationId -Secret $Config.Secret `
             -ResourceGroupName $Config.ResourceGroupName `
             -SubscriptionId $Config.SubscriptionId `
             -WorkspaceName $Config.WorkspaceName `

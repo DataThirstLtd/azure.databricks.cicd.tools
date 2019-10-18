@@ -15,7 +15,7 @@ Azure Region - must match the URL of your Databricks workspace, example northeur
 Optional. Returns just a single service principal using the internal Databricks Id.
 
 .PARAMETER ServicePrincipalId
-Optional. Returns just a single service principal using the ServicePrincipalId/ClientId/ApplicationId.
+Optional. Returns just a single service principal using the ServicePrincipalId/ApplicationId/ClientId.
 
 .EXAMPLE
 PS C:\> Get-DatabricksServicePrincipals -BearerToken $BearerToken -Region $Region

@@ -4,7 +4,7 @@ Import-Module "..\Private\ConnectFunctions.ps1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
 $TenantId = $Config.TenantId
-$ClientId = $Config.ClientId
+$ApplicationId = $Config.ApplicationId
 $Secret = $Config.Secret
 $URI = "https://login.microsoftonline.com/$tenantId/oauth2/token/"
 
