@@ -45,7 +45,7 @@ Describe "Remove Dummy Key"{
               "key": "DummyKey",
               "value": 1
             }
-          ],
+          ]
         }
 '@
 

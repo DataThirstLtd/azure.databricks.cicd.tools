@@ -12,7 +12,7 @@
     RootModule = 'azure.databricks.cicd.tools.psm1'
 
     # Version number of this module.
-    ModuleVersion = '1.1.21'
+    ModuleVersion = '0.0.0'
 
     # ID used to uniquely identify this module
     GUID = 'b277a688-f588-434c-a1dc-a44ff2105279'
@@ -74,9 +74,11 @@
     'Remove-DatabricksJob', 'Add-DatabricksSparkSubmitJob', 'Add-DatabricksPythonJob', 'Add-DatabricksJarJob',
     'Add-DatabricksDBFSFolder', 'Get-DatabricksDBFSFile', 'Get-DatabricksRun', 'Get-DatabricksJobId',
     'Add-DatabricksGroup', 'Add-DatabricksMemberToGroup', 'Get-DatabricksGroupMembers', 'Get-DatabricksGroups',
+    'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster', 'Connect-Databricks',
     'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster', 'Get-DatabricksSecretScopes',
     'Start-DatabricksJob', 'Get-DatabricksJobRun', 'Get-DatabricksJobRunList', 'Remove-DatabricksNotebook',
-    'Remove-DatabricksLibrary'
+    'Remove-DatabricksLibrary', 'Get-DatabricksServicePrincipals', 'Add-DatabricksUser', 'Set-DatabricksPermission',
+    'Get-DatabricksPermissionLevels', 'Invoke-DatabricksAPI'
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'
@@ -99,7 +101,7 @@
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData = @{
         PSData = @{
-
+            Prerelease = 'preview'
             # Tags applied to this module. These help with module discovery in online galleries.
             Tags = @("Databricks", "Azure", "DevOps", "Deploy", "DBFS", "Cluster", "Jobs")
 

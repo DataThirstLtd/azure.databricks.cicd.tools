@@ -1,0 +1,14 @@
+{
+    "Comment": "Copy this file as config.json in the same folder and complete the values below",
+    "BearerToken": "Legacy Databricks Token from the Workspace UI",
+    "Region": "For example WestEurope",
+    "TenantId": "Your AAD tenant id",
+    "ApplicationId": "AAD Client ID with contributor role on your workspace or resource group",
+    "Secret": "Secret for Client Id",
+    "DatabricksOrgId": "Organisation Id of your workspace (take from the URL as o=123456)",
+    "ResourceGroupName": "Resource group name where your worksapce is",
+    "SubscriptionId": "Azure subscription Id",
+    "WorkspaceName": "Databricks workspace name (resource name in portal)",
+    "ClusterId": "Test Cluster Id to use",
+    "Username": "Existing user in workspace to apply permissions to"
+}

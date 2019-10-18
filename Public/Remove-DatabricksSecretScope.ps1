@@ -25,14 +25,14 @@ Function Remove-DatabricksSecretScope
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken, 
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$ScopeName
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters 
+    
     
     $Body = @{}
     $Body['scope'] = $ScopeName
@@ -40,7 +40,7 @@ Function Remove-DatabricksSecretScope
     $BodyText = $Body | ConvertTo-Json -Depth 10
     
     Try {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/secrets/scopes/delete" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/secrets/scopes/delete" -Headers $Headers
     }
     Catch {
         $err = $_.ErrorDetails.Message

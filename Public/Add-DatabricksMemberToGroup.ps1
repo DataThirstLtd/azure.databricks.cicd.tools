@@ -32,16 +32,16 @@ Function Add-DatabricksMemberToGroup
 {
     [cmdletbinding()]
     param (
-        [parameter(Mandatory=$true)][string]$BearerToken,
-        [parameter(Mandatory=$true)][string]$Region,
+        [parameter(Mandatory=$false)][string]$BearerToken,
+        [parameter(Mandatory=$false)][string]$Region,
         [parameter(Mandatory=$true)][string]$Member,
         [parameter(Mandatory=$true)][string]$Parent
     )
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-    $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters
+    
 
     Try
     {
@@ -55,7 +55,7 @@ Function Add-DatabricksMemberToGroup
             $body = '{"user_name": "' + $Member + '", "parent_name": "' + $Parent + '"   }'
         }
 
-        Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/add-member" -Headers @{Authorization = $InternalBearerToken} -OutFile $OutFile
+        Invoke-RestMethod -Method Post -Body $body -Uri "$global:DatabricksURI/api/2.0/groups/add-member" -Headers $Headers -OutFile $OutFile
         Write-Verbose "User $UserName added to $Parent group"
     }
     Catch {

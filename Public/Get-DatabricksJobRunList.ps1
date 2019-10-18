@@ -31,18 +31,17 @@ Function Get-DatabricksJobRunList
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken, 
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$JobId,
         [parameter(Mandatory = $false)][int]$Limit=10
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters 
     
     Try {
-        $Output = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/runs/list?job_id=$JobId&limit=$Limit" -Headers @{Authorization = $InternalBearerToken}
+        $Output = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/jobs/runs/list?job_id=$JobId&limit=$Limit" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

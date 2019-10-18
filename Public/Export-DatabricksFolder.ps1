@@ -32,8 +32,8 @@ Function Export-DatabricksFolder
 {
     [cmdletbinding()]
     param (
-        [parameter(Mandatory=$true)][string]$BearerToken,
-        [parameter(Mandatory=$true)][string]$Region,
+        [parameter(Mandatory=$false)][string]$BearerToken,
+        [parameter(Mandatory=$false)][string]$Region,
         [parameter(Mandatory=$true)][string]$ExportPath,
         [parameter(Mandatory=$false)][string]$LocalOutputPath,
         [parameter(Mandatory=$false)]
@@ -46,10 +46,9 @@ Function Export-DatabricksFolder
     }
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Region = $Region.Replace(" ","")
-
-    $outJSON = Get-FolderContents $ExportPath $Region $InternalBearerToken
-    Get-Notebooks $outJSON $ExportPath $Region $InternalBearerToken $LocalOutputPath $Format
+    $Headers = GetHeaders $PSBoundParameters
+    
+    $outJSON = Get-FolderContents $ExportPath
+    Get-Notebooks $outJSON $ExportPath $LocalOutputPath $Format
 
 }

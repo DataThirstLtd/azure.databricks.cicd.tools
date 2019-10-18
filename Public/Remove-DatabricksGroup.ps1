@@ -25,14 +25,14 @@ Function Remove-DatabricksGroup
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken, 
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$GroupName
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters 
+    
     
     $Body = @{}
     $Body['group_name'] = $GroupName
@@ -40,7 +40,7 @@ Function Remove-DatabricksGroup
     $BodyText = $Body | ConvertTo-Json -Depth 10
     
     Try {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/groups/delete" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/groups/delete" -Headers $Headers
     }
     Catch {
         $err = $_.ErrorDetails.Message

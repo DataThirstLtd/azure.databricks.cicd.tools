@@ -25,15 +25,15 @@ Author: Simon D'Morias / Data Thirst Ltd
 Function Start-DatabricksCluster {  
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken,    
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $false)][string]$ClusterName,
         [parameter(Mandatory = $false)][string]$ClusterId
         )
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters
+    
     
     $body = @{}
     $ClusterIds = @()
@@ -59,7 +59,7 @@ Function Start-DatabricksCluster {
         $Body['cluster_id'] = $ClusterId
         Try {
             $BodyText = $Body | ConvertTo-Json -Depth 10
-            Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/start" -Headers @{Authorization = $InternalBearerToken}
+            Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/start" -Headers $Headers
         }
         Catch {
             Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

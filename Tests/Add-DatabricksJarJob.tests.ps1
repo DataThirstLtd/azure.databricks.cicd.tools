@@ -1,10 +1,11 @@
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
-$BearerToken = Get-Content "MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
-$Region = "westeurope"
+$Config = (Get-Content '.\config.json' | ConvertFrom-Json)
+$BearerToken = $Config.BearerToken
+$Region = $Config.Region
 
 Describe "Add-DatabricksJarJob" {
-    $Region = "westeurope"    
+  
     $JobName = "UnitTestJob-JarJob"
     $SparkVersion = "5.3.x-scala2.11"
     $NodeType = "Standard_D3_v2"
@@ -16,7 +17,7 @@ Describe "Add-DatabricksJarJob" {
     $Timezone = "UTC"
     $JarPath = "test/test1.jar"
     $JarParameters = "val1", "val2"
-    $ClusterId = "0926-081131-crick762"
+    $ClusterId = $Config.ClusterId
     $Libraries = '{"jar": "DBFS:/mylibraries/test.jar"}'
     $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
     $JarMainClass = 'com.test'

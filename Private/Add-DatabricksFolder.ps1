@@ -1,17 +1,15 @@
 Function Add-DatabricksFolder {    
     [cmdletbinding()]
     param (
-        [parameter(Mandatory=$true)][string]$BearerToken,    
-        [parameter(Mandatory=$true)][string]$Region,
         [parameter(Mandatory=$true)][string]$Path
     ) 
 
-    $InternalBearerToken = Format-BearerToken($BearerToken)
+    $Headers = GetHeaders $PSBoundParameters
     $body = '{"path": "' + $Path + '"}'
 
     Try
     {
-        Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/workspace/mkdirs" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $body -Uri "$global:DatabricksURI/api/2.0/workspace/mkdirs" -Headers $Headers
     }
     Catch
     {

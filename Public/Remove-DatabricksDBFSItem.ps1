@@ -23,14 +23,14 @@ Function Remove-DatabricksDBFSItem
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken, 
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $false)][string]$Path
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters 
+    
     
     $Body = @{}
     $Body['path'] = $Path
@@ -39,7 +39,7 @@ Function Remove-DatabricksDBFSItem
     $BodyText = $Body | ConvertTo-Json -Depth 10
     
     Try {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/delete" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/dbfs/delete" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

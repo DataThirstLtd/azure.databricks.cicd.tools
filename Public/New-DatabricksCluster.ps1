@@ -73,8 +73,8 @@ Author: Simon D'Morias / Data Thirst Ltd
 Function New-DatabricksCluster {  
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken,    
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$ClusterName,
         [parameter(Mandatory = $true)][string]$SparkVersion,
         [parameter(Mandatory = $true)][string]$NodeType,
@@ -93,8 +93,8 @@ Function New-DatabricksCluster {
         [parameter(Mandatory = $false)][string]$InstancePoolId
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters
+    
     $Mode = "create"
     $Body = @{"cluster_name"=$ClusterName}
     $ClusterArgs = @{}
@@ -135,7 +135,7 @@ Function New-DatabricksCluster {
     $BodyText = Remove-DummyKey $BodyText
     Write-Verbose $BodyText
     Try {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/$Mode" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/$Mode" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

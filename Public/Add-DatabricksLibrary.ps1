@@ -55,18 +55,18 @@ Author: Simon D'Morias / Data Thirst Ltd
 Function Add-DatabricksLibrary {  
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken,    
+        [parameter(Mandatory = $false)][string]$Region,
         [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran', 'whl')][string]$LibraryType,
         [parameter(Mandatory = $true)][string]$LibrarySettings,
         [parameter(Mandatory = $true)][string]$ClusterId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters
+    
 
-    $uri ="https://$Region.azuredatabricks.net/api/2.0/libraries/install"
+    $uri ="$global:DatabricksURI/api/2.0/libraries/install"
 
     $Body = @{"cluster_id"=$ClusterId}
 
@@ -98,5 +98,5 @@ Function Add-DatabricksLibrary {
 
     Write-Verbose "Request Body: $BodyText"
     Write-Verbose "Installing library $LibraryType with setting $LibrarySettings to REST API: $uri"
-    Invoke-RestMethod -Uri $uri -Body $BodyText -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
+    Invoke-RestMethod -Uri $uri -Body $BodyText -Method 'POST' -Headers $Headers
 }

@@ -23,16 +23,16 @@ Function Get-DatabricksNodeTypes
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region
+        [parameter(Mandatory = $false)][string]$BearerToken, 
+        [parameter(Mandatory = $false)][string]$Region
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters 
+    
     
     Try {
-        $Nodes = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/list-node-types" -Headers @{Authorization = $InternalBearerToken}
+        $Nodes = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/clusters/list-node-types" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

@@ -1,7 +1,8 @@
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
-$BearerToken = Get-Content "MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
-$Region = "westeurope"
+$Config = (Get-Content '.\config.json' | ConvertFrom-Json)
+$BearerToken = $Config.BearerToken
+$Region = $Config.Region
 
 Push-Location
 
@@ -11,6 +12,13 @@ Describe "Add-DatabricksDBFSFile" {
         $Files = Get-DatabricksDBFSFolder -BearerToken $BearerToken -Region $Region -Path /test
         $Found = ($Files | Where-Object {$_.Path -like "*est.jar"}).path
         $Found | Should -BeLike "*test.jar"
+    }
+
+    It "Add large single file" {
+        Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder "Samples" -FilePattern "aw.csv"  -TargetLocation '/test' -Verbose
+        $Files = Get-DatabricksDBFSFolder -BearerToken $BearerToken -Region $Region -Path /test
+        $Found = ($Files | Where-Object {$_.Path -like "*w.csv"}).path
+        $Found | Should -BeLike "*w.csv"
     }
 
     AfterAll{

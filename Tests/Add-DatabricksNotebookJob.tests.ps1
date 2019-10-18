@@ -1,10 +1,10 @@
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
-$BearerToken = Get-Content "MyBearerToken.txt"  # Create this file in the Tests folder with just your bearer token in
-$Region = "westeurope"
+$Config = (Get-Content '.\config.json' | ConvertFrom-Json)
+$BearerToken = $Config.BearerToken
+$Region = $Config.Region
 
 Describe "Add-DatabricksNotebookJob" {
-    $Region = "westeurope"    
     $JobName = "UnitTestJob"
     $SparkVersion = "5.3.x-scala2.11"
     $NodeType = "Standard_D3_v2"
@@ -16,7 +16,7 @@ Describe "Add-DatabricksNotebookJob" {
     $Timezone = "Europe/Warsaw"
     $NotebookPath = "/Shared/Test"
     $NotebookParametersJson = '{"key": "value", "name": "test2"}'
-    $ClusterId = "0926-081131-crick762"
+    $ClusterId = $Config.ClusterId
     $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
     $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 

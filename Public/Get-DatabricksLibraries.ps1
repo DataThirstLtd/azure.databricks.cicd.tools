@@ -26,19 +26,19 @@ Function Get-DatabricksLibraries
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken, 
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$ClusterId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters 
     
-    $Uri = "https://$Region.azuredatabricks.net/api/2.0/libraries/cluster-status?cluster_id=$ClusterId"
+    
+    $Uri = "$global:DatabricksURI/api/2.0/libraries/cluster-status?cluster_id=$ClusterId"
 
     Try {
-        $Libraries = Invoke-RestMethod -Method Get -Uri $Uri -Headers @{Authorization = $InternalBearerToken}
+        $Libraries = Invoke-RestMethod -Method Get -Uri $Uri -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

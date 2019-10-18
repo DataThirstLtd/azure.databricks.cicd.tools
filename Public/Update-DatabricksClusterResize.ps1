@@ -25,18 +25,16 @@ Function Update-DatabricksClusterResize
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken, 
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$ClusterId,
         [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
         [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers
     ) 
     
-
-
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters 
+    
     $Body = @{}
 
     $Body['cluster_id'] = $ClusterId
@@ -51,7 +49,7 @@ Function Update-DatabricksClusterResize
     Try {
         $BodyText = $Body | ConvertTo-Json -Depth 10
         Write-Verbose $BodyText
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/resize" -Headers @{Authorization = $InternalBearerToken}
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/resize" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

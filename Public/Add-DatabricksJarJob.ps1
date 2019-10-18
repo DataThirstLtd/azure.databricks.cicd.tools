@@ -97,8 +97,8 @@ Author: Simon D'Morias / Data Thirst Ltd
 Function Add-DatabricksJarJob {  
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken,    
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$JobName,
         [parameter(Mandatory = $false)][string]$ClusterId,
         [parameter(Mandatory = $false)][string]$SparkVersion,
@@ -123,8 +123,8 @@ Function Add-DatabricksJarJob {
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters
+    
 
     $ExistingJobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
 
@@ -202,7 +202,7 @@ Function Add-DatabricksJarJob {
     Write-Verbose $BodyText
   
     Try {
-        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "https://$Region.azuredatabricks.net/api/2.0/jobs/$Mode" -Headers @{Authorization = $InternalBearerToken}
+        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/jobs/$Mode" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

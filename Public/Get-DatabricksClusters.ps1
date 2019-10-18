@@ -28,21 +28,26 @@ Function Get-DatabricksClusters
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
-        [parameter(Mandatory = $false)][string]$ClusterId
+        [parameter(Mandatory = $true, ParameterSetName='Bearer')]
+        [string]$BearerToken, 
+
+        [parameter(Mandatory = $false, ParameterSetName='Bearer')]
+        [parameter(Mandatory = $false, ParameterSetName='AAD')]
+        [string]$Region,
+        
+        [parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [string]$ClusterId
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
-    $Region = $Region.Replace(" ","")
-    
+    $Headers = GetHeaders $PSBoundParameters
+
     Try {
-        $Clusters = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/clusters/list" -Headers @{Authorization = $InternalBearerToken}
+        $Clusters = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/clusters/list" -Headers $Headers
     }
     Catch {
-        Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
-        Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
+        Write-Error "StatusCode:" $_.Exception.Response.StatusCode.value__ 
+        Write-Error "StatusDescription:" $_.Exception.Response.StatusDescription
         Write-Error $_.ErrorDetails.Message
     }
 

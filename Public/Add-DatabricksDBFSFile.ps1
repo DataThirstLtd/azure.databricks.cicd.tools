@@ -42,16 +42,17 @@
 Function Add-DatabricksDBFSFile {  
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken,    
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken,    
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$LocalRootFolder,
         [parameter(Mandatory = $true)][string]$FilePattern,
         [parameter(Mandatory = $true)][string]$TargetLocation
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Region = $Region.Replace(" ","")
+    
+    $Headers = GetHeaders $PSBoundParameters
+    
     $size = 1200000
     $LocalRootFolder = Resolve-Path $LocalRootFolder
     Write-Verbose $LocalRootFolder
@@ -79,22 +80,22 @@ Function Add-DatabricksDBFSFile {
             $Body['overwrite'] = "true"
 
             $BodyText = $Body | ConvertTo-Json -Depth 10
-            $handle = Invoke-RestMethod -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/create" -Body $BodyText -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
+            $handle = Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/create" -Body $BodyText -Method 'POST' -Headers $Headers
 
             $i = 0
             While ($i -le ($EncodedContents.length-$size))
             {
                 $part = $EncodedContents.Substring($i,$size)
-                Add-DatabricksChunk -part $part -InternalBearerToken $InternalBearerToken -Region $Region -handle $handle.handle
+                Add-DatabricksChunk -part $part -handle $handle.handle
                 $i += $size
                 Write-Verbose "Uploaded $i bytes"
             }
             $part = $EncodedContents.Substring($i)
-            Add-DatabricksChunk -part $part -InternalBearerToken $InternalBearerToken -Region $Region -handle $handle.handle   
+            Add-DatabricksChunk -part $part -handle $handle.handle   
 
             $Body = @{"handle"= $handle.handle}
             $BodyText = $Body | ConvertTo-Json -Depth 10
-            Invoke-RestMethod -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/close" -Body $BodyText -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
+            Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/close" -Body $BodyText -Method 'POST' -Headers $Headers
         }
         else
         {
@@ -103,7 +104,7 @@ Function Add-DatabricksDBFSFile {
             $Body['overwrite'] = "true"    
             $BodyText = $Body | ConvertTo-Json -Depth 10
             Write-Verbose "Pushing file $($f.FullName) to $FileTarget"
-            Invoke-RestMethod -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/put" -Body $BodyText -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
+            Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/put" -Body $BodyText -Method 'POST' -Headers $Headers
         }
     }
     Pop-Location

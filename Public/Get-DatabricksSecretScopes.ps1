@@ -27,18 +27,17 @@ Function Get-DatabricksSecretScopes
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken, 
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $false)][string]$ScopeName
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken =  Format-BearerToken($BearerToken) 
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters
     
     
     Try {
-        $Scopes = Invoke-RestMethod -Method Get -Uri "https://$Region.azuredatabricks.net/api/2.0/secrets/scopes/list" -Headers @{Authorization = $InternalBearerToken}
+        $Scopes = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/secrets/scopes/list" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 

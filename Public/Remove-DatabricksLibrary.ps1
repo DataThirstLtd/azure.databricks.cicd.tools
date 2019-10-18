@@ -44,18 +44,17 @@ Function Remove-DatabricksLibrary
 { 
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $true)][string]$BearerToken, 
-        [parameter(Mandatory = $true)][string]$Region,
+        [parameter(Mandatory = $false)][string]$BearerToken, 
+        [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$ClusterId,
         [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran', 'whl')][string]$LibraryType,
         [parameter(Mandatory = $true)][string]$LibrarySettings
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters
 
-    $uri ="https://$Region.azuredatabricks.net/api/2.0/libraries/uninstall"
+    $uri ="api/2.0/libraries/uninstall"
 
     $Body = @{"cluster_id"=$ClusterId}
 
@@ -87,5 +86,5 @@ Function Remove-DatabricksLibrary
 
     Write-Verbose "Request Body: $BodyText"
     Write-Verbose "Uninstalling library $LibraryType with setting $LibrarySettings to REST API: $uri"
-    Invoke-RestMethod -Uri $uri -Body $BodyText -Method 'POST' -Headers @{Authorization = $InternalBearerToken}
+    Invoke-RestMethod -Uri "$global:DatabricksURI/$uri" -Body $BodyText -Method 'POST' -Headers $Headers
 }

@@ -27,15 +27,19 @@ Author: Simon D'Morias / Data Thirst Ltd
 Function Get-DatabricksDBFSFile
 {
 param(
-    [parameter(Mandatory = $true)][string]$BearerToken,
-    [parameter(Mandatory = $true)][string]$Region,
+    [parameter(Mandatory = $false)][string]$BearerToken,
+    [parameter(Mandatory = $false)][string]$Region,
     [parameter(Mandatory = $true)][string]$DBFSFile,
     [parameter(Mandatory = $true)][string]$TargetFile
 )
 
+    if ($PSVersionTable.PSVersion.Major -lt 6){
+        Throw "This command requires PowerShell 6 or higher"
+    }
+
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters
+
     $size = 1048576
 
     $body = @{'path' = $DBFSFile}
@@ -49,7 +53,7 @@ param(
         $body['offset'] = $chunkStart
         $body['length'] = $size
         $BodyText = $Body | ConvertTo-Json -Depth 10
-        $chunk = Invoke-RestMethod -Uri "https://$Region.azuredatabricks.net/api/2.0/dbfs/read" -Body $BodyText -Method 'GET' -Headers @{Authorization = $InternalBearerToken}
+        $chunk = Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/read" -Body $BodyText -Method 'GET' -Headers $Headers
 
         $finalFile += [Convert]::FromBase64String($chunk.data)
 

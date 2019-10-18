@@ -29,21 +29,21 @@ Function Set-DatabricksSecret
 {
     [cmdletbinding()]
     param (
-        [parameter(Mandatory=$true)][string]$BearerToken,
-        [parameter(Mandatory=$true)][string]$Region,
+        [parameter(Mandatory=$false)][string]$BearerToken,
+        [parameter(Mandatory=$false)][string]$Region,
         [parameter(Mandatory=$true)][string]$ScopeName,
         [Parameter(Mandatory=$true)][string]$SecretName,
         [Parameter(Mandatory=$true)][string]$SecretValue
     )
 
-    $InternalBearerToken = Format-BearerToken($BearerToken)
-    $Region = $Region.Replace(" ","")
+    $Headers = GetHeaders $PSBoundParameters
+    
 
     Add-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName
 
     $body = '{ "scope": "' + $ScopeName + '", "key": "' + $SecretName + '", "string_value": "' + $SecretValue + '"}'
 
-    Invoke-RestMethod -Method Post -Body $body -Uri "https://$Region.azuredatabricks.net/api/2.0/secrets/put" -Headers @{Authorization = $InternalBearerToken}
+    Invoke-RestMethod -Method Post -Body $body -Uri "$global:DatabricksURI/api/2.0/secrets/put" -Headers $Headers
     Write-Output "Secret $SecretName Set"
 }
 
