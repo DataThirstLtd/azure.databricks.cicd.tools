@@ -2,5 +2,6 @@ Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherChe
 Import-Module Pester -MinimumVersion 4.4.2
 
 Set-Location $PSScriptRoot
-Invoke-Pester -Script ./*.tests.ps1 -OutputFile TestResults.xml -OutputFormat NUnitXML
+$Edition = $PSVersionTable.PSEdition
+Invoke-Pester -Script ./*.tests.ps1 -OutputFile "TestResults-$Edition.xml" -OutputFormat NUnitXML
 Set-Location $PSScriptRoot
