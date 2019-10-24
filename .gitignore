@@ -334,5 +334,6 @@ ASALocalRun/
 Tests/MyBearerToken2.txt
 Tests/Scratch.ps1
 *TestResults*.xml
-Tests/config.json
+Tests/config*.json
+!Tests/config.sample.json
 Tests/aaTest.ps1

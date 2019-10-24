@@ -54,7 +54,7 @@ Function Add-DatabricksSecretScope
     $body = @{}
     $body['scope'] = $ScopeName
 
-    if ($PSBoundParameters.ContainsKey('AllUserAccess')){$body['initial_manage_principal'] = "users"}
+    if ($AllUserAccess){$body['initial_manage_principal'] = "users"}
 
     # Key Vault backed Scope (This is in preview only)
     if ($PSBoundParameters.ContainsKey('KeyVaultResourceId')){
@@ -71,7 +71,7 @@ Function Add-DatabricksSecretScope
 
     Try
     {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/secrets/scopes/create" -Headers $Headers -OutFile $OutFile
+        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/secrets/scopes/create" -Headers $Headers
         Write-Verbose "Secret Scope $ScopeName created"
     }
     Catch
