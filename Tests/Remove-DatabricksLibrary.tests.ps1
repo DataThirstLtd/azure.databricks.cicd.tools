@@ -19,7 +19,7 @@ $ClusterId = $Config.ClusterId
 
 Describe "Add-DatabricksLibrary" {
     BeforeAll{
-        $cluster = Get-DatabricksClusters -BearerToken $BearerToken -Region $Region
+        $cluster = Get-DatabricksClusters 
         $state = ($cluster | Where-Object {$_.cluster_id -eq $ClusterId }).state
         if ($state -eq "TERMINATED"){
             Start-DatabricksCluster  -ClusterId $ClusterId
@@ -32,6 +32,7 @@ Describe "Add-DatabricksLibrary" {
             -LibraryType "egg" -LibrarySettings 'dbfs:/eggs/pipelines-0.0.1-py3.5.egg' `
             -ClusterId $ClusterId
 
+        Start-Sleep -Seconds 3
         $Res = Get-DatabricksLibraries  -ClusterId $ClusterId 
         ($Res | Where-Object {$_.status -eq "UNINSTALL_ON_RESTART"} | Where-Object {$_.library.egg -eq $egg}).library.egg | Should -Be $egg
     }
