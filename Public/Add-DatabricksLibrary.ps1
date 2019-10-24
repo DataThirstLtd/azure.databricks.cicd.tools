@@ -52,6 +52,7 @@ The above example applies a pypi library to a cluster by id
 Author: Simon D'Morias / Data Thirst Ltd
 
 #>
+
 Function Add-DatabricksLibrary {  
     [cmdletbinding()]
     param (

@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Pulls the contents of a Databricks folder (and subfolders) locally so that they can be committed to a repo
+Get a list of Datbricks Clusters
 
 .DESCRIPTION
-Pulls the contents of a Databricks folder (and subfolders) locally so that they can be committed to a repo
+Get a list of Datbricks Clusters
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)

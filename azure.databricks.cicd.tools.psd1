@@ -78,7 +78,8 @@
     'Remove-DatabricksSecretScope', 'Remove-DatabricksGroup', 'Restart-DatabricksCluster', 'Get-DatabricksSecretScopes',
     'Start-DatabricksJob', 'Get-DatabricksJobRun', 'Get-DatabricksJobRunList', 'Remove-DatabricksNotebook',
     'Remove-DatabricksLibrary', 'Get-DatabricksServicePrincipals', 'Add-DatabricksUser', 'Set-DatabricksPermission',
-    'Get-DatabricksPermissionLevels', 'Invoke-DatabricksAPI', 'Remove-DatabricksSecret', 'Get-DatabricksWorkspaceFolder'
+    'Get-DatabricksPermissionLevels', 'Invoke-DatabricksAPI', 'Remove-DatabricksSecret', 'Get-DatabricksWorkspaceFolder',
+    'Get-DatabricksInstancePool', 'Add-DatabricksInstancePool', 'Remove-DatabricksInstancePool'
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'

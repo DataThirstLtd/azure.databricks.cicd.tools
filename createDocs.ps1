@@ -17,4 +17,4 @@ else {
 }
 
 
-
+# Note if docs do not work check there is exactly one empty line before function start

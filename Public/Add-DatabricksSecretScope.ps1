@@ -35,7 +35,6 @@ This example creates a scope called Test1
 
 #>
 
-
 Function Add-DatabricksSecretScope
 {
     [cmdletbinding()]

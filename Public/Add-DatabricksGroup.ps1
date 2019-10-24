@@ -25,7 +25,6 @@ This example creates a group called acme
 
 #>
 
-
 Function Add-DatabricksGroup
 {
     [cmdletbinding()]
