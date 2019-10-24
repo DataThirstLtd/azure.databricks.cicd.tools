@@ -1,24 +1,35 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
+
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 Describe "Get-DatabricksDBFSFolder" {
     It "Add single file" {
-        Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder "Samples" -FilePattern "Test.jar"  -TargetLocation '/test' -Verbose
-        $Files = Get-DatabricksDBFSFolder -BearerToken $BearerToken -Region $Region -Path /test
-        $Found = ($Files | Where-Object {$_.Path -eq "/test/Test.jar"}).Count
-        $Found | Should -Be 1
+        Add-DatabricksDBFSFile -LocalRootFolder "Samples" -FilePattern "Test.jar"  -TargetLocation '/test' -Verbose
+        $Files = Get-DatabricksDBFSFolder -Path /test
+        $Found = ($Files | Where-Object {$_.path -eq "/test/Test.jar"})
+        $Found.path | Should -Be "/test/Test.jar"
     }
 
     AfterAll{
-        Remove-DatabricksDBFSItem -BearerToken $BearerToken -Region $Region -Path /test
+        Remove-DatabricksDBFSItem -Path /test
     }
 
     It "Add folder with subfolder" {
-        Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder Samples -FilePattern "*.py"  -TargetLocation '/test' -Verbose
-        $Files = Get-DatabricksDBFSFolder -BearerToken $BearerToken -Region $Region -Path /test/DummyNotebooks
+        Add-DatabricksDBFSFile -LocalRootFolder Samples -FilePattern "*.py"  -TargetLocation '/test' -Verbose
+        $Files = Get-DatabricksDBFSFolder -Path /test/DummyNotebooks
         $Found = ($Files | Where-Object {$_.Path -like "*.py"}).Count
         $Found | Should -Be 2
     }

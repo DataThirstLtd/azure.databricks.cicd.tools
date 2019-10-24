@@ -1,8 +1,19 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
+
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 Describe "Get-DatabricksJobRunList" {
     BeforeAll{
@@ -21,7 +32,7 @@ Describe "Get-DatabricksJobRunList" {
         $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
         $JarMainClass = 'com.test'
 
-        $global:jobid = Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName "DummyJob-For-Get-DatabricksJobRunList" `
+        $global:jobid = Add-DatabricksJarJob -JobName "DummyJob-For-Get-DatabricksJobRunList" `
             -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Timeout $Timeout -MaxRetries $MaxRetries `
@@ -31,7 +42,7 @@ Describe "Get-DatabricksJobRunList" {
             -Libraries $Libraries -JarMainClass $JarMainClass -Verbose
     }
     It "Get Status" {
-        Get-DatabricksJobRunList -BearerToken $BearerToken -Region $Region -JobId $global:jobid -Limit 2
+        Get-DatabricksJobRunList -JobId $global:jobid -Limit 2
     }
 }
 

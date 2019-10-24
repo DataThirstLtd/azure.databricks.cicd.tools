@@ -1,28 +1,34 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
 
-$global:Expires = $null
-$global:DatabricksOrgId = $null
-$global:RefeshToken = $null
-$global:jobs 
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 Describe "Invoke-DatabricksAPI" {
     it "Get Clusters"{
-        $Clusters = Invoke-DatabricksAPI -BearerToken $BearerToken -Region $Region -API "api/2.0/clusters/list" -Method GET
+        $Clusters = Invoke-DatabricksAPI -API "api/2.0/clusters/list" -Method GET
 
     }
 
     it "with double slash"{
-        $Clusters = Invoke-DatabricksAPI -BearerToken $BearerToken -Region $Region -API "/api/2.0/clusters/list" -Method GET
+        $Clusters = Invoke-DatabricksAPI -API "/api/2.0/clusters/list" -Method GET
 
     }
 
     it "post secret"{
         $Body = @{scope= "TestScope";key="SecretName"; string_value="MySecret"}
-        $Post = Invoke-DatabricksAPI -BearerToken $BearerToken -Region $Region -API "/api/2.0/secrets/put" -Method POST -Body $Body
+        $Post = Invoke-DatabricksAPI -API "/api/2.0/secrets/put" -Method POST -Body $Body
     }
 }
 

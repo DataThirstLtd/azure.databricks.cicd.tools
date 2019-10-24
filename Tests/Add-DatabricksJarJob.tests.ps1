@@ -1,8 +1,19 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
+
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 Describe "Add-DatabricksJarJob" {
   
@@ -23,7 +34,7 @@ Describe "Add-DatabricksJarJob" {
     $JarMainClass = 'com.test'
 
     It "Autoscale with parameters, new cluster" {
-        $global:jobid = Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+        $global:jobid = Add-DatabricksJarJob -JobName $JobName `
             -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Timeout $Timeout -MaxRetries $MaxRetries `
@@ -36,7 +47,7 @@ Describe "Add-DatabricksJarJob" {
     }
 
     It "Update Job to use existing cluster" {
-        $global:jobid = Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+        $global:jobid = Add-DatabricksJarJob -JobName $JobName `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -JarPath $JarPath `
@@ -48,6 +59,6 @@ Describe "Add-DatabricksJarJob" {
     }
 
     AfterAll{
-        Remove-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId $global:jobid
+        Remove-DatabricksJob -JobId $global:jobid
     }
 }

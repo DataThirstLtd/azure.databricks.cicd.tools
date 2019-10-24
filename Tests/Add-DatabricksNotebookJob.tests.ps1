@@ -1,8 +1,19 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
+
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 Describe "Add-DatabricksNotebookJob" {
     $JobName = "UnitTestJob"
@@ -21,7 +32,7 @@ Describe "Add-DatabricksNotebookJob" {
     $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 
     It "Autoscale with parameters, new cluster" {
-        $global:JobId = Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+        $global:JobId = Add-DatabricksNotebookJob -JobName $JobName `
             -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Timeout $Timeout -MaxRetries $MaxRetries `
@@ -34,7 +45,7 @@ Describe "Add-DatabricksNotebookJob" {
     }
 
     It "Update Job to use existing cluster" {
-        $global:JobId = Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+        $global:JobId = Add-DatabricksNotebookJob -JobName $JobName `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -NotebookPath $NotebookPath `
@@ -45,7 +56,7 @@ Describe "Add-DatabricksNotebookJob" {
     }
 
     It "With run now" {
-        $global:RunId = Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+        $global:RunId = Add-DatabricksNotebookJob -JobName $JobName `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -Timezone $Timezone -NotebookPath $NotebookPath `
             -ClusterId $ClusterId `
@@ -56,6 +67,6 @@ Describe "Add-DatabricksNotebookJob" {
     }
 
     AfterAll{
-        Remove-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId $JobId
+        Remove-DatabricksJob -JobId $JobId
     }
 }

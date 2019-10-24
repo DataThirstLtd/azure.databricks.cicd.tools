@@ -1,22 +1,33 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
+
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 $DatabricksPath = "/Shared/UnitTestImport"
 
 Describe "Import-DatabricksFolder"{
     BeforeAll {
-        Import-DatabricksFolder -BearerToken $BearerToken -Region $Region `
+        Import-DatabricksFolder `
             -LocalPath 'Samples\DummyNotebooks' -DatabricksPath $DatabricksPath `
             -Verbose
     }
     it "Delete single item"{
-        Remove-DatabricksNotebook -BearerToken $BearerToken -Region $Region -Path '/Shared/UnitTestImport/SubFolder/File3'
+        Remove-DatabricksNotebook -Path '/Shared/UnitTestImport/SubFolder/File3'
     }
 
     it "Delete Folder with Recurse"{
-        Remove-DatabricksNotebook -BearerToken $BearerToken -Region $Region -Path $DatabricksPath -Recursive
+        Remove-DatabricksNotebook -Path $DatabricksPath -Recursive
     }
 }

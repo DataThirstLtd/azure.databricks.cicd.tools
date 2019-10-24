@@ -1,8 +1,19 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
+
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 $global:Expires = $null
 $global:DatabricksOrgId = $null
@@ -23,7 +34,7 @@ Describe "Get-DatabricksJobs" {
         $NotebookPath = "/Shared/Test"
         $NotebookParametersJson = '{"key": "value", "name": "test2"}'
 
-        $global:JobId = Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+        $global:JobId = Add-DatabricksNotebookJob -JobName $JobName `
             -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Timeout $Timeout -MaxRetries $MaxRetries `
@@ -37,7 +48,7 @@ Describe "Get-DatabricksJobs" {
     }
 
     AfterAll{
-        Remove-DatabricksJob -Region $Region -BearerToken $BearerToken -JobId $global:JobId
+        Remove-DatabricksJob  -JobId $global:JobId
     }
 }
 

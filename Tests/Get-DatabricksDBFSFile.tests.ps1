@@ -1,17 +1,27 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
 
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 Describe "Get-DatabricksDBFSFile"{
     
     BeforeAll{
-        Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder "Samples" -FilePattern "Test.jar"  -TargetLocation '/test' -Verbose
+        Add-DatabricksDBFSFile -LocalRootFolder "Samples" -FilePattern "Test.jar"  -TargetLocation '/test' -Verbose
     }
     It "Get file"{
-        Get-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -DBFSFile '/test/Test.jar' -TargetFile './Samples/Test2.jar' -Verbose
+        Get-DatabricksDBFSFile -DBFSFile '/test/Test.jar' -TargetFile './Samples/Test2.jar' -Verbose
     }
 
    

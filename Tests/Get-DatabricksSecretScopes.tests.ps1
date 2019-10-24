@@ -1,9 +1,19 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
 
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 Describe "Get-DatabricksSecretScopes"{
     
@@ -12,7 +22,7 @@ Describe "Get-DatabricksSecretScopes"{
     }
 
     It "Search for scope by name"{
-        $json = Get-DatabricksSecretScopes -BearerToken $BearerToken -Region $Region -ScopeName "Test1"
+        $json = Get-DatabricksSecretScopes -ScopeName "Test1"
     }
 
 }

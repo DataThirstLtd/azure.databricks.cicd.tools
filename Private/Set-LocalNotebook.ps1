@@ -1,6 +1,6 @@
 function Set-LocalNotebook ($DatabricksFile, $Language, $LocalOutputPath, $Format="SOURCE"){
     $DatabricksFileForUrl = Format-DataBricksFileName -DataBricksFile $DatabricksFile
-    $uri = "https://$Region.azuredatabricks.net/api/2.0/workspace/export?path=" + $DatabricksFileForUrl + "&format=$Format&direct_download=true"
+    $uri = "$global:DatabricksURI/api/2.0/workspace/export?path=" + $DatabricksFileForUrl + "&format=$Format&direct_download=true"
     
     switch ($Format){
         "SOURCE" {
