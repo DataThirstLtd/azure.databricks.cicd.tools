@@ -1,12 +1,22 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
+
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 
 Describe "Add-DatabricksPythonJob" {
-    $Region = "westeurope" 
     $JobName = "UnitTestJob-PythonJob"
     $SparkVersion = "5.3.x-scala2.11"
     $NodeType = "Standard_D3_v2"
@@ -24,11 +34,11 @@ Describe "Add-DatabricksPythonJob" {
     $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 
     BeforeAll{
-        Add-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -LocalRootFolder Samples/DummyNotebooks -FilePattern 'File*.py' -TargetLocation '/pythonjobtest'
+        Add-DatabricksDBFSFile -LocalRootFolder Samples/DummyNotebooks -FilePattern 'File*.py' -TargetLocation '/pythonjobtest'
     }
 
     It "Autoscale with parameters, new cluster" {
-        $global:jobid = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+        $global:jobid = Add-DatabricksPythonJob -JobName $JobName `
             -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Timeout $Timeout -MaxRetries $MaxRetries `
@@ -41,7 +51,7 @@ Describe "Add-DatabricksPythonJob" {
     }
 
     It "Update Job to use existing cluster" {
-        $global:jobid = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+        $global:jobid = Add-DatabricksPythonJob -JobName $JobName `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
@@ -54,7 +64,7 @@ Describe "Add-DatabricksPythonJob" {
     It "Job Single Library pypi package" {
         $Libraries = '{"pypi":{package:"simplejson"}}'
 
-        $global:jobid = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Libary Test1" `
+        $global:jobid = Add-DatabricksPythonJob -JobName "Libary Test1" `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
@@ -67,7 +77,7 @@ Describe "Add-DatabricksPythonJob" {
     It "Job Single Library jar" {
         $Libraries = '{"jar": "DBFS:/mylibraries/test.jar"}'
 
-        $global:jobid = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Libary Test2" `
+        $global:jobid = Add-DatabricksPythonJob -JobName "Libary Test2" `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
@@ -80,7 +90,7 @@ Describe "Add-DatabricksPythonJob" {
     It "Job Single Library egg dbfs" {
         $Libraries = '{"egg": "DBFS:/mylibraries/test.egg"}'
 
-        $global:jobid = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Libary Test2" `
+        $global:jobid = Add-DatabricksPythonJob -JobName "Libary Test2" `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
@@ -93,7 +103,7 @@ Describe "Add-DatabricksPythonJob" {
     
 
     It "Execute Immediate Run" {
-        $global:res = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Immediate Job" `
+        $global:res = Add-DatabricksPythonJob -JobName "Immediate Job" `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
@@ -104,8 +114,8 @@ Describe "Add-DatabricksPythonJob" {
     }
 
     AfterAll{
-        Remove-DatabricksDBFSItem -BearerToken $BearerToken -Region $Region -Path '/pythonjobtest'
-        Remove-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId $global:jobid
+        Remove-DatabricksDBFSItem -Path '/pythonjobtest'
+        Remove-DatabricksJob -JobId $global:jobid
     }
 }
 

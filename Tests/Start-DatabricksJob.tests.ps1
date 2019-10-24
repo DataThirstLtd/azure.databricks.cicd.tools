@@ -1,8 +1,19 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
+
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 $JobName = "StartJobTest"
 $SparkVersion = "5.3.x-scala2.11"
@@ -16,19 +27,19 @@ $PythonParameters = "val1", "val2"
 Describe "Start-DatabricksJob" { 
     
     It "Start By Job Id" {
-        Start-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId $global:jobid -PythonParameters $PythonParameters
+        Start-DatabricksJob -JobId $global:jobid -PythonParameters $PythonParameters
     }
 
     It "Start By Job Name" {
-        Start-DatabricksJob -BearerToken $BearerToken -Region $Region -JobName $JobName
+        Start-DatabricksJob -JobName $JobName
     }
 
     AfterAll{
-        Remove-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId $global:jobid
+        Remove-DatabricksJob -JobId $global:jobid
     }
 
     BeforeAll{
-        $global:jobid = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName $JobName `
+        $global:jobid = Add-DatabricksPythonJob -JobName $JobName `
             -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -PythonPath $PythonPath -PythonParameters $PythonParameters

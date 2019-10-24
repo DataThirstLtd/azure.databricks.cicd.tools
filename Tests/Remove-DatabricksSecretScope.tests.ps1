@@ -1,20 +1,31 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
+
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 $ScopeName = "DataThirstTest123"
 
 Describe "Remove-DatabricksSecretScope" {
     BeforeAll{
-        Add-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName  -Verbose
+        Add-DatabricksSecretScope -ScopeName $ScopeName  -Verbose
     }
     It "Simple addition"{
-        Remove-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName  -Verbose
+        Remove-DatabricksSecretScope -ScopeName $ScopeName  -Verbose
     }
 
     It "Delete non existent should not fail"{
-        Remove-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName "Doesnt exist"  -Verbose
+        Remove-DatabricksSecretScope -ScopeName "Doesnt exist"  -Verbose
     }
 }

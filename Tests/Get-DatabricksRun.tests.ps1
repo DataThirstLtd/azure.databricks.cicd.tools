@@ -1,8 +1,19 @@
+param(
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+)
+
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
-$BearerToken = $Config.BearerToken
-$Region = $Config.Region
+
+switch ($mode){
+    ("Bearer"){
+        Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
+    }
+    ("ServicePrincipal"){
+        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+    }
+}
 
 Describe "Get-DatabricksRun" {
     
@@ -18,7 +29,7 @@ Describe "Get-DatabricksRun" {
         $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
         $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 
-        $global:RunID = Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Immediate Job" `
+        $global:RunID = Add-DatabricksPythonJob -JobName "Immediate Job" `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
@@ -27,7 +38,7 @@ Describe "Get-DatabricksRun" {
     }
 
     It "Get Status" {
-        $global:res = Get-DatabricksRun -BearerToken $BearerToken -Region $Region -RunId $global:RunID -StateOnly
+        $global:res = Get-DatabricksRun -RunId $global:RunID -StateOnly
     }
 }
 
