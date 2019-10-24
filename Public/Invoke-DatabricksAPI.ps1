@@ -45,8 +45,8 @@ Function Invoke-DatabricksAPI
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-
-    $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers
+    $BodyText = $Body | ConvertTo-Json -Depth 10
+    $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers -Body $BodyText
     
     return $Response
 }
