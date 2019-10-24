@@ -19,7 +19,7 @@ $ClusterId = $Config.ClusterId
 
 Describe "Add-DatabricksLibrary" {
     BeforeAll{
-        $cluster = Get-DatabricksClusters -BearerToken $BearerToken -Region $Region
+        $cluster = Get-DatabricksClusters
         $state = ($cluster | Where-Object {$_.cluster_id -eq $ClusterId }).state
         if ($state -eq "TERMINATED"){
             Start-DatabricksCluster  -ClusterId $ClusterId
@@ -30,7 +30,7 @@ Describe "Add-DatabricksLibrary" {
             -LibraryType "jar" -LibrarySettings 'dbfs:/mnt/libraries/library.jar' `
             -ClusterId $ClusterId
 
-        $Res = Get-DatabricksLibraries  -ClusterId $ClusterId
+        $Res = Get-DatabricksLibraries -ClusterId $ClusterId
         $Res.library.jar | Where-Object {$_ -eq "dbfs:/mnt/libraries/library.jar"} | Should -Be "dbfs:/mnt/libraries/library.jar"
     }
 }

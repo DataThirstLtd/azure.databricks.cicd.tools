@@ -19,12 +19,12 @@ switch ($mode){
 Describe "Get-DatabricksClusters"{
     
     It "Get all clusters"{
-        $json = Get-DatabricksClusters -BearerToken $BearerToken -Region $Region
+        $json = Get-DatabricksClusters
         $Json.Count | Should -BeGreaterThan 1
     }
 
     It "Search for cluster by id"{
-        $json = Get-DatabricksClusters -BearerToken $BearerToken -Region $Region
+        $json = Get-DatabricksClusters
         $ClusterId = $Json.cluster_id[0]
         $json = Get-DatabricksClusters -ClusterId $ClusterId
         $Json.cluster_id | Should -Be "$ClusterId"

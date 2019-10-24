@@ -24,14 +24,14 @@ Describe "Get-DatabricksServicePrincipals"{
     }
 
     It "Search for application id"{
-        $json = Get-DatabricksServicePrincipals -BearerToken $BearerToken -Region $Region
+        $json = Get-DatabricksServicePrincipals
         $ServicePrincipalId = $json[0].applicationid
         $json = Get-DatabricksServicePrincipals -ServicePrincipalId $ServicePrincipalId 
         $Json.applicationid | Should -Be $ServicePrincipalId
     }
 
     It "Search for application id"{
-        $json = Get-DatabricksServicePrincipals -BearerToken $BearerToken -Region $Region
+        $json = Get-DatabricksServicePrincipals
         $DatabricksId = $json[0].id
         $json = Get-DatabricksServicePrincipals -DatabricksId $DatabricksId 
         $Json.id | Should -Be $DatabricksId
