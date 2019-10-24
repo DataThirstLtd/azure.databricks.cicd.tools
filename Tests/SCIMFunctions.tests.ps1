@@ -20,7 +20,7 @@ Describe "Get-DatabricksServicePrincipals"{
 
     It "Get multi filter"{
         $url = Get-SCIMURL -Api "Users" -filters @{"filter1"=1;"filter2"=2}
-        $url | Should -Be "/api/2.0/preview/scim/v2/Users?filter1=1&filter2=2"
+        $url.length | Should -Be 50
     }
 
     It "Add-SCIMValueArray"{
