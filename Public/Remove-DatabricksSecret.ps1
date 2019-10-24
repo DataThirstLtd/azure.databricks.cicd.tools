@@ -1,22 +1,21 @@
 <#
-
 .SYNOPSIS
-    Delete a Databricks secret.
+Delete a Databricks secret.
 
 .DESCRIPTION
-    Delete a Databricks secret.
+Delete a Databricks secret.
 
 .PARAMETER BearerToken
-    Your Databricks Bearer token to authenticate to your workspace (see User Settings in Databricks WebUI)
+Your Databricks Bearer token to authenticate to your workspace (see User Settings in Databricks WebUI)
 
 .PARAMETER Region
-    Azure Region - must match the URL of your Databricks workspace, example northeurope
+Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER ScopeName
-    Name for the scope - do not include spaces or special characters.
+Name for the scope - do not include spaces or special characters.
 
 .PARAMETER SecretName
-    Name of the Secret to delete
+Name of the Secret to delete
 
 .EXAMPLE 
 C:\PS> Remove-DatabricksSecret -BearerToken $BearerToken -Region $Region -ScopeName "Test1" -SecretName "Test"
@@ -24,10 +23,9 @@ C:\PS> Remove-DatabricksSecret -BearerToken $BearerToken -Region $Region -ScopeN
 This example removes a secret called Test in Scope Test1
 
 .NOTES
-    Author: Simon D'Morias / Data Thirst Ltd
+Author: Simon D'Morias / Data Thirst Ltd
 
 #>
-
 
 Function Remove-DatabricksSecret
 {

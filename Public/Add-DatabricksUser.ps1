@@ -31,7 +31,6 @@
 
 #>
 
-
 Function Add-DatabricksUser
 {
     [cmdletbinding()]

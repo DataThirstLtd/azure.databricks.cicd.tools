@@ -39,7 +39,6 @@ A list of Spark image versions the pool installs on each instance. Pool clusters
 Author: Simon D'Morias / Data Thirst Ltd
 
 #>
-
     
 Function Add-DatabricksInstancePool {  
     [cmdletbinding()]
