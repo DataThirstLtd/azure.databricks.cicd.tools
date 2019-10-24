@@ -173,6 +173,12 @@ Deploy a folder of scripts from a local folder (Git repo) to a specific folder i
 - Add-DatabricksLibrary
 - Get-DatabricksLibraries
 
+## Missing Commands/Bugs
+
+This command can be used for calling the API directly just lookup the syntax (https://docs.databricks.com/dev-tools/api/latest/index.html)
+
+- Invoke-DatabricksAPI
+
 ## Examples
 
 See the [Wiki](https://github.com/DataThirstLtd/azure.databricks.cicd.tools/wiki) for help on the commands.
