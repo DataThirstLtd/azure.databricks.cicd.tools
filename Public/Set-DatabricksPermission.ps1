@@ -17,12 +17,13 @@
 
 .PARAMETER PermissionLevel
     See Get-DatabricksPermissionLevels
+    For Secret Scopes this value must be READ, WRITE or MANAGE
 
 .PARAMETER DatabricksObjectType
-    Job, Cluster or Instance-pool
+    Job, Cluster, secretScope or Instance-pool
 
 .PARAMETER DatabricksObjectId
-    JobUd, ClusterId or Instance-poolId
+    JobId, ClusterId, secretScope or Instance-poolId
 
 .EXAMPLE 
     C:\PS> Set-DatabricksPermission -BearerToken $BearerToken -Region $Region -Principal "MyTestGroup" -PermissionLevel 'CAN_MANAGE' -DatabricksObjectType 'Cluster' -DatabricksObjectId "tubby-1234"
@@ -42,19 +43,42 @@ Function Set-DatabricksPermission
         [parameter(Mandatory=$false)][string]$Region,
         [parameter(Mandatory=$true)][string]$Principal,
         [Parameter(Mandatory=$true)][string]$PermissionLevel,
-        [Parameter(Mandatory=$true)][ValidateSet('job','cluster','instance-pool')][string]$DatabricksObjectType,
+        [Parameter(Mandatory=$true)][ValidateSet('job','cluster','instance-pool', 'secretScope')][string]$DatabricksObjectType,
         [Parameter(Mandatory=$true)][string]$DatabricksObjectId
     )
 
     $Headers = GetHeaders $PSBoundParameters
-    $BasePath = "$global:DatabricksURI/api/2.0/preview"
-    $URI =  "$BasePath/permissions/$DatabricksObjectType" + "s/$DatabricksObjectId"
-  
-    $acl = @(@{"user_name"= $Principal; "permission_level"=$PermissionLevel})
-    $Body = @{"access_control_list"= $acl} | ConvertTo-Json -Depth 10
 
-    Write-Verbose $Body
-    $Response = Invoke-RestMethod -Method PATCH -Body $Body -Uri $URI -Headers $Headers
+    if ($DatabricksObjectType -eq "secretScope"){
+        $URI = "$global:DatabricksURI/api/2.0/secrets/acls/put"
+        $Body = @{scope=$DatabricksObjectId; principal=$Principal; permission=$PermissionLevel} | ConvertTo-Json -Depth 10
+        try{
+            Write-Verbose $Body
+            $Response = Invoke-RestMethod -Method POST -Body $Body -Uri $URI -Headers $Headers
+        }
+        catch{
+            $err = $_.ErrorDetails.Message
+            if ($err.Contains('exists'))
+            {
+                Write-Verbose $err
+            }
+            else
+            {
+                throw $err
+            }
+        }
+        return $Response
+    }
+    else {
+        $BasePath = "$global:DatabricksURI/api/2.0/preview"
+        $URI =  "$BasePath/permissions/$DatabricksObjectType" + "s/$DatabricksObjectId"
+    
+        $acl = @(@{"user_name"= $Principal; "permission_level"=$PermissionLevel})
+        $Body = @{"access_control_list"= $acl} | ConvertTo-Json -Depth 10
+
+        Write-Verbose $Body
+        $Response = Invoke-RestMethod -Method PATCH -Body $Body -Uri $URI -Headers $Headers
+    }
     
     return $Response
 }
