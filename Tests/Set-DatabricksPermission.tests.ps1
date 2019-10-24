@@ -22,6 +22,16 @@ Describe "Set-DatabricksPermission" {
             -Verbose
     }
 
+
+    It "Apply Secret Scope permissions" {
+        Set-DatabricksPermission -Principal "caroline@datathirst.net" -Permission "READ" `
+            -DatabricksObjectType "secretScope" -DatabricksObjectId "PermissionsTest" `
+            -Verbose
+    }
+
+    BeforeAll{
+        Set-DatabricksSecret -ScopeName "PermissionsTest" -SecretName "Test" -SecretValue "value"
+    }
 }
 
 
