@@ -12,7 +12,7 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER GroupName
-Id of the job to delete
+   Name for the group that will be deleted.
 
 .EXAMPLE
 PS C:\> Remove-DatabricksJob -BearerToken $BearerToken -Region $Region -JobId 10
