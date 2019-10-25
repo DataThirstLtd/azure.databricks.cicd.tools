@@ -44,6 +44,12 @@ Function Invoke-DatabricksAPI
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+    # Removing first slash if any
+    if ($API.Substring(0,1) -eq "/"){
+        $API = $API.Substring(1)
+    }
+
     $Headers = GetHeaders $PSBoundParameters
     $BodyText = $Body | ConvertTo-Json -Depth 10
     $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers -Body $BodyText
