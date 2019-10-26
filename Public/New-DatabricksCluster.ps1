@@ -100,7 +100,7 @@ Function New-DatabricksCluster {
     $ClusterArgs = @{}
     If ($UniqueNames)
     {
-        $ClusterId = (Get-DatabricksClusters -Bearer $BearerToken -Region $Region | Where-Object {$_.cluster_name -eq $ClusterName})
+        $ClusterId = (Get-DatabricksClusters | Where-Object {$_.cluster_name -eq $ClusterName})
         if ($ClusterId){
             if ($Update){
                 $Mode = "edit"
