@@ -14,6 +14,9 @@ Azure Region - must match the URL of your Databricks workspace, example northeur
 .PARAMETER RunId
 The Run Id of the Job
 
+.PARAMETER includeNoteBookOutput
+When notebook returns value through dbutils.notebook.exit() api will retrieve this value. API limits this to first 5MB of output only
+
 .EXAMPLE
 PS C:\> Get-DatabricksJobRun -BearerToken $BearerToken -Region $Region
 
@@ -24,13 +27,14 @@ Author: Simon D'Morias / Data Thirst Ltd
 
 #>
 
-Function Get-DatabricksJobRun
-{ 
+Function Get-DatabricksJobRun { 
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $false)][string]$BearerToken, 
         [parameter(Mandatory = $false)][string]$Region,
-        [parameter(Mandatory = $true)][string]$RunId
+        [parameter(Mandatory = $true)][string]$RunId,
+        [parameter(Mandatory = $false)][switch]$includeNoteBookOutput
+
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -44,8 +48,11 @@ Function Get-DatabricksJobRun
         Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
         Write-Error $_.ErrorDetails.Message
     }
-
-    return $Output.metadata
-
+    if ($PSBoundParameters.ContainsKey('includeNoteBookOutput') -eq $true) {
+        return $Output
+    }
+    else {
+        return $Output.metadata
+    }
 }
     
