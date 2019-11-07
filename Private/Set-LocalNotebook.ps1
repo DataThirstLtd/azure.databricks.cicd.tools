@@ -19,14 +19,18 @@ function Set-LocalNotebook ($DatabricksFile, $Language, $LocalOutputPath, $Forma
     }
         
     $LocalExportPath = $DatabricksFile.Replace($ExportPath + "/","") + $FileExt
+    $tempLocalExportPath = $DatabricksFile.Replace($ExportPath + "/", "") + ".temp" + $FileExt
     $LocalExportPath = Join-Path $LocalOutputPath $LocalExportPath
+    $tempLocalExportPath = Join-Path $LocalOutputPath $tempLocalExportPath
     $Headers = GetHeaders $null
     
     Try
     {
         # Databricks exports with a comment line in the header, remove this and ensure we have Windows line endings
-        $Response = (Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers) -split '\n' | Select-Object -Skip 1
-       
+        Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers -OutFile $tempLocalExportPath
+        $Response = Get-Content $tempLocalExportPath -Encoding UTF8
+        $Response = $response | Select-Object -Skip 1
+        Remove-Item $tempLocalExportPath
         if ($Format -eq "SOURCE"){
             $Response = ($Response.replace("[^`r]`n", "`r`n") -Join "`r`n")
         }
