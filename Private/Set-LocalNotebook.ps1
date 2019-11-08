@@ -22,6 +22,7 @@ function Set-LocalNotebook ($DatabricksFile, $Language, $LocalOutputPath, $Forma
     $tempLocalExportPath = $DatabricksFile.Replace($ExportPath + "/", "") + ".temp" + $FileExt
     $LocalExportPath = Join-Path $LocalOutputPath $LocalExportPath
     $tempLocalExportPath = Join-Path $LocalOutputPath $tempLocalExportPath
+    New-Item -Force -path $tempLocalExportPath -Type File | Out-Null
     $Headers = GetHeaders $null
     
     Try
