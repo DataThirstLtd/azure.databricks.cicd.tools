@@ -30,7 +30,7 @@ function Set-LocalNotebook ($DatabricksFile, $Language, $LocalOutputPath, $Forma
         # Databricks exports with a comment line in the header, remove this and ensure we have Windows line endings
         Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers -OutFile $tempLocalExportPath
         $Response = Get-Content $tempLocalExportPath -Encoding UTF8
-        $Response = $response | Select-Object -Skip 1
+        $Response = $response.Replace("# Databricks notebook source", " ")
         Remove-Item $tempLocalExportPath
         if ($Format -eq "SOURCE"){
             $Response = ($Response.replace("[^`r]`n", "`r`n") -Join "`r`n")
