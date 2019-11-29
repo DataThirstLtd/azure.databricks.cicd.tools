@@ -50,6 +50,7 @@ Function Get-AADDatabricksToken{
         }
         "Missing" {
             Write-Verbose "Getting new AAD Databricks Token"
+            $Secret = [System.Web.HttpUtility]::UrlEncode($Secret)
             $BodyText="grant_type=client_credentials&client_id=$ApplicationId&resource=2ff814a6-3304-4ab8-85cb-cd0e6f879c1d&client_secret=$Secret"
             $Response = Invoke-RestMethod -Method POST -Body $BodyText -Uri $URI -ContentType application/x-www-form-urlencoded
         }
