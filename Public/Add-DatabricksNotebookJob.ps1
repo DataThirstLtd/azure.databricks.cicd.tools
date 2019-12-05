@@ -90,6 +90,22 @@ Setting this option returns a RunId.
 DBFS Location for Cluster logs - must start with dbfs:/
 Example dbfs:/logs/mycluster
 
+.PARAMETER EmailAlertsOnFailure
+A string of email accounts that will receive an email if the job is failed
+Example "andrea.lewis@microsoft.com,maria.wood@microsoft.com"
+
+.PARAMETER EmailAlertsOnStart
+A string of email accounts that will receive an email if the job is started
+Example "bob.orear@microsoft.com,bob.greenberg@microsoft.com"
+
+.PARAMETER EmailAlertsOnSuccess
+A string of email accounts that will receive an email if the job is succeeded
+Example "marc.mcdonald@microsoft.com,gordon.letwin@microsoft.com"
+
+.PARAMETER noAlertSkippedRuns
+Switch.
+if set, do not send email to recipients specified in on_failure if the run is skipped.
+
 .EXAMPLE
 PS C:\> Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.3.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -NotebookPath "/Shared/Test" -NotebookParametersJson '{"key": "value", "name": "test2"}' -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
 
@@ -101,7 +117,7 @@ Extended: Simon D'Morias / Data Thirst Ltd
 #>
 
 Function Add-DatabricksNotebookJob {  
-    [cmdletbinding()]
+   [cmdletbinding()]
     param (
         [parameter(Mandatory = $false)][string]$BearerToken,    
         [parameter(Mandatory = $false)][string]$Region,
@@ -113,6 +129,10 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][int]$MinNumberOfWorkers,
         [parameter(Mandatory = $false)][int]$MaxNumberOfWorkers,
         [parameter(Mandatory = $false)][int]$Timeout,
+        [parameter(Mandatory = $false)][string]$EmailAlertsOnFailure,
+        [parameter(Mandatory = $false)][string]$EmailAlertsOnStart,
+         [parameter(Mandatory = $false)][string]$EmailAlertsOnSuccess,
+        [parameter(Mandatory = $false)][switch]$noAlertSkippedRuns,
         [parameter(Mandatory = $false)][int]$MaxRetries,
         [parameter(Mandatory = $false)][string]$ScheduleCronExpression,
         [parameter(Mandatory = $false)][string]$Timezone,
@@ -180,7 +200,35 @@ Function Add-DatabricksNotebookJob {
     If ($PSBoundParameters.ContainsKey('ScheduleCronExpression')) {
         $JobBody['schedule'] = @{"quartz_cron_expression"=$ScheduleCronExpression;"timezone_id"=$Timezone}
     }
+
+
+    If ($PSBoundParameters.ContainsKey('EmailAlertsOnStart')) {
+        $JobBody['email_notifications'] = @{"on_start"= $EmailAlertsOnStart}
+    }
+
+    If ($PSBoundParameters.ContainsKey('EmailAlertsOnSuccess')) {
+        If ($PSBoundParameters.ContainsKey('EmailAlertsOnStart')) {
+            $JobBody['email_notifications'].Add("on_success",$EmailAlertsOnSuccess)
+        }
+        else{
+            $JobBody['email_notifications'] = @{"on_success"= $EmailAlertsOnSuccess}
+        }
+    }
+
+    If ($PSBoundParameters.ContainsKey('EmailAlertsOnFailure')) {
+        If ($PSBoundParameters.ContainsKey('EmailAlertsOnSuccess') -or $PSBoundParameters.ContainsKey('EmailAlertsOnStart')) {
+            $JobBody['email_notifications'].Add("on_failure",$EmailAlertsOnFailure)
+        }
+        else{
+            $JobBody['email_notifications'] = @{"on_failure"= $EmailAlertsOnFailure}
+        }
     
+    }
+
+    if ($noAlertSkippedRuns.IsPresent){
+          $JobBody['email_notifications'].Add("no_alert_for_skipped_runs",$true)
+    }
+
     $Notebook = @{}
     $Notebook['notebook_path'] = $NotebookPath
     If ($PSBoundParameters.ContainsKey('NotebookParametersJson')) {
