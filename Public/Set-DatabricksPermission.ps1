@@ -47,7 +47,7 @@ Function Set-DatabricksPermission
         [parameter(Mandatory=$false)][string]$BearerToken,
         [parameter(Mandatory=$false)][string]$Region,
         [parameter(Mandatory=$true)][string]$Principal,
-        [parameter(Mandatory=$true)][ValidateSet('user_name','group_name','service_principal_name')][string]$PrincipalType,
+        [parameter(Mandatory=$false)][ValidateSet('user_name','group_name','service_principal_name')][string]$PrincipalType = 'user_name',
         [Parameter(Mandatory=$true)][string]$PermissionLevel,
         [Parameter(Mandatory=$true)][ValidateSet('job','cluster','instance-pool', 'secretScope')][string]$DatabricksObjectType,
         [Parameter(Mandatory=$true)][string]$DatabricksObjectId
