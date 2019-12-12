@@ -82,7 +82,7 @@ Function Add-DatabricksInstancePool {
     $Response = Invoke-RestMethod -Method POST -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/instance-pools/$Mode" -Headers $Headers
 
     if ($Mode -eq "create") {
-        return $Response
+        return $Response.instance_pool_id
     }
     else { 
         return $ExistingPool.instance_pool_id 
