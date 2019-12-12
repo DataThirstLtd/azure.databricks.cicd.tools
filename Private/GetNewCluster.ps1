@@ -2,7 +2,7 @@
 Function GetNewClusterCluster {  
     param (
         [parameter(Mandatory = $true)][string]$SparkVersion,
-        [parameter(Mandatory = $true)][string]$NodeType,
+        [parameter(Mandatory = $false)][string]$NodeType,
         [parameter(Mandatory = $false)][string]$DriverNodeType,
         [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
         [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers,
@@ -17,9 +17,9 @@ Function GetNewClusterCluster {
     ) 
     
     $Body = @{}
-    $Body['spark_version'] = $SparkVersion
+    If (($PSBoundParameters.ContainsKey('SparkVersion')) -and ($SparkVersion)) { $Body['spark_version'] = $SparkVersion }
     if ($null -ne $Spark_conf) {$Body['spark_conf'] = $Spark_conf}
-    $Body['node_type_id'] = $NodeType
+    If (($PSBoundParameters.ContainsKey('NodeType')) -and ($NodeType)) { $Body['node_type_id'] = $NodeType }
     If (($PSBoundParameters.ContainsKey('DriverNodeType')) -and ($DriverNodeType)) { $Body['driver_node_type_id'] = $DriverNodeType }
     If ($MinNumberOfWorkers -eq $MaxNumberOfWorkers){
         $Body['num_workers'] = $MinNumberOfWorkers
