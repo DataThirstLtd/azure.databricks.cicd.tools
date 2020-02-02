@@ -1,5 +1,5 @@
 Set-Location $PSScriptRoot
-Import-Module "..\azure.databricks.cicd.Tools.psm1" -Force
+Import-Module "..\azure.databricks.cicd.tools.psm1" -Force
 
 
 Describe "Remove Dummy Key"{
@@ -9,7 +9,7 @@ Describe "Remove Dummy Key"{
       {
           "node_type_id": "Standard_D3_v2",
           "autotermination_minutes": 15,
-          "spark_version": "5.3.x-scala2.11",
+          "spark_version": "5.5.x-scala2.11",
           "spark_env_vars": [
             {
               "key": "SPARK_WORKER_MEMORY",
@@ -57,7 +57,7 @@ Describe "Remove Dummy Key"{
     It "New Cluster Example" {
       $Test = @'
       {
-        "spark_version": "5.3.x-scala2.11",
+        "spark_version": "5.5.x-scala2.11",
         "init_scripts": [
           {
             "dbfs": {

@@ -1,7 +1,7 @@
 Set-Location $PSScriptRoot
 Import-Module "..\Private\GetHeaders.ps1" -Force
 Import-Module "..\Private\ConnectFunctions.ps1" -Force
-Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
+Import-Module "..\azure.databricks.cicd.tools.psd1" -Force
 
 
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)

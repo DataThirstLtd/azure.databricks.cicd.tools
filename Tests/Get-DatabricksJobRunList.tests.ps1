@@ -3,7 +3,7 @@ param(
 )
 
 Set-Location $PSScriptRoot
-Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
+Import-Module "..\azure.databricks.cicd.tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
 switch ($mode){
@@ -17,7 +17,7 @@ switch ($mode){
 
 Describe "Get-DatabricksJobRunList" {
     BeforeAll{
-        $SparkVersion = "5.3.x-scala2.11"
+        $SparkVersion = "5.5.x-scala2.11"
         $NodeType = "Standard_D3_v2"
         $MinNumberOfWorkers = 1
         $MaxNumberOfWorkers = 1
@@ -43,6 +43,10 @@ Describe "Get-DatabricksJobRunList" {
     }
     It "Get Status" {
         Get-DatabricksJobRunList -JobId $global:jobid -Limit 2
+    }
+
+    AfterAll{
+        Remove-DatabricksJob -JobId $global:jobid
     }
 }
 
