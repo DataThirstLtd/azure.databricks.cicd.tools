@@ -3,7 +3,7 @@ param(
 )
 
 Set-Location $PSScriptRoot
-Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
+Import-Module "..\azure.databricks.cicd.tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
 switch ($mode){
@@ -17,7 +17,7 @@ switch ($mode){
 
 Describe "Add-DatabricksNotebookJob" {
     $JobName = "UnitTestJob"
-    $SparkVersion = "5.3.x-scala2.11"
+    $SparkVersion = "5.5.x-scala2.11"
     $NodeType = "Standard_D3_v2"
     $MinNumberOfWorkers = 1
     $MaxNumberOfWorkers = 1
@@ -32,7 +32,7 @@ Describe "Add-DatabricksNotebookJob" {
     $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
 
     It "Autoscale with parameters, new cluster" {
-        $global:JobId = Add-DatabricksNotebookJob -JobName $JobName `
+        $global:JobId2 = Add-DatabricksNotebookJob -JobName $JobName `
             -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Timeout $Timeout -MaxRetries $MaxRetries `
@@ -41,32 +41,32 @@ Describe "Add-DatabricksNotebookJob" {
             -NotebookParametersJson $NotebookParametersJson `
             -Libraries $Libraries -Spark_conf $Spark_conf
 
-        $global:JobId | Should -BeGreaterThan 0
+        $global:JobId2 | Should -BeGreaterThan 0
     }
 
     It "Update Job to use existing cluster" {
-        $global:JobId = Add-DatabricksNotebookJob -JobName $JobName `
+        $global:JobId1 = Add-DatabricksNotebookJob -JobName $JobName `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -NotebookPath $NotebookPath `
             -NotebookParametersJson $NotebookParametersJson -ClusterId $ClusterId `
             -Libraries $Libraries
 
-        $global:JobId | Should -BeGreaterThan 0
+        $global:JobId1 | Should -BeGreaterThan 0
     }
 
     It "With run now" {
-        $global:RunId = Add-DatabricksNotebookJob -JobName $JobName `
+        $global:JobId = Add-DatabricksNotebookJob -JobName $JobName `
             -Timeout $Timeout -MaxRetries $MaxRetries `
             -Timezone $Timezone -NotebookPath $NotebookPath `
             -ClusterId $ClusterId `
             -NotebookParametersJson $NotebookParametersJson `
             -RunImmediate -Verbose
 
-        $global:RunId | Should -BeGreaterThan 0
+        $global:JobId | Should -BeGreaterThan 0
     }
 
     AfterAll{
-        Remove-DatabricksJob -JobId $JobId
+        Remove-DatabricksJob -JobId $global:JobId1
     }
 }

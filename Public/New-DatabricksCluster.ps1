@@ -12,7 +12,7 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER SparkVersion
-Spark version for cluster. Example: 5.3.x-scala2.11
+Spark version for cluster. Example: 5.5.x-scala2.11
 See Get-DatabricksSparkVersions
     
 .PARAMETER NodeType

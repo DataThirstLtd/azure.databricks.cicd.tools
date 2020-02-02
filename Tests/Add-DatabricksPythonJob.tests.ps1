@@ -3,7 +3,7 @@ param(
 )
 
 Set-Location $PSScriptRoot
-Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
+Import-Module "..\azure.databricks.cicd.tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
 switch ($mode){
@@ -18,7 +18,7 @@ switch ($mode){
 
 Describe "Add-DatabricksPythonJob" {
     $JobName = "UnitTestJob-PythonJob"
-    $SparkVersion = "5.3.x-scala2.11"
+    $SparkVersion = "5.5.x-scala2.11"
     $NodeType = "Standard_D3_v2"
     $MinNumberOfWorkers = 1
     $MaxNumberOfWorkers = 1
@@ -101,6 +101,36 @@ Describe "Add-DatabricksPythonJob" {
     }
 
     
+    AfterEach{
+        Remove-DatabricksJob -JobId $global:jobid
+    }
+    AfterAll{
+        Remove-DatabricksDBFSItem -Path '/pythonjobtest'
+    }
+}
+
+
+
+Describe "Add-DatabricksPythonJob2" {
+    $JobName = "UnitTestJob-PythonJob"
+    $SparkVersion = "5.5.x-scala2.11"
+    $NodeType = "Standard_D3_v2"
+    $MinNumberOfWorkers = 1
+    $MaxNumberOfWorkers = 1
+    $Timeout = 1000
+    $MaxRetries = 1
+    $ScheduleCronExpression = "0 15 22 ? * *"
+    $Timezone = "UTC"
+    $PythonPath = "dbfs:/pythonjobtest/File1.py"
+    $PythonParameters = "val1", "val2"
+    $ClusterId = $Config.ClusterId
+    $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
+    $InitScripts = 'dbfs:/pythonjobtestFile2.py'
+    $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
+
+    BeforeAll{
+        Add-DatabricksDBFSFile -LocalRootFolder Samples/DummyNotebooks -FilePattern 'File*.py' -TargetLocation '/pythonjobtest'
+    }
 
     It "Execute Immediate Run" {
         $global:res = Add-DatabricksPythonJob -JobName "Immediate Job" `
@@ -115,8 +145,6 @@ Describe "Add-DatabricksPythonJob" {
 
     AfterAll{
         Remove-DatabricksDBFSItem -Path '/pythonjobtest'
-        Remove-DatabricksJob -JobId $global:jobid
     }
+
 }
-
-

@@ -20,7 +20,7 @@ it will be updated.
 The ClusterId of an existing cluster to use. Optional.
 
 .PARAMETER SparkVersion
-Spark version for cluster that will run the job. Example: 5.3.x-scala2.11
+Spark version for cluster that will run the job. Example: 5.5.x-scala2.11
 Note: Ignored if ClusterId is populated.
     
 .PARAMETER NodeType
@@ -86,7 +86,7 @@ DBFS Location for Cluster logs - must start with dbfs:/
 Example dbfs:/logs/mycluster
 
 .EXAMPLE
-PS C:\> Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.3.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -JarPath "folder/Test.jar" -JarMainClass 'com.test.me' -JarParameters "val1", "val2" -Libraries '{"jar": "DBFS:/mylibraries/test.jar"}'
+PS C:\> Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.5.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -JarPath "folder/Test.jar" -JarMainClass 'com.test.me' -JarParameters "val1", "val2" -Libraries '{"jar": "DBFS:/mylibraries/test.jar"}'
 
 The above example create a job on a new cluster.
     

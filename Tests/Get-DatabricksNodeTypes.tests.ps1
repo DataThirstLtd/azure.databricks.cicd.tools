@@ -3,7 +3,7 @@ param(
 )
 
 Set-Location $PSScriptRoot
-Import-Module "..\azure.databricks.cicd.Tools.psd1" -Force
+Import-Module "..\azure.databricks.cicd.tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
 switch ($mode){
