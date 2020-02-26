@@ -28,16 +28,17 @@ Author: Simon D'Morias / Data Thirst Ltd
 
 #>  
 
-Function Import-DatabricksFolder
-{
+Function Import-DatabricksFolder {
     [cmdletbinding()]
     param (
-        [parameter(Mandatory=$false)][string]$BearerToken,
-        [parameter(Mandatory=$false)][string]$Region,
-        [parameter(Mandatory=$true)][string]$LocalPath,
-        [parameter(Mandatory=$true)][string]$DatabricksPath,
-        [parameter(Mandatory=$false)][switch]$Clean
+        [parameter(Mandatory = $false)][string]$BearerToken,
+        [parameter(Mandatory = $false)][string]$Region,
+        [parameter(Mandatory = $true)][string]$LocalPath,
+        [parameter(Mandatory = $true)][string]$DatabricksPath,
+        [parameter(Mandatory = $false)][switch]$Clean
     )
+    $threadJobs = @()
+    $throttleLimit = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 2
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
@@ -46,25 +47,24 @@ Function Import-DatabricksFolder
     $Files = Get-ChildItem $LocalPath -Recurse -Attributes !D
     Set-Location $LocalPath
 
-    if ($Clean){
+    if ($Clean) {
         Remove-DatabricksNotebook -Path $DatabricksPath -Recursive -ErrorAction SilentlyContinue
     }
     
-    ForEach ($FileToPush In $Files)
-    {
+    ForEach ($FileToPush In $Files) {
         $Path = $FileToPush.DirectoryName
-        $LocalPath = $LocalPath.Replace("/","\")
+        $LocalPath = $LocalPath.Replace("/", "\")
 
         if ($FileToPush.DirectoryName -ne (Get-Location).Path) {
             $FolderFromTargetRoot = (Resolve-Path ($FileToPush.DirectoryName) -Relative)
             $Path = Join-Path $DatabricksPath $FolderFromTargetRoot
         }
-        else{
+        else {
             $Path = $DatabricksPath
         }
         
-        $Path = $Path.Replace("\","/")
-        $Path = $Path.Replace("/./","/")
+        $Path = $Path.Replace("\", "/")
+        $Path = $Path.Replace("/./", "/")
 
         # Create folder in Databricks
         Add-DatabricksFolder -Path $Path
@@ -72,13 +72,13 @@ Function Import-DatabricksFolder
 
         $BinaryContents = [System.IO.File]::ReadAllBytes($FileToPush.FullName)
         $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
-        $TargetPath = $Path + '/'+ $FileToPush.BaseName
+        $TargetPath = $Path + '/' + $FileToPush.BaseName
 
-        $Body = @{}
+        $Body = @{ }
         $Body['content'] = $EncodedContents
         $Body['path'] = $TargetPath
         $Body['overwrite'] = "true"
-        switch ($FileToPush.Extension){
+        switch ($FileToPush.Extension) {
             ".py" {
                 $Body['format'] = "SOURCE"
                 $Body['language'] = "PYTHON"
@@ -115,15 +115,29 @@ Function Import-DatabricksFolder
 
         $BodyText = $Body | ConvertTo-Json -Depth 10
 
-        if($null -eq $Body['format'])
-        {
+        if ($null -eq $Body['format']) {
             Write-Warning "File $FileToPush has an unknown extension - skipping file"
         }
-        else{
+        else {
             Write-Verbose "Pushing file $FileToPush to $TargetPath"
-            Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/import" -Body $BodyText -Method 'POST' -Headers $Headers
+            $ProgressPreference ='SilentlyContinue'
+            $threadJobs += Start-ThreadJob -Name $fileToPush -ScriptBlock { Invoke-RestMethod -Uri $args[0] -Body $args[1] -Method 'POST' -Headers $args[2] } -ArgumentList "$global:DatabricksURI/api/2.0/workspace/import", $BodyText, $Headers -ThrottleLimit $throttleLimit
         }
     }
-
+    Wait-Job -Job $threadJobs | Out-Null
+    $toThrow = $null
+    foreach ($threadJob in $threadJobs){
+        $getState = Get-Job $threadJob.Name | Select-Object -Last 1
+        if ($getState.State -eq 'Failed') {
+            $toThrow = 1
+            Write-Host ($threadJob.ChildJobs[0].JobStateInfo.Reason.Message) -ForegroundColor Red
+        } 
+        else{
+            Write-Verbose "$($getState.Name) has $($getState.State)" 
+        }
+    }
     Pop-Location
+    if ($null -ne $toThrow){
+        Write-Error "Oh dear one of the jobs has failed. Check the details of the jobs above."
+    }
 }

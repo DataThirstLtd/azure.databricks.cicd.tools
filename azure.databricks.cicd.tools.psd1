@@ -30,7 +30,7 @@
     Description = 'PowerShell module to help with Azure Databricks CI & CD Scenarios by simplifying the API or CLI calls into idempotent commands. See https://github.com/DataThirstLtd/azure.databricks.cicd.tools & https://datathirst.net'
 
     # Minimum version of the Windows PowerShell engine required by this module
-    PowerShellVersion = '5.0'
+    PowerShellVersion = '5.1'
 
     # Name of the Windows PowerShell host required by this module
     # PowerShellHostName = ''
@@ -48,7 +48,9 @@
     # ProcessorArchitecture = ''
 
     # Modules that must be imported into the global environment prior to importing this module
-    # RequiredModules = @()
+    #RequiredModules =  @(
+    #    @{ModuleName="ThreadJob";ModuleVersion="2.0.3";Guid="0e7b895d-2fec-43f7-8cae-11e8d16f6e40"}
+    #)
 
     # Assemblies that must be loaded prior to importing this module
     # RequiredAssemblies = @('')
