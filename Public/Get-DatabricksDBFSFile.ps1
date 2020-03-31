@@ -24,7 +24,7 @@ PS C:\> Get-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -DBFSFi
 Author: Simon D'Morias / Data Thirst Ltd 
 #>  
 
-Function Get-DatabricksDBFSFiles {
+Function Get-DatabricksDBFSFile {
     param(
         [parameter(Mandatory = $false)][string]$BearerToken,
         [parameter(Mandatory = $false)][string]$Region,
