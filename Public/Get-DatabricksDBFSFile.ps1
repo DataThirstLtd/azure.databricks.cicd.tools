@@ -24,35 +24,35 @@ PS C:\> Get-DatabricksDBFSFile -BearerToken $BearerToken -Region $Region -DBFSFi
 Author: Simon D'Morias / Data Thirst Ltd 
 #>  
 
-Function Get-DatabricksDBFSFile
-{
-param(
-    [parameter(Mandatory = $false)][string]$BearerToken,
-    [parameter(Mandatory = $false)][string]$Region,
-    [parameter(Mandatory = $true)][string]$DBFSFile,
-    [parameter(Mandatory = $true)][string]$TargetFile
-)
-
-    if ($PSVersionTable.PSVersion.Major -lt 6){
-        Throw "This command requires PowerShell 6 or higher"
-    }
+Function Get-DatabricksDBFSFiles {
+    param(
+        [parameter(Mandatory = $false)][string]$BearerToken,
+        [parameter(Mandatory = $false)][string]$Region,
+        [parameter(Mandatory = $true)][string]$DBFSFile,
+        [parameter(Mandatory = $true)][string]$TargetFile
+    )
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
 
     $size = 1048576
 
-    $body = @{'path' = $DBFSFile}
+    $body = @{'path' = $DBFSFile }
 
     $chunkStart = 0
     [byte[]]$finalFile = $null
     $chunkEnd = $chunkStart + $size
     $bytesRead = $size
 
-    while ($bytesRead -eq $size){
+    while ($bytesRead -eq $size) {
         $body['offset'] = $chunkStart
         $body['length'] = $size
-        $BodyText = $Body | ConvertTo-Json -Depth 10
+        if ($PSVersionTable.PSVersion.Major -lt 6) {
+            $BodyText = $Body 
+        }
+        else {
+            $BodyText = $Body | ConvertTo-Json -Depth 10
+        }
         $chunk = Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/read" -Body $BodyText -Method 'GET' -Headers $Headers
 
         $finalFile += [Convert]::FromBase64String($chunk.data)
@@ -61,6 +61,10 @@ param(
         $chunkEnd = $chunkStart + $size
         $bytesRead = $chunk.bytes_read
     }
-
-    Set-Content -Path $TargetFile -Value $finalFile -AsByteStream
+    if ($PSVersionTable.PSVersion.Major -lt 6) {
+        Set-Content -Path $TargetFile -Value $finalFile -Encoding Byte
+    }
+    else {
+        Set-Content -Path $TargetFile -Value $finalFile -AsByteStream
+    }
 }
