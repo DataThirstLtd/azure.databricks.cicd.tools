@@ -124,6 +124,12 @@ Function Import-DatabricksFolder {
             $threadJobs += Start-ThreadJob -Name $fileToPush -ScriptBlock { Invoke-RestMethod -Uri $args[0] -Body $args[1] -Method 'POST' -Headers $args[2] } -ArgumentList "$global:DatabricksURI/api/2.0/workspace/import", $BodyText, $Headers -ThrottleLimit $throttleLimit
         }
     }
+    
+    if ($threadJobs.length -eq 0){
+        Pop-Location
+        return
+    }
+
     Wait-Job -Job $threadJobs | Out-Null
     $toThrow = $null
     foreach ($threadJob in $threadJobs){

@@ -15,18 +15,31 @@ switch ($mode){
     }
 }
 
+$UploadFolder = 'Samples\DummyNotebooks'
+New-Item -Path $UploadFolder -Name "empty" -Force -ItemType Directory | Out-Null
+
 $DatabricksPath = "/Shared/UnitTestImport"
 
+Describe "Import-DatabricksFolder Empty Folder"{
+
+    It "Empty Folder" {
+        Import-DatabricksFolder `
+            -LocalPath "$UploadFolder\empty"  -DatabricksPath $DatabricksPath `
+            -Verbose
+    }
+}
+
 Describe "Import-DatabricksFolder"{
+
     It "Simple Import" {
         Import-DatabricksFolder `
-            -LocalPath 'Samples\DummyNotebooks' -DatabricksPath $DatabricksPath `
+            -LocalPath $UploadFolder  -DatabricksPath $DatabricksPath `
             -Verbose
     }
 
     It "With Clean" {
         Import-DatabricksFolder `
-            -LocalPath 'Samples\DummyNotebooks' -DatabricksPath $DatabricksPath -Clean `
+            -LocalPath $UploadFolder  -DatabricksPath $DatabricksPath -Clean `
             -Verbose
     }
 }
