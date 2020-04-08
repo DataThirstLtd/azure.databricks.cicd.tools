@@ -135,11 +135,18 @@ Function New-DatabricksCluster {
     $BodyText = Remove-DummyKey $BodyText
     Write-Verbose $BodyText
     Try {
-        Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/$Mode" -Headers $Headers
+        if ($Mode -eq "create"){
+            $ClusterId = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/create" -Headers $Headers
+        }
+        if ($Mode -eq "edit"){
+            Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/edit" -Headers $Headers
+        }
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
         Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
         Write-Error $_.ErrorDetails.Message
     }
+
+    return $ClusterId.cluster_id
 }
