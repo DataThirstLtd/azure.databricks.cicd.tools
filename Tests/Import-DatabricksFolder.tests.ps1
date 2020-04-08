@@ -19,6 +19,7 @@ $UploadFolder = 'Samples\DummyNotebooks'
 New-Item -Path $UploadFolder -Name "empty" -Force -ItemType Directory | Out-Null
 
 $DatabricksPath = "/Shared/UnitTestImport"
+$DatabricksPathClean = "/Shared/UnitTestImportClean2"
 
 Describe "Import-DatabricksFolder Empty Folder"{
 
@@ -37,6 +38,6 @@ Describe "Import-DatabricksFolder"{
 
     It "With Clean" {
         Import-DatabricksFolder `
-            -LocalPath $UploadFolder  -DatabricksPath $DatabricksPath -Clean
+            -LocalPath $UploadFolder  -DatabricksPath $DatabricksPathClean -Clean
     }
 }

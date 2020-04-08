@@ -48,7 +48,10 @@ Function Import-DatabricksFolder {
     Set-Location $LocalPath
 
     if ($Clean) {
-        $ExistingFiles = Get-DatabricksWorkspaceFolder -Path $DatabricksPath -ErrorAction SilentlyContinue
+        Trap {
+            $ExistingFiles = Get-DatabricksWorkspaceFolder -Path $DatabricksPath -ErrorAction:SilentlyContinue;
+            continue
+        }
         foreach ($f in $ExistingFiles){
             if ($f.object_type -eq "DIRECTORY"){
                 Write-Verbose "Removing directory $($f.path)"
