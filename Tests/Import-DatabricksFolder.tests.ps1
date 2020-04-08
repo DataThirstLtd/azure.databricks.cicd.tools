@@ -32,14 +32,11 @@ Describe "Import-DatabricksFolder Empty Folder"{
 Describe "Import-DatabricksFolder"{
 
     It "Simple Import" {
-        Import-DatabricksFolder `
-            -LocalPath $UploadFolder  -DatabricksPath $DatabricksPath `
-            -Verbose
+        Import-DatabricksFolder -LocalPath $UploadFolder  -DatabricksPath $DatabricksPath
     }
 
     It "With Clean" {
         Import-DatabricksFolder `
-            -LocalPath $UploadFolder  -DatabricksPath $DatabricksPath -Clean `
-            -Verbose
+            -LocalPath $UploadFolder  -DatabricksPath $DatabricksPath -Clean
     }
 }
