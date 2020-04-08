@@ -35,7 +35,7 @@ Describe "New-DatabricksCluster" {
             -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
             -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts    # -UniqueNames -Update 
 
-        $ClusterId.cluster_id.Length | Should -BeGreaterThan 1
+        $ClusterId.Length | Should -BeGreaterThan 1
     }
 
     AfterAll {
