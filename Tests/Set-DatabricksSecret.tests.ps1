@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="Bearer"
 )
 
 Set-Location $PSScriptRoot
@@ -17,7 +17,7 @@ switch ($mode){
 
 $ScopeName = "DataThirst1"
 $SecretName = "Test1"
-$SecretValue = "mykey"
+$SecretValue = "mykey\/\/"
 
 
 Describe "Set-DatabricksSecret" {
