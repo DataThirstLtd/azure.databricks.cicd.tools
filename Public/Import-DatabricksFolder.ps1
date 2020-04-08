@@ -48,7 +48,17 @@ Function Import-DatabricksFolder {
     Set-Location $LocalPath
 
     if ($Clean) {
-        Remove-DatabricksNotebook -Path $DatabricksPath -Recursive -ErrorAction SilentlyContinue
+        $ExistingFiles = Get-DatabricksWorkspaceFolder -Path $DatabricksPath -ErrorAction SilentlyContinue
+        foreach ($f in $ExistingFiles){
+            if ($f.object_type -eq "DIRECTORY"){
+                Write-Verbose "Removing directory $($f.path)"
+                Remove-DatabricksNotebook -Path $f.path -Recursive
+            }
+            else {
+                Write-Verbose "Removing file $($f.path)"
+                Remove-DatabricksNotebook -Path $f.path 
+            }
+        }
     }
     
     ForEach ($FileToPush In $Files) {
