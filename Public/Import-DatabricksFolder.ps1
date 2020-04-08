@@ -58,6 +58,7 @@ Function Import-DatabricksFolder {
                 Write-Verbose "Removing file $($f.path)"
                 Remove-DatabricksNotebook -Path $f.path 
             }
+            Start-Sleep -Milliseconds 200 # Prevent 429 responses
         }
     }
     
