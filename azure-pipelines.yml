@@ -1,0 +1,61 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+- task: PowerShell@2
+  displayName: 'Configure Environment'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $c = @"
+      {
+          "BearerToken": "$(BearerToken)",
+          "Region": "$(AzureRegion)",
+          "TenantId": "$(TenantId)",
+          "ApplicationId": "$(ApplicationId)",
+          "Secret": "$(Secret)",
+          "DatabricksOrgId": "$(DatabricksOrgId)",
+          "ResourceGroupName": "$(ResourceGroup)",
+          "SubscriptionId": "$(SubscriptionId)",
+          "WorkspaceName": "$(Workspace)",
+          "ClusterId": "$(ClusterId)",
+          "Username": "$(TestUser)"
+      }
+      "@
+    pwsh: true
+    workingDirectory: 'Tests'
+
+- task: PowerShell@2
+  displayName: 'Windows Powershell - Bearer'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $Mode="Bearer"
+      Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
+      Import-Module Pester -MinimumVersion 4.4.2 
+      Set-Location "./Tests"
+      $Edition = $PSVersionTable.PSEdition
+      Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "TestResults-$Edition-$Mode.xml" -OutputFormat NUnitXML
+    pwsh: false
+
+- task: PowerShell@2
+  displayName: 'Powershell Core - ServicePrincipal'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $Mode="ServicePrincipal"
+      Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
+      Import-Module Pester -MinimumVersion 4.4.2 
+      Set-Location "./Tests"
+      $Edition = $PSVersionTable.PSEdition
+      Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "TestResults-$Edition-$Mode.xml" -OutputFormat NUnitXML
+    pwsh: true
+  
