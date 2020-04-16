@@ -1,5 +1,5 @@
-[![Build status](https://datathirst.visualstudio.com/DataThirst/_apis/build/status/azure.databricks.cicd.tools)](https://datathirst.visualstudio.com/DataThirst/_build/latest?definitionId=13)
-![PSGalleryStatus](https://datathirst.vsrm.visualstudio.com/_apis/public/Release/badge/cceb0041-0508-4178-abee-9b0c30c127e8/1/1)
+[![Build status](https://dev.azure.com/datathirst/Databricks%20Tools/_apis/build/status/azure.databricks.cicd.tools)](https://dev.azure.com/datathirst/Databricks%20Tools/_build/latest?definitionId=54)
+![PSGalleryStatus](https://vsrm.dev.azure.com/datathirst/_apis/public/Release/badge/6982ad16-9bb5-4c62-93c7-e8f22e7e6b1f/1/2)
 
 # azure.databricks.cicd.tools
 
