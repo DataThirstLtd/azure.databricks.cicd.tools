@@ -5,6 +5,11 @@
 
 trigger:
 - master
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - master
 
 pool:
   vmImage: 'windows-2019'
@@ -30,6 +35,8 @@ steps:
           "Username": "$(TestUser)"
       }
       "@
+      Set-Content .\config.json $c
+      Remove-Item .\TestResults.xml -Force -ErrorAction SilentlyContinue
     pwsh: true
     workingDirectory: 'Tests'
 
@@ -58,4 +65,34 @@ steps:
       $Edition = $PSVersionTable.PSEdition
       Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "TestResults-$Edition-$Mode.xml" -OutputFormat NUnitXML
     pwsh: true
-  
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results **/TestResults-*Bearer.xml'
+  inputs:
+    testResultsFormat: NUnit
+    testResultsFiles: '**/TestResults-*Bearer.xml'
+    testRunTitle: Bearer
+    publishRunAttachments: false
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results **/TestResults-*ServicePrincipal.xml'
+  inputs:
+    testResultsFormat: NUnit
+    testResultsFiles: '**/TestResults-*ServicePrincipal.xml'
+    testRunTitle: ServicePrincipal
+    publishRunAttachments: false
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+  inputs:
+    Contents: |
+     Private\**
+     Public\**
+     *.psd1
+     *.psm1
+    TargetFolder: '$(build.artifactstagingdirectory)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: azure.databricks.cicd.Tools'
+  inputs:
+    ArtifactName: azure.databricks.cicd.Tools
