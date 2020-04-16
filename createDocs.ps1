@@ -1,5 +1,7 @@
 $reset=$true
 
+# Note if docs do not work check there is exactly one empty line before function start
+
 Install-Module platyPS -Scope CurrentUser
 Import-Module platyPS
 Set-Location $PSScriptRoot
@@ -16,5 +18,3 @@ else {
     Update-MarkdownHelp ..\azure.databricks.cicd.tools.wiki
 }
 
-
-# Note if docs do not work check there is exactly one empty line before function start
