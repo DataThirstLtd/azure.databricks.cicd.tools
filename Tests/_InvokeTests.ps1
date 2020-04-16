@@ -1,7 +1,7 @@
 param(
     [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
 )
-Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck
+Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
 Import-Module Pester -MinimumVersion 4.4.2
 
 Set-Location $PSScriptRoot
