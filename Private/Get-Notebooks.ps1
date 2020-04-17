@@ -1,7 +1,7 @@
 Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Format = "SOURCE" ) {
 
     $threadJobs = @()
-    $throttleLimit = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 2
+    $throttleLimit = GetCpuCount
 
     $scriptBlock = { param($DatabricksFile, $Format = "SOURCE", $Headers, $uri, $LocalExportPath, $tempLocalExportPath)         
         Try {
