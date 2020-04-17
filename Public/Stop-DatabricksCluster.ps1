@@ -42,7 +42,7 @@ Function Stop-DatabricksCluster {
         $ClusterIds += $ClusterId
     }
     elseif ($PSBoundParameters.ContainsKey('ClusterName')) {
-        $Clusters = (Get-DatabricksClusters -Bearer $BearerToken -Region $Region | Where-Object {$_.cluster_name -eq $ClusterName})
+        $Clusters = (Get-DatabricksClusters | Where-Object {$_.cluster_name -eq $ClusterName})
         foreach ($c in $Clusters)
         {
             $ClusterIds += $c.cluster_id

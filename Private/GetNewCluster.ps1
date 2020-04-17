@@ -1,11 +1,12 @@
 
+
 Function GetNewClusterCluster {  
     param (
-        [parameter(Mandatory = $true)][string]$SparkVersion,
+        [parameter(Mandatory = $false)][string]$SparkVersion,
         [parameter(Mandatory = $false)][string]$NodeType,
         [parameter(Mandatory = $false)][string]$DriverNodeType,
-        [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
-        [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers,
+        [parameter(Mandatory = $false)][int]$MinNumberOfWorkers,
+        [parameter(Mandatory = $false)][int]$MaxNumberOfWorkers,
         [parameter(Mandatory = $false)][int]$AutoTerminationMinutes,
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
@@ -13,26 +14,32 @@ Function GetNewClusterCluster {
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
         [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
         [parameter(Mandatory = $false)][string]$ClusterLogPath,
-        [parameter(Mandatory = $false)][string]$InstancePoolId
+        [parameter(Mandatory = $false)][string]$InstancePoolId,
+        [parameter(Mandatory = $false)][object]$ClusterObject
+
     ) 
     
     $Body = @{}
+    if ($ClusterObject){
+        $Body = $ClusterObject | ConvertPSObjectToHashtable
+    }
+
     If (($PSBoundParameters.ContainsKey('SparkVersion')) -and ($SparkVersion)) { $Body['spark_version'] = $SparkVersion }
     if ($null -ne $Spark_conf) {$Body['spark_conf'] = $Spark_conf}
     If (($PSBoundParameters.ContainsKey('NodeType')) -and ($NodeType)) { $Body['node_type_id'] = $NodeType }
     If (($PSBoundParameters.ContainsKey('DriverNodeType')) -and ($DriverNodeType)) { $Body['driver_node_type_id'] = $DriverNodeType }
-    If ($MinNumberOfWorkers -eq $MaxNumberOfWorkers){
-        $Body['num_workers'] = $MinNumberOfWorkers
-    }
-    else {
-        $Body['autoscale'] = @{"min_workers"=$MinNumberOfWorkers;"max_workers"=$MaxNumberOfWorkers}
+    
+    If ($PSBoundParameters.ContainsKey('MinNumberOfWorkers')){
+        If ($MinNumberOfWorkers -eq $MaxNumberOfWorkers){
+            $Body['num_workers'] = $MinNumberOfWorkers
+        }
+        else {
+            $Body['autoscale'] = @{"min_workers"=$MinNumberOfWorkers;"max_workers"=$MaxNumberOfWorkers}
+        }
     }
 
     If (($PSBoundParameters.ContainsKey('CustomTags')) -and ($null -ne $CustomTags)) {
-        If ($CustomTags.Count -eq 1) {
-            $CustomTags.Add('DummyKey', 1)
-        }
-        $Body['custom_tags'] = GetKeyValues $CustomTags
+        $Body['custom_tags'] = $CustomTags
     }
 
     If (($PSBoundParameters.ContainsKey('InitScripts')) -and ($null -ne $InitScripts)) {
@@ -49,11 +56,8 @@ Function GetNewClusterCluster {
         $SparkEnvVars['PYSPARK_PYTHON'] = "/databricks/python3/bin/python3"
     }
 
-    If ($SparkEnvVars.Count -gt 0) {
-        If ($SparkEnvVars.Count -eq 1) {
-            $SparkEnvVars.Add('DummyKey', 1)
-        }
-        $Body['spark_env_vars'] = GetKeyValues $SparkEnvVars
+    If ($PSBoundParameters.ContainsKey('SparkEnvVars')) {
+        $Body['spark_env_vars'] = $SparkEnvVars
     }
 
     If ($PSBoundParameters.ContainsKey('ClusterLogPath') -and (!([string]::IsNullOrEmpty($ClusterLogPath)))) {

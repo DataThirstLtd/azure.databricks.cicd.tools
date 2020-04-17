@@ -26,7 +26,6 @@ Describe "GetNewCluster" {
                         -SparkEnvVars $SparkEnvVars `
                         -PythonVersion $PythonVersion 
 
-                $s = $res | ConvertTo-Json -Depth 10
                 $res['spark_version'] | Should -be "5.5.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
                 $res['spark_env_vars'].Count | Should -be 2
@@ -61,16 +60,13 @@ Describe "GetNewCluster" {
                         -SparkEnvVars $SparkEnvVars `
                         -PythonVersion $PythonVersion 
 
-                $s = $res | ConvertTo-Json -Depth 10
-                $BodyText = Remove-DummyKey $s
                 $res['spark_version'] | Should -be "5.5.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
-                $res['spark_env_vars'].Count | Should -be 2
-                $res['custom_tags'].Count | Should -be 2
+                $res['spark_env_vars'].Count | Should -be 1
+                $res['custom_tags'].Count | Should -be 1
                 $res['init_scripts'].Count | Should -be 1
                 $res['spark_conf'].Count | Should -be 1 -Because "spark_conf"
                 $res['init_scripts'].dbfs.destination | Should -be "dbfs:/script/script1" -Because "Init Scripts"
-                $BodyText.IndexOf("Dummy") | Should -be -1
         }
 
         It "Up Python Version"{
@@ -98,17 +94,13 @@ Describe "GetNewCluster" {
                         -SparkEnvVars $SparkEnvVars `
                         -PythonVersion $PythonVersion 
 
-                $s = $res | ConvertTo-Json -Depth 10
-                $BodyText = Remove-DummyKey $s
                 $res['spark_version'] | Should -be "5.5.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
                 $res['spark_env_vars'].Count | Should -be 2
-                $res['custom_tags'].Count | Should -be 2
+                $res['custom_tags'].Count | Should -be 1
                 $res['init_scripts'].Count | Should -be 1
                 $res['spark_conf'].Count | Should -be 1 -Because "spark_conf"
                 $res['init_scripts'].dbfs.destination | Should -be "dbfs:/script/script1" -Because "Init Scripts"
-                $BodyText.IndexOf("Dummy") | Should -be -1
-
         }
 
         It "Python Version 3 with no other EnvVars"{
@@ -135,16 +127,13 @@ Describe "GetNewCluster" {
                         -InitScripts $InitScripts `
                         -PythonVersion $PythonVersion 
 
-                $s = $res | ConvertTo-Json -Depth 10
-                $BodyText = Remove-DummyKey $s
                 $res['spark_version'] | Should -be "5.5.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
-                $res['spark_env_vars'].Count | Should -be 2
-                $res['custom_tags'].Count | Should -be 2
+                $res['spark_env_vars'].Count | Should -be 1
+                $res['custom_tags'].Count | Should -be 1
                 $res['init_scripts'].Count | Should -be 1
                 $res['spark_conf'].Count | Should -be 1 -Because "spark_conf"
                 $res['init_scripts'].dbfs.destination | Should -be "dbfs:/script/script1" -Because "Init Scripts"
-                $BodyText.IndexOf("Dummy") | Should -be -1
 
         }
 
@@ -184,7 +173,6 @@ Describe "GetNewCluster" {
 
         }
 
-
         It "Do not pass optional params"{
                 $SparkVersion="5.5.x-scala2.11"
                 $NodeType="Standard_D3_v2"
@@ -197,16 +185,98 @@ Describe "GetNewCluster" {
                         -MinNumberOfWorkers $MinNumberOfWorkers `
                         -MaxNumberOfWorkers $MaxNumberOfWorkers 
                         
-                $s = $res | ConvertTo-Json -Depth 10
-                $BodyText = Remove-DummyKey $s
                 $res['spark_version'] | Should -be "5.5.x-scala2.11"
                 $res['Node_type_id'] | Should -be "Standard_D3_v2"
-                $res['spark_env_vars'].Count | Should -be 2
+                $res['spark_env_vars'].Count | Should -be 0
                 $res['custom_tags'].Count | Should -be 0
                 $res['init_scripts'].Count | Should -be 0
                 $res['spark_conf'].Count | Should -be 0
-                $BodyText.IndexOf("Dummy") | Should -be -1
 
         }
+
+        It "Pass as json"{
+                $json = '{
+                        "num_workers": 1,
+                        "cluster_name": "CICD",
+                        "spark_version": "6.4.x-scala2.11",
+                        "spark_conf": {
+                            "spark.databricks.service.server.enabled": "true",
+                            "spark.databricks.service.port": "8787",
+                            "spark.databricks.delta.preview.enabled": "true"
+                        },
+                        "node_type_id": "Standard_DS3_v2",
+                        "driver_node_type_id": "Standard_DS3_v2",
+                        "ssh_public_keys": [],
+                        "custom_tags": {},
+                        "cluster_log_conf": {
+                            "dbfs": {
+                                "destination": "dbfs:/cluster-logs"
+                            }
+                        },
+                        "spark_env_vars": {
+                            "LIQUIXCONFIG": "/dbfs/liquix/config.json"
+                        },
+                        "autotermination_minutes": 30,
+                        "enable_elastic_disk": true,
+                        "cluster_source": "UI",
+                        "init_scripts": [],
+                        "cluster_id": "0920-081811-lamps471"
+                    }' | ConvertFrom-Json
+
+                $res = GetNewClusterCluster `
+                        -ClusterObject $json
+                
+                $res['spark_version'] | Should -be "6.4.x-scala2.11"
+                $res['Node_type_id'] | Should -be "Standard_DS3_v2"
+                $res['spark_env_vars'].Count | Should -be 1
+                $res['custom_tags'].Count | Should -be 0
+                $res['init_scripts'].Count | Should -be 0
+                $res['spark_conf'].Count | Should -be 3
+        }
+
+        It "Override as json values"{
+                $json = '{
+                        "num_workers": 1,
+                        "cluster_name": "CICD",
+                        "spark_version": "6.4.x-scala2.11",
+                        "spark_conf": {
+                            "spark.databricks.service.server.enabled": "true",
+                            "spark.databricks.service.port": "8787",
+                            "spark.databricks.delta.preview.enabled": "true"
+                        },
+                        "node_type_id": "Standard_DS3_v2",
+                        "driver_node_type_id": "Standard_DS3_v2",
+                        "ssh_public_keys": [],
+                        "custom_tags": {},
+                        "cluster_log_conf": {
+                            "dbfs": {
+                                "destination": "dbfs:/cluster-logs"
+                            }
+                        },
+                        "spark_env_vars": {
+                            "LIQUIXCONFIG": "/dbfs/liquix/config.json"
+                        },
+                        "autotermination_minutes": 30,
+                        "enable_elastic_disk": true,
+                        "cluster_source": "UI",
+                        "init_scripts": [],
+                        "cluster_id": "0920-081811-lamps471"
+                    }' | ConvertFrom-Json
+
+                $res = GetNewClusterCluster `
+                        -ClusterObject $json `
+                        -SparkVersion "5.5.x-scala2.11" `
+                        -CustomTags @{CreatedBy="SimonDM"} `
+                        -SparkEnvVars @{SPARK_WORKER_MEMORY="29000m"}
+
+                $res['spark_version'] | Should -be "5.5.x-scala2.11"
+                $res['Node_type_id'] | Should -be "Standard_DS3_v2"
+                $res['spark_env_vars'].Count | Should -be 2
+                $res['custom_tags'].Count | Should -be 1
+                $res['init_scripts'].Count | Should -be 0
+                $res['spark_conf'].Count | Should -be 3
+        }
+
+       
 }
 

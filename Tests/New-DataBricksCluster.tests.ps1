@@ -33,7 +33,7 @@ Describe "New-DatabricksCluster" {
         $ClusterId = New-DatabricksCluster  -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
-            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts    # -UniqueNames -Update 
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts
 
         $ClusterId.Length | Should -BeGreaterThan 1
     }
@@ -43,3 +43,30 @@ Describe "New-DatabricksCluster" {
         Remove-DatabricksCluster -ClusterName $ClusterName
     }
 }
+
+Describe "Edit Cluster New-DatabricksCluster" {
+    BeforeAll{
+        $global:ClusterId = New-DatabricksCluster  -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
+            -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
+            -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts
+        Start-Sleep -Seconds 3
+        Stop-DatabricksCluster -ClusterName $ClusterName
+        Start-Sleep -Seconds 3
+    }
+
+    It "Update cluster auto term"{
+        $ClusterIdEdited = New-DatabricksCluster -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
+            -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
+            -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes 55 -ClusterLogPath $ClusterLogPath `
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts
+
+        $ClusterIdEdited | Should -Be $global:ClusterId
+    }
+
+    AfterAll {
+        Start-Sleep -Seconds 3
+        Remove-DatabricksCluster -ClusterName $ClusterName
+    }
+}
+
