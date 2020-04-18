@@ -52,7 +52,7 @@ Function Invoke-DatabricksAPI
 
     $Headers = GetHeaders $PSBoundParameters
     $BodyText = $Body | ConvertTo-Json -Depth 10
-    Write-Verbose $BodyText
+    
     try{
         $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers -Body $BodyText
         return $Response
