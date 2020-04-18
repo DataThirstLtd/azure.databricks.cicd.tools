@@ -1,0 +1,195 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+- develop
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - master
+
+jobs:
+
+- job: 'Windows'
+  pool:
+    vmImage: 'windows-latest'
+
+  steps:
+  - task: PowerShell@2
+    displayName: 'Configure Environment'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $c = @"
+        {
+            "BearerToken": "$(BearerToken)",
+            "Region": "$(AzureRegion)",
+            "TenantId": "$(TenantId)",
+            "ApplicationId": "$(ApplicationId)",
+            "Secret": "$(Secret)",
+            "DatabricksOrgId": "$(DatabricksOrgId)",
+            "ResourceGroupName": "$(ResourceGroup)",
+            "SubscriptionId": "$(SubscriptionId)",
+            "WorkspaceName": "$(Workspace)",
+            "ClusterId": "$(ClusterId)",
+            "Username": "$(TestUser)"
+        }
+        "@
+        Set-Content .\config.json $c
+      pwsh: true
+      workingDirectory: 'Tests'
+
+  - task: PowerShell@2
+    displayName: 'Windows Powershell - Bearer'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $Mode="Bearer"
+        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 
+        Set-Location "./Tests"
+        Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "Win-PS-Bearer.xml" -OutputFormat NUnitXML
+      pwsh: false
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/Win-PS-Bearer.xml'
+    inputs:
+      testResultsFormat: NUnit
+      testResultsFiles: '**/Win-PS-Bearer.xml'
+      testRunTitle: Windows PowerShell - Bearer
+      publishRunAttachments: false
+
+  - task: PowerShell@2
+    displayName: 'Windows Powershell - Service Principal'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $Mode="ServicePrincipal"
+        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 
+        Set-Location "./Tests"
+        Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "Win-PS-SP.xml" -OutputFormat NUnitXML
+      pwsh: false
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/Win-PS-SP.xml'
+    inputs:
+      testResultsFormat: NUnit
+      testResultsFiles: '**/Win-PS-SP.xml'
+      testRunTitle: Windows PowerShell - ServicePrincipal
+      publishRunAttachments: false
+
+
+  - task: PowerShell@2
+    displayName: 'Powershell Core - Bearer'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $Mode="Bearer"
+        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 
+        Set-Location "./Tests"
+        Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "Win-PSCORE-Bearer.xml" -OutputFormat NUnitXML
+      pwsh: true
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/Win-PSCORE-Bearer.xml'
+    inputs:
+      testResultsFormat: NUnit
+      testResultsFiles: '**/Win-PSCORE-Bearer.xml'
+      testRunTitle: Windows PowerShell Core - Bearer
+      publishRunAttachments: false
+
+  - task: PowerShell@2
+    displayName: 'Windows Powershell Core - Service Principal'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $Mode="ServicePrincipal"
+        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 
+        Set-Location "./Tests"
+        Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "Win-PSCORE-SP.xml" -OutputFormat NUnitXML
+      pwsh: true
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/Win-PS-SP.xml'
+    inputs:
+      testResultsFormat: NUnit
+      testResultsFiles: '**/Win-PSCORE-SP.xml'
+      testRunTitle: Windows PowerShell Core - ServicePrincipal
+      publishRunAttachments: false
+
+
+- job: 'Ubuntu'
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - task: PowerShell@2
+    displayName: 'Configure Environment'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $c = @"
+        {
+            "BearerToken": "$(BearerToken)",
+            "Region": "$(AzureRegion)",
+            "TenantId": "$(TenantId)",
+            "ApplicationId": "$(ApplicationId)",
+            "Secret": "$(Secret)",
+            "DatabricksOrgId": "$(DatabricksOrgId)",
+            "ResourceGroupName": "$(ResourceGroup)",
+            "SubscriptionId": "$(SubscriptionId)",
+            "WorkspaceName": "$(Workspace)",
+            "ClusterId": "$(ClusterId)",
+            "Username": "$(TestUser)"
+        }
+        "@
+        Set-Content .\config.json $c
+      pwsh: true
+      workingDirectory: 'Tests'
+
+  - task: PowerShell@2
+    displayName: 'Powershell Core - Bearer'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $Mode="Bearer"
+        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 
+        Set-Location "./Tests"
+        Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "U-PS-Bearer.xml" -OutputFormat NUnitXML
+      pwsh: true
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/U-PS-Bearer.xml'
+    inputs:
+      testResultsFormat: NUnit
+      testResultsFiles: '**/U-PS-Bearer.xml'
+      testRunTitle: Ubuntu PowerShell Core - Bearer
+      publishRunAttachments: false
+
+  - task: PowerShell@2
+    displayName: 'Ubuntu Powershell Core - Service Principal'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $Mode="ServicePrincipal"
+        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 
+        Set-Location "./Tests"
+        Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "U-PS-SP.xml" -OutputFormat NUnitXML
+      pwsh: true
+
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results **/U-PS-SP.xml'
+    inputs:
+      testResultsFormat: NUnit
+      testResultsFiles: '**/U-PS-SP.xml'
+      testRunTitle: Ubuntu PowerShell Core - ServicePrincipal
+      publishRunAttachments: false
