@@ -5,6 +5,7 @@
 
 trigger:
 - master
+- develop
 pr:
   autoCancel: true
   branches:
@@ -71,7 +72,7 @@ steps:
   inputs:
     testResultsFormat: NUnit
     testResultsFiles: '**/TestResults-*Bearer.xml'
-    testRunTitle: Bearer
+    testRunTitle: Windows PowerShell - Bearer
     publishRunAttachments: false
 
 - task: PublishTestResults@2
@@ -79,7 +80,7 @@ steps:
   inputs:
     testResultsFormat: NUnit
     testResultsFiles: '**/TestResults-*ServicePrincipal.xml'
-    testRunTitle: ServicePrincipal
+    testRunTitle: Windows PowerShell Core - ServicePrincipal
     publishRunAttachments: false
 
 - task: CopyFiles@2

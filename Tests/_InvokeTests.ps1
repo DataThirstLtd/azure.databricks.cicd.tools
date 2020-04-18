@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="Bearer"
 )
 Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
 Import-Module Pester -MinimumVersion 4.4.2

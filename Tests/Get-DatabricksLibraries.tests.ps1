@@ -21,7 +21,7 @@ $ClusterId = $Config.ClusterId
 Describe "Get-DatabricksLibraries" {
     It "Simple fetch" {
         $json = Get-DatabricksLibraries -ClusterId $ClusterId
-        $json.Count | Should -BeGreaterThan 0
+        $json.Count | Should -BeGreaterOrEqual 0
     }
 }
 

@@ -51,8 +51,23 @@ Function Invoke-DatabricksAPI
     }
 
     $Headers = GetHeaders $PSBoundParameters
-    $BodyText = $Body | ConvertTo-Json -Depth 10
-    $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers -Body $BodyText
     
-    return $Response
+    
+    try{
+        if ($Body){
+            $BodyText = $Body | ConvertTo-Json -Depth 10
+            $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers -Body $BodyText
+        }
+        else{
+            $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers
+        }
+        return $Response
+    }
+    catch{
+        $ErrorCode = $_.Exception.Response.StatusCode.value__ 
+        Write-Error "Response Code: $ErrorCode"
+        throw $_.Exception
+    }
+    
+    
 }

@@ -38,7 +38,7 @@ Function Import-DatabricksFolder {
         [parameter(Mandatory = $false)][switch]$Clean
     )
     $threadJobs = @()
-    $throttleLimit = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors * 2
+    $throttleLimit = GetCpuCount
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters

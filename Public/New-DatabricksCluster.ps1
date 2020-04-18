@@ -48,11 +48,10 @@ Automatically terminates the cluster after it is inactive for this time in minut
 If specified, the threshold must be between 10 and 10000 minutes. You can also set this value to 0 to explicitly disable automatic termination.
 
 .PARAMETER UniqueNames
-Switch. By default Databricks allows duplicate cluster names. By setting this switch a check will be completed to see if this cluster exists.
-If it does exist an error will be thrown making the script idempotent. Defaults to False.
+No longer used - cluster names are always unique, if a cluster exists with the name passed it will be updated
 
 .PARAMETER Update
-Switch. If the cluster name exist then update the configuration to this one. Defaults to False.
+No longer used - if the cluster exists by name or id it is updated
 
 .PARAMETER PythonVersion
 2 or 3 - defaults to 3.
@@ -62,8 +61,11 @@ DBFS Location for Cluster logs - must start with dbfs:/
 Example dbfs:/logs/mycluster
 
 .PARAMETER InstancePoolId
-If you would liek to use nodes from an instance pool set the pool id 
+If you would like to use nodes from an instance pool set the pool id 
 https://docs.azuredatabricks.net/user-guide/instance-pools/index.html#instance-pools
+
+.PARAMETER InputObject
+Pipe the contents of Get-DatabricksCluster or a json file
 
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
@@ -75,12 +77,12 @@ Function New-DatabricksCluster {
     param (
         [parameter(Mandatory = $false)][string]$BearerToken,    
         [parameter(Mandatory = $false)][string]$Region,
-        [parameter(Mandatory = $true)][string]$ClusterName,
+        [parameter(Mandatory = $false)][string]$ClusterName,
         [parameter(Mandatory = $false)][string]$SparkVersion,
         [parameter(Mandatory = $false)][string]$NodeType,
         [parameter(Mandatory = $false)][string]$DriverNodeType,
-        [parameter(Mandatory = $true)][int]$MinNumberOfWorkers,
-        [parameter(Mandatory = $true)][int]$MaxNumberOfWorkers,
+        [parameter(Mandatory = $false)][int]$MinNumberOfWorkers,
+        [parameter(Mandatory = $false)][int]$MaxNumberOfWorkers,
         [parameter(Mandatory = $false)][int]$AutoTerminationMinutes,
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
@@ -90,28 +92,45 @@ Function New-DatabricksCluster {
         [parameter(Mandatory = $false)][switch]$Update,
         [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
         [parameter(Mandatory = $false)][string]$ClusterLogPath,
-        [parameter(Mandatory = $false)][string]$InstancePoolId
+        [parameter(Mandatory = $false)][string]$InstancePoolId,
+        [parameter(ValueFromPipeline)][object]$InputObject
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $Headers = GetHeaders $PSBoundParameters
+    GetHeaders $PSBoundParameters | Out-Null
     
-    $Mode = "create"
-    $Body = @{"cluster_name"=$ClusterName}
+    $Body = @{}
     $ClusterArgs = @{}
-    If ($UniqueNames)
-    {
-        $ClusterId = (Get-DatabricksClusters | Where-Object {$_.cluster_name -eq $ClusterName})
-        if ($ClusterId){
-            if ($Update){
-                $Mode = "edit"
-                $Body['cluster_id'] = $ClusterId.cluster_id
-                Write-Warning "Cluster already exists - it will be updated to this configuration"
-            }
-            else
-            {
-                Write-Error "Cluster with name $ClusterName already exists. Change name or remove -UniqueNames"
-                return
-            }
+
+    if ($InputObject){
+        if ($InputObject.cluster_id -and (!(Get-DatabricksClusters -ClusterId $InputObject.cluster_id))){
+            Write-Verbose "Input object contains a cluster id that does not exist - cluster will be created with a new id"
+            $InputObject.PSObject.properties.remove('cluster_id')
+            $Mode = "create"
+        }
+        elseif ($InputObject.cluster_id) {
+            Write-Verbose "Input object contains a cluster id that exists - updating cluster"
+            $Mode = "edit"
+            $ClusterId = $InputObject.cluster_id
+            # $Body['cluster_id'] = $ClusterId
+            $ExistingClusterConfig = Get-DatabricksClusters -ClusterId $ClusterId | ConvertPSObjectToHashtable
+        }
+        else{
+            Write-Verbose "No cluster with name found - creating new cluster"
+            $Mode = "create"
+        }
+    }
+    else{
+        $ExistingClusterConfig = Get-DatabricksClusters | Where-Object {$_.cluster_name -eq $ClusterName}| ConvertPSObjectToHashtable
+        
+        if ($ExistingClusterConfig){
+            Write-Verbose "Cluster name exists - updating cluster"
+            $ClusterId = $ExistingClusterConfig['cluster_id']
+            $Mode = "edit"
+            $Body['cluster_id'] = $ClusterId
+        }
+        else{
+            Write-Verbose "No cluster found with this name - creating new cluster"
+            $Mode = "create"
         }
     }
 
@@ -128,25 +147,31 @@ Function New-DatabricksCluster {
     $ClusterArgs['PythonVersion'] = $PythonVersion
     $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
     $ClusterArgs['InstancePoolId'] = $InstancePoolId
+    $ClusterArgs['ClusterObject'] = $InputObject
+
     
     $Body += GetNewClusterCluster @ClusterArgs
-
-    $BodyText = $Body | ConvertTo-Json -Depth 10
-    $BodyText = Remove-DummyKey $BodyText
-    Write-Verbose $BodyText
-    Try {
-        if ($Mode -eq "create"){
-            $ClusterId = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/create" -Headers $Headers
-        }
-        if ($Mode -eq "edit"){
-            Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/clusters/edit" -Headers $Headers
-        }
-    }
-    Catch {
-        Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
-        Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
-        Write-Error $_.ErrorDetails.Message
+    if ($ClusterName){
+        $Body += @{"cluster_name"=$ClusterName}
     }
 
-    return $ClusterId.cluster_id
+    if ($Mode -eq "create"){
+        $Body.Remove("cluster_source")
+        $Response = Invoke-DatabricksAPI -Method POST -Body $Body -API "/api/2.0/clusters/create"
+        return $Response.cluster_id
+    }
+    if ($Mode -eq "edit"){
+        $ExistingClusterConfig = RemoveClusterMeta $ExistingClusterConfig
+        $CompareBody = RemoveClusterMeta $Body
+
+        if ((HashCompare $ExistingClusterConfig $CompareBody) -gt 0){
+            $Response = Invoke-DatabricksAPI -Method POST -Body $Body -API "/api/2.0/clusters/edit"
+        }
+        else{
+            Write-Warning "Cluster unchanged - not deploying to prevent unnecessary restart of cluster"
+        }
+        return $ClusterId
+    }
 }
+
+

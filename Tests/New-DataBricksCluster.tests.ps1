@@ -33,7 +33,7 @@ Describe "New-DatabricksCluster" {
         $ClusterId = New-DatabricksCluster  -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
-            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts    # -UniqueNames -Update 
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts
 
         $ClusterId.Length | Should -BeGreaterThan 1
     }
@@ -42,4 +42,77 @@ Describe "New-DatabricksCluster" {
         Start-Sleep -Seconds 5
         Remove-DatabricksCluster -ClusterName $ClusterName
     }
+}
+
+Describe "Edit Cluster New-DatabricksCluster" {
+    BeforeAll{
+        $global:ClusterId = New-DatabricksCluster  -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
+            -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
+            -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts
+        Start-Sleep -Seconds 3
+        Stop-DatabricksCluster -ClusterName $ClusterName
+        Start-Sleep -Seconds 3
+    }
+
+    It "Update cluster auto term"{
+        $ClusterIdEdited = New-DatabricksCluster -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
+            -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
+            -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes 55 -ClusterLogPath $ClusterLogPath `
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts
+
+        $ClusterIdEdited | Should -Be $global:ClusterId
+    }
+
+    AfterAll {
+        Start-Sleep -Seconds 3
+        Remove-DatabricksCluster -ClusterName $ClusterName
+    }
+}
+
+Describe "New Cluster - via pipe"{
+    It "Basic Pipe" {
+        $json = '{
+            "num_workers": 1,
+            "cluster_name": "UnitTestPipeCluster",
+            "spark_version": "6.4.x-scala2.11",
+            "spark_conf": {
+                "spark.databricks.service.port": "8787",
+                "spark.databricks.service.server.enabled": "true",
+                "spark.databricks.delta.preview.enabled": "true"
+            },
+            "node_type_id": "Standard_DS3_v2",
+            "driver_node_type_id": "Standard_DS3_v2",
+            "ssh_public_keys": [],
+            "custom_tags": {},
+            "cluster_log_conf": {
+                "dbfs": {
+                    "destination": "dbfs:/cluster-logs"
+                }
+            },
+            "spark_env_vars": {
+                "LIQUIXCONFIG": "/dbfs/liquix/config.json",
+                "LIQUIXCONFIG2": "/dbfs/liquix/config.json"
+            },
+            "autotermination_minutes": 30,
+            "enable_elastic_disk": true,
+            "cluster_source": "UI",
+            "init_scripts": []
+        }' | ConvertFrom-Json
+
+        $NewClusterId = ($json | New-DatabricksCluster -Verbose)
+        Start-Sleep -Seconds 5
+        $Result = Get-DatabricksClusters -ClusterId $NewClusterId -Verbose
+
+        $Result.num_workers | Should -be $json.num_workers
+        $Result.autotermination_minutes | Should -be $json.autotermination_minutes
+        $Result.driver_node_type_id | Should -be $json.driver_node_type_id
+
+    }
+
+    AfterAll{
+        Remove-DatabricksCluster -ClusterName "UnitTestPipeCluster"
+    }
+    
+
 }
