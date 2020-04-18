@@ -96,7 +96,7 @@ Function New-DatabricksCluster {
         [parameter(ValueFromPipeline)][object]$InputObject
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-    $Headers = GetHeaders $PSBoundParameters
+    GetHeaders $PSBoundParameters | Out-Null
     
     $Body = @{}
     $ClusterArgs = @{}
@@ -111,13 +111,20 @@ Function New-DatabricksCluster {
             Write-Verbose "Input object contains a cluster id that exists - updating cluster"
             $Mode = "edit"
             $ClusterId = $InputObject.cluster_id
-            $Body['cluster_id'] = $ClusterId
+            # $Body['cluster_id'] = $ClusterId
+            $ExistingClusterConfig = Get-DatabricksClusters -ClusterId $ClusterId | ConvertPSObjectToHashtable
+        }
+        else{
+            Write-Verbose "No cluster with name found - creating new cluster"
+            $Mode = "create"
         }
     }
     else{
-        $ClusterId = (Get-DatabricksClusters | Where-Object {$_.cluster_name -eq $ClusterName}).cluster_id
-        if ($ClusterId){
+        $ExistingClusterConfig = Get-DatabricksClusters | Where-Object {$_.cluster_name -eq $ClusterName}| ConvertPSObjectToHashtable
+        
+        if ($ExistingClusterConfig){
             Write-Verbose "Cluster name exists - updating cluster"
+            $ClusterId = $ExistingClusterConfig['cluster_id']
             $Mode = "edit"
             $Body['cluster_id'] = $ClusterId
         }
@@ -149,11 +156,22 @@ Function New-DatabricksCluster {
     }
 
     if ($Mode -eq "create"){
+        $Body.Remove("cluster_source")
         $Response = Invoke-DatabricksAPI -Method POST -Body $Body -API "/api/2.0/clusters/create"
         return $Response.cluster_id
     }
     if ($Mode -eq "edit"){
-        $Response = Invoke-DatabricksAPI -Method POST -Body $Body -API "/api/2.0/clusters/edit"
+        $ExistingClusterConfig = RemoveClusterMeta $ExistingClusterConfig
+        $CompareBody = RemoveClusterMeta $Body
+
+        if ((HashCompare $ExistingClusterConfig $CompareBody) -gt 0){
+            $Response = Invoke-DatabricksAPI -Method POST -Body $Body -API "/api/2.0/clusters/edit"
+        }
+        else{
+            Write-Warning "Cluster unchanged - not deploying to prevent unnecessary restart of cluster"
+        }
         return $ClusterId
     }
 }
+
+

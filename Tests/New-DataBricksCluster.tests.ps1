@@ -70,3 +70,49 @@ Describe "Edit Cluster New-DatabricksCluster" {
     }
 }
 
+Describe "New Cluster - via pipe"{
+    It "Basic Pipe" {
+        $json = '{
+            "num_workers": 1,
+            "cluster_name": "UnitTestPipeCluster",
+            "spark_version": "6.4.x-scala2.11",
+            "spark_conf": {
+                "spark.databricks.service.port": "8787",
+                "spark.databricks.service.server.enabled": "true",
+                "spark.databricks.delta.preview.enabled": "true"
+            },
+            "node_type_id": "Standard_DS3_v2",
+            "driver_node_type_id": "Standard_DS3_v2",
+            "ssh_public_keys": [],
+            "custom_tags": {},
+            "cluster_log_conf": {
+                "dbfs": {
+                    "destination": "dbfs:/cluster-logs"
+                }
+            },
+            "spark_env_vars": {
+                "LIQUIXCONFIG": "/dbfs/liquix/config.json",
+                "LIQUIXCONFIG2": "/dbfs/liquix/config.json"
+            },
+            "autotermination_minutes": 30,
+            "enable_elastic_disk": true,
+            "cluster_source": "UI",
+            "init_scripts": []
+        }' | ConvertFrom-Json -Depth 10 
+
+        $NewClusterId = ($json | New-DatabricksCluster -Verbose)
+        Start-Sleep -Seconds 5
+        $Result = Get-DatabricksClusters -ClusterId $NewClusterId -Verbose
+
+        $Result.num_workers | Should -be $json.num_workers
+        $Result.autotermination_minutes | Should -be $json.autotermination_minutes
+        $Result.driver_node_type_id | Should -be $json.driver_node_type_id
+
+    }
+
+    AfterAll{
+        Remove-DatabricksCluster -ClusterName "UnitTestPipeCluster"
+    }
+    
+
+}

@@ -1,5 +1,3 @@
-
-
 Function GetNewClusterCluster {  
     param (
         [parameter(Mandatory = $false)][string]$SparkVersion,
@@ -29,7 +27,7 @@ Function GetNewClusterCluster {
     If (($PSBoundParameters.ContainsKey('NodeType')) -and ($NodeType)) { $Body['node_type_id'] = $NodeType }
     If (($PSBoundParameters.ContainsKey('DriverNodeType')) -and ($DriverNodeType)) { $Body['driver_node_type_id'] = $DriverNodeType }
     
-    If ($PSBoundParameters.ContainsKey('MinNumberOfWorkers')){
+    If ($MinNumberOfWorkers -gt 0){
         If ($MinNumberOfWorkers -eq $MaxNumberOfWorkers){
             $Body['num_workers'] = $MinNumberOfWorkers
         }
@@ -46,7 +44,7 @@ Function GetNewClusterCluster {
         $Body['init_scripts'] = Get-InitScript $InitScripts
     }
 
-    If ($PSBoundParameters.ContainsKey('AutoTerminationMinutes')) {$Body['autotermination_minutes'] = $AutoTerminationMinutes}
+    If ($AutoTerminationMinutes -gt 0) {$Body['autotermination_minutes'] = $AutoTerminationMinutes}
 
     If (!($PSBoundParameters.ContainsKey('SparkEnvVars')) -or ($null -eq $SparkEnvVars)) {
         $SparkEnvVars = @{}
