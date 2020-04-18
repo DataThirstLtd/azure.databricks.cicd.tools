@@ -19,6 +19,14 @@ Function GetNewClusterCluster {
     
     $Body = @{}
     if ($ClusterObject){
+        if (($ClusterObject.ssh_public_keys -is [array]) -and ($ClusterObject.ssh_public_keys.count -eq 0)){
+            # Issues with Windows PowerShell only - empty array causes bad request
+            $ClusterObject.PSObject.properties.remove('ssh_public_keys')
+        }
+        if (($ClusterObject.init_scripts -is [array]) -and ($ClusterObject.init_scripts.count -eq 0)){
+            # Issues with Windows PowerShell only - empty array causes bad request
+            $ClusterObject.PSObject.properties.remove('init_scripts')
+        }
         $Body = $ClusterObject | ConvertPSObjectToHashtable
     }
 
@@ -65,6 +73,8 @@ Function GetNewClusterCluster {
     If ($PSBoundParameters.ContainsKey('InstancePoolId') -and (!([string]::IsNullOrEmpty($InstancePoolId)))) {
         $Body['instance_pool_id'] = $InstancePoolId
     }
+
+    
     
     Return $Body
 }
