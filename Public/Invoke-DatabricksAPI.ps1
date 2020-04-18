@@ -52,6 +52,7 @@ Function Invoke-DatabricksAPI
 
     $Headers = GetHeaders $PSBoundParameters
     $BodyText = $Body | ConvertTo-Json -Depth 10
+    Write-Verbose $BodyText
     try{
         $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers -Body $BodyText
         return $Response
@@ -59,7 +60,7 @@ Function Invoke-DatabricksAPI
     catch{
         $ErrorCode = $_.Exception.Response.StatusCode.value__ 
         Write-Error "Response Code: $ErrorCode"
-        ThrowError $_.ErrorDetails.Message
+        throw $_.Exception
     }
     
     
