@@ -51,10 +51,16 @@ Function Invoke-DatabricksAPI
     }
 
     $Headers = GetHeaders $PSBoundParameters
-    $BodyText = $Body | ConvertTo-Json -Depth 10
+    
     
     try{
-        $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers -Body $BodyText
+        if ($Body){
+            $BodyText = $Body | ConvertTo-Json -Depth 10
+            $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers -Body $BodyText
+        }
+        else{
+            $Response = Invoke-RestMethod -Method $Method -Uri "$global:DatabricksURI/$API" -Headers $Headers
+        }
         return $Response
     }
     catch{

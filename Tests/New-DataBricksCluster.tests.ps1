@@ -98,7 +98,7 @@ Describe "New Cluster - via pipe"{
             "enable_elastic_disk": true,
             "cluster_source": "UI",
             "init_scripts": []
-        }' | ConvertFrom-Json -Depth 10 
+        }' | ConvertFrom-Json
 
         $NewClusterId = ($json | New-DatabricksCluster -Verbose)
         Start-Sleep -Seconds 5
