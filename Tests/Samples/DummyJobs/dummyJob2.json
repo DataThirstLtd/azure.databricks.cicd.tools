@@ -1,0 +1,61 @@
+{
+    "name": "dummyJob2",
+    "new_cluster": {
+      "spark_version": "5.5.x-scala2.11",
+      "spark_conf": {
+        "spark.databricks.repl.allowedLanguages": "sql,python,r",
+        "spark.executor.heartbeatInterval": "60s",
+        "spark.databricks.delta.preview.enabled": "true",
+        "spark.network.timeout": "720s",
+        "spark.databricks.cluster.profile": "serverless"
+      },
+      "node_type_id": "Standard_D16s_v3",
+      "driver_node_type_id": "Standard_D16s_v3",
+      "custom_tags": {
+        "jobcluster": "true",
+        "source": "tomato",
+        "project": "bob"
+      },
+      "spark_env_vars": {
+        "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+      },
+      "enable_elastic_disk": true,
+      "autoscale": {
+        "min_workers": 1,
+        "max_workers": 2
+      }
+    },
+    "libraries": [
+      {
+        "whl": "dbfs:/FileStore/jars/110566a7_e14f_4691_9f98_94f1620bc071/azure_storage_blob-2.1.0-py2.py3-none-any.whl"
+      },
+      {
+        "whl": "dbfs:/FileStore/jars/08a0a5c3_07de_4fe6_9de3_19640f2ccd54/boto3-1.9.249-py2.py3-none-any.whl"
+      },
+      {
+        "pypi": {
+          "package": "cryptography==1.5"
+        }
+      },
+      {
+        "egg": "dbfs:/FileStore/jars/dd7c0220_5a5b_4378_82d8_d378830a899e-jars_735a2ecf_f11d_4412_b83c_a30e7b23298a_engineering_0_7_py3_7_4efca__1_-e4943.egg"
+      },
+      {
+        "whl": "dbfs:/FileStore/jars/f9bcde31_715a_4d04_8f67_76355f952739/paramiko-2.4.2-py2.py3-none-any.whl"
+      }
+    ],
+    "email_notifications": {},
+    "timeout_seconds": 0,
+    "notebook_task": {
+      "notebook_path": "/DEV/PATH/NOTEBOOK",
+      "base_parameters": {
+        "notebook": "THISONE",
+        "project": "THATONE"
+      }
+    },
+    "max_concurrent_runs": 1,
+    "schedule": {
+      "quartz_cron_expression": "0 0 18 * * ?",
+      "timezone_id": "Europe/London"
+    }
+  }

@@ -122,7 +122,7 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][string]$BearerToken,    
         [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$JobName,
-        [parameter(Mandatory = $false)]$JobSettings,
+        [parameter(ValueFromPipeline, Mandatory = $false)][object]$InputObject,
         [parameter(Mandatory = $false)][string]$ClusterId,
         [parameter(Mandatory = $false)][string]$SparkVersion,
         [parameter(Mandatory = $false)][string]$NodeType,
@@ -166,7 +166,7 @@ Function Add-DatabricksNotebookJob {
         $Mode = "create"
     }
  
-    if ($PSBoundParameters.ContainsKey('jobSettings') -eq $false) {
+    if ($PSBoundParameters.ContainsKey('InputObject') -eq $false) {
         $JobBody = @{ }   
         if ($RunImmediate.IsPresent) {
             $JobBody['run_name'] = $JobName
@@ -246,7 +246,7 @@ Function Add-DatabricksNotebookJob {
         }
     }
     else {
-        $jobBody = $jobSettings
+        $jobBody = $InputObject
     }
 
     If ($Mode -eq 'create') {

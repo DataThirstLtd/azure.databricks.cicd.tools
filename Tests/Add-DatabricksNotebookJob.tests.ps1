@@ -1,16 +1,16 @@
 param(
-    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+    [ValidateSet('Bearer', 'ServicePrincipal')][string]$Mode = "ServicePrincipal"
 )
 
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
-switch ($mode){
-    ("Bearer"){
+switch ($mode) {
+    ("Bearer") {
         Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
     }
-    ("ServicePrincipal"){
+    ("ServicePrincipal") {
         Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
     }
 }
@@ -29,7 +29,7 @@ Describe "Add-DatabricksNotebookJob" {
     $NotebookParametersJson = '{"key": "value", "name": "test2"}'
     $ClusterId = $Config.ClusterId
     $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
-    $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
+    $Spark_conf = @{"spark.speculation" = $true; "spark.streaming.ui.retainedBatches" = 5 }
 
     It "Autoscale with parameters, new cluster" {
         $global:JobId2 = Add-DatabricksNotebookJob -JobName $JobName `
@@ -66,7 +66,25 @@ Describe "Add-DatabricksNotebookJob" {
         $global:JobId | Should -BeGreaterThan 0
     }
 
-    AfterAll{
+    It "With Settings Saved, Existing Cluster" {
+        $jobFile = 'Samples\DummyJobs\dummyJob.json'
+        $jobSettings = Get-Content $jobFile
+        $global:JobId3 = Add-DatabricksNotebookJob -JobName "DummyJob" `
+            -InputObject ($jobSettings | ConvertFrom-Json) -Verbose
+    }
+
+    It "With Settings Saved, Create Cluster" {
+        $jobFile = 'Samples\DummyJobs\dummyJob2.json'
+        $jobSettings = Get-Content $jobFile
+        $global:JobId4 = Add-DatabricksNotebookJob -JobName "DummyJob2" `
+            -InputObject ($jobSettings | ConvertFrom-Json) -Verbose
+    }
+    
+    $global:JobId3 | Should -BeGreaterThan 0
+
+    AfterAll {
         Remove-DatabricksJob -JobId $global:JobId1
+        Remove-DatabricksJob -JobId $global:JobId3
+        Remove-DatabricksJob -JobId $global:JobId4
     }
 }
