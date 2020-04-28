@@ -35,11 +35,7 @@ Describe "Export-DatabricksJobs" {
         New-Item $LocalOutputPath -ItemType Directory -Force | out-Null
         $LocalOutputPath = Resolve-Path $LocalOutputPath
     }
-# Write-Host "here"
-#     $referenceObj = Get-Content -Path ("$LocalOutputPath\DummyJob2.json") | ConvertFrom-Json
-#     $DifferenceObj = Get-Content -Path ('Samples\DummyJobs\dummyJob2.json') | ConvertFrom-Json
-#     $whatIs = Compare-Object -ReferenceObject $referenceObj -DifferenceObject $DifferenceObj -IncludeEqual
-Write-Host $whatIs
+
     It "Download 2 Jobs, and content matches" {
         Export-DatabricksJobs -bearerToken $bearerToken -Region $config.Region -JobIds $global:JobIds -LocalOutputPath $LocalOutputPath -SettingsOnly -Verbose
         $Count = (Get-ChildItem -Path $LocalOutputPath).Count
@@ -60,5 +56,7 @@ Write-Host $whatIs
 
     AfterAll {
         Remove-Item $LocalOutputPath -Force -Recurse
+        Remove-DatabricksJob -JobId $global:JobId1
+        Remove-DatabricksJob -JobId $global:JobId2
     }
 }
