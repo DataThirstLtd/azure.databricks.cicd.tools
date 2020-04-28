@@ -82,7 +82,7 @@
     'Remove-DatabricksLibrary', 'Get-DatabricksServicePrincipals', 'Add-DatabricksUser', 'Set-DatabricksPermission',
     'Get-DatabricksPermissionLevels', 'Invoke-DatabricksAPI', 'Remove-DatabricksSecret', 'Get-DatabricksWorkspaceFolder',
     'Get-DatabricksInstancePool', 'Add-DatabricksInstancePool', 'Remove-DatabricksInstancePool',
-    'New-DatabricksBearerToken', 'Remove-DatabricksBearerToken', 'Get-DatabricksBearerToken'
+    'New-DatabricksBearerToken', 'Remove-DatabricksBearerToken', 'Get-DatabricksBearerToken', 'Get-DatabricksJob', 'Export-DatabricksJobs'
 
     # Cmdlets to export from this module
     CmdletsToExport = '*'
