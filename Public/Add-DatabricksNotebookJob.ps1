@@ -117,11 +117,12 @@ Extended: Simon D'Morias / Data Thirst Ltd
 #>
 
 Function Add-DatabricksNotebookJob {  
-   [cmdletbinding()]
+    [cmdletbinding()]
     param (
         [parameter(Mandatory = $false)][string]$BearerToken,    
         [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$JobName,
+        [parameter(ValueFromPipeline, Mandatory = $false)][object]$InputObject,
         [parameter(Mandatory = $false)][string]$ClusterId,
         [parameter(Mandatory = $false)][string]$SparkVersion,
         [parameter(Mandatory = $false)][string]$NodeType,
@@ -131,15 +132,15 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][int]$Timeout,
         [parameter(Mandatory = $false)][string]$EmailAlertsOnFailure,
         [parameter(Mandatory = $false)][string]$EmailAlertsOnStart,
-         [parameter(Mandatory = $false)][string]$EmailAlertsOnSuccess,
+        [parameter(Mandatory = $false)][string]$EmailAlertsOnSuccess,
         [parameter(Mandatory = $false)][switch]$noAlertSkippedRuns,
         [parameter(Mandatory = $false)][int]$MaxRetries,
         [parameter(Mandatory = $false)][string]$ScheduleCronExpression,
         [parameter(Mandatory = $false)][string]$Timezone,
-        [parameter(Mandatory = $true)][string]$NotebookPath,
+        [parameter(Mandatory = $false)][string]$NotebookPath,
         [parameter(Mandatory = $false)][string]$NotebookParametersJson,
         [parameter(Mandatory = $false)][string[]]$Libraries,
-        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
+        [parameter(Mandatory = $false)][ValidateSet(2, 3)] [string]$PythonVersion = 3,
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
@@ -151,105 +152,109 @@ Function Add-DatabricksNotebookJob {
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-    
 
     $ExistingJobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
 
-    $ExistingJobDetail = $ExistingJobs | Where-Object {$_.settings.name -eq $JobName} | Select-Object job_id -First 1
+    $ExistingJobDetail = $ExistingJobs | Where-Object { $_.settings.name -eq $JobName } | Select-Object job_id -First 1
 
-    if (($ExistingJobDetail) -and (!($RunImmediate.IsPresent))){
+    if (($ExistingJobDetail) -and (!($RunImmediate.IsPresent))) {
         $JobId = $ExistingJobDetail.job_id[0]
         Write-Verbose "Updating JobId: $JobId"
         $Mode = "reset"
     } 
-    else{
+    else {
         $Mode = "create"
     }
+ 
+    if ($PSBoundParameters.ContainsKey('InputObject') -eq $false) {
+        $JobBody = @{ }   
+        if ($RunImmediate.IsPresent) {
+            $JobBody['run_name'] = $JobName
+        }
+        else {
+            $JobBody['name'] = $JobName
+        }
 
-    $JobBody = @{}
-    if ($RunImmediate.IsPresent){
-        $JobBody['run_name'] = $JobName
-    }
-    else{
-        $JobBody['name'] = $JobName
-    }
+        If ($ClusterId) {
+            $JobBody['existing_cluster_id'] = $ClusterId
+        }
+        else {
+            $ClusterArgs = @{ }
+            $ClusterArgs['SparkVersion'] = $SparkVersion
+            $ClusterArgs['NodeType'] = $NodeType
+            $ClusterArgs['MinNumberOfWorkers'] = $MinNumberOfWorkers
+            $ClusterArgs['MaxNumberOfWorkers'] = $MaxNumberOfWorkers
+            $ClusterArgs['DriverNodeType'] = $DriverNodeType
+            $ClusterArgs['Spark_conf'] = $Spark_conf
+            $ClusterArgs['CustomTags'] = $CustomTags
+            $ClusterArgs['InitScripts'] = $InitScripts
+            $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
+            $ClusterArgs['PythonVersion'] = $PythonVersion
+            $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
+            $ClusterArgs['InstancePoolId'] = $InstancePoolId
 
-    If ($ClusterId){
-        $JobBody['existing_cluster_id'] = $ClusterId
+            $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
+        }
+
+        If ($PSBoundParameters.ContainsKey('Timeout')) { $JobBody['timeout_seconds'] = $Timeout }
+        If ($PSBoundParameters.ContainsKey('MaxRetries')) { $JobBody['max_retries'] = $MaxRetries }
+        If ($PSBoundParameters.ContainsKey('ScheduleCronExpression')) {
+            $JobBody['schedule'] = @{"quartz_cron_expression" = $ScheduleCronExpression; "timezone_id" = $Timezone }
+        }
+
+
+        If ($PSBoundParameters.ContainsKey('EmailAlertsOnStart')) {
+            $JobBody['email_notifications'] = @{"on_start" = $EmailAlertsOnStart }
+        }
+
+        If ($PSBoundParameters.ContainsKey('EmailAlertsOnSuccess')) {
+            If ($PSBoundParameters.ContainsKey('EmailAlertsOnStart')) {
+                $JobBody['email_notifications'].Add("on_success", $EmailAlertsOnSuccess)
+            }
+            else {
+                $JobBody['email_notifications'] = @{"on_success" = $EmailAlertsOnSuccess }
+            }
+        }
+
+        If ($PSBoundParameters.ContainsKey('EmailAlertsOnFailure')) {
+            If ($PSBoundParameters.ContainsKey('EmailAlertsOnSuccess') -or $PSBoundParameters.ContainsKey('EmailAlertsOnStart')) {
+                $JobBody['email_notifications'].Add("on_failure", $EmailAlertsOnFailure)
+            }
+            else {
+                $JobBody['email_notifications'] = @{"on_failure" = $EmailAlertsOnFailure }
+            }
+    
+        }
+
+        if ($noAlertSkippedRuns.IsPresent) {
+            $JobBody['email_notifications'].Add("no_alert_for_skipped_runs", $true)
+        }
+
+        $Notebook = @{ }
+        $Notebook['notebook_path'] = $NotebookPath
+        If ($PSBoundParameters.ContainsKey('NotebookParametersJson')) {
+            $Notebook['base_parameters'] = $NotebookParametersJson | ConvertFrom-Json
+        }
+
+        $JobBody['notebook_task'] = $Notebook
+
+        If ($PSBoundParameters.ContainsKey('Libraries')) {
+            If ($Libraries.Count -eq 1) {
+                $Libraries += '{"DummyKey":"1"}'
+            }
+            $JobBody['libraries'] = $Libraries | ConvertFrom-Json
+        }
     }
     else {
-        $ClusterArgs = @{}
-        $ClusterArgs['SparkVersion'] = $SparkVersion
-        $ClusterArgs['NodeType'] = $NodeType
-        $ClusterArgs['MinNumberOfWorkers'] = $MinNumberOfWorkers
-        $ClusterArgs['MaxNumberOfWorkers'] = $MaxNumberOfWorkers
-        $ClusterArgs['DriverNodeType'] = $DriverNodeType
-        $ClusterArgs['Spark_conf'] = $Spark_conf
-        $ClusterArgs['CustomTags'] = $CustomTags
-        $ClusterArgs['InitScripts'] = $InitScripts
-        $ClusterArgs['SparkEnvVars'] = $SparkEnvVars
-        $ClusterArgs['PythonVersion'] = $PythonVersion
-        $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
-        $ClusterArgs['InstancePoolId'] = $InstancePoolId
-
-        $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
+        $jobBody = $InputObject
     }
 
-    If ($PSBoundParameters.ContainsKey('Timeout')) {$JobBody['timeout_seconds'] = $Timeout}
-    If ($PSBoundParameters.ContainsKey('MaxRetries')) {$JobBody['max_retries'] = $MaxRetries}
-    If ($PSBoundParameters.ContainsKey('ScheduleCronExpression')) {
-        $JobBody['schedule'] = @{"quartz_cron_expression"=$ScheduleCronExpression;"timezone_id"=$Timezone}
-    }
-
-
-    If ($PSBoundParameters.ContainsKey('EmailAlertsOnStart')) {
-        $JobBody['email_notifications'] = @{"on_start"= $EmailAlertsOnStart}
-    }
-
-    If ($PSBoundParameters.ContainsKey('EmailAlertsOnSuccess')) {
-        If ($PSBoundParameters.ContainsKey('EmailAlertsOnStart')) {
-            $JobBody['email_notifications'].Add("on_success",$EmailAlertsOnSuccess)
-        }
-        else{
-            $JobBody['email_notifications'] = @{"on_success"= $EmailAlertsOnSuccess}
-        }
-    }
-
-    If ($PSBoundParameters.ContainsKey('EmailAlertsOnFailure')) {
-        If ($PSBoundParameters.ContainsKey('EmailAlertsOnSuccess') -or $PSBoundParameters.ContainsKey('EmailAlertsOnStart')) {
-            $JobBody['email_notifications'].Add("on_failure",$EmailAlertsOnFailure)
-        }
-        else{
-            $JobBody['email_notifications'] = @{"on_failure"= $EmailAlertsOnFailure}
-        }
-    
-    }
-
-    if ($noAlertSkippedRuns.IsPresent){
-          $JobBody['email_notifications'].Add("no_alert_for_skipped_runs",$true)
-    }
-
-    $Notebook = @{}
-    $Notebook['notebook_path'] = $NotebookPath
-    If ($PSBoundParameters.ContainsKey('NotebookParametersJson')) {
-        $Notebook['base_parameters'] = $NotebookParametersJson | ConvertFrom-Json
-    }
-
-    $JobBody['notebook_task'] = $Notebook
-
-    If ($PSBoundParameters.ContainsKey('Libraries')) {
-        If ($Libraries.Count -eq 1) {
-            $Libraries += '{"DummyKey":"1"}'
-        }
-        $JobBody['libraries'] = $Libraries | ConvertFrom-Json
-    }
-
-    If ($Mode -eq 'create'){
+    If ($Mode -eq 'create') {
         $Body = $JobBody
     }
     else {
-        $Body = @{}
-        $Body['job_id']= $JobId
+        $Body = @{ }
+        $Body['job_id'] = $JobId
         $Body['new_settings'] = $JobBody
     }
 
@@ -259,10 +264,10 @@ Function Add-DatabricksNotebookJob {
     Write-Verbose $BodyText
   
     Try {
-        if ($RunImmediate.IsPresent){
+        if ($RunImmediate.IsPresent) {
             $Url = "jobs/runs/submit"
         }
-        else{
+        else {
             $Url = "jobs/$Mode"
         }   
         $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/$Url" -Headers $Headers
@@ -273,10 +278,10 @@ Function Add-DatabricksNotebookJob {
         Write-Error $_.ErrorDetails.Message
     }
     
-    if ($RunImmediate.IsPresent){
+    if ($RunImmediate.IsPresent) {
         Return $JobDetails.run_id
     }
-    else{
+    else {
         if ($Mode -eq "create") {
             Return $JobDetails.job_id
         }

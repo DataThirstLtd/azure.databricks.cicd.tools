@@ -1,0 +1,27 @@
+{
+    "name": "dummyJob",
+    "existing_cluster_id": "2009-143475-skull768",
+    "email_notifications": {
+      "on_start": [
+        "necrozma@bzzzt.io"
+      ],
+      "on_success": [
+        "123@fakedomain.io",
+        "necrozma@bzzzt.io"
+      ],
+      "on_failure": [
+        "123@fakedomain.io",
+        "necrozma@bzzzt.io"
+      ]
+    },
+    "timeout_seconds": 0,
+    "schedule": {
+      "quartz_cron_expression": "0 0 7 ? * 2",
+      "timezone_id": "Europe/London"
+    },
+    "notebook_task": {
+      "notebook_path": "/DEV/PATH/TO/NOTEBOOk",
+      "revision_timestamp": 0
+    },
+    "max_concurrent_runs": 1
+  }
