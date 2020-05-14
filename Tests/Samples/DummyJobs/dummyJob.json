@@ -3,15 +3,15 @@
     "existing_cluster_id": "2009-143475-skull768",
     "email_notifications": {
       "on_start": [
-        "necrozma@bzzzt.io"
+        "bob@fakedomain.io"
       ],
       "on_success": [
         "123@fakedomain.io",
-        "necrozma@bzzzt.io"
+        "bob@fakedomain.io"
       ],
       "on_failure": [
         "123@fakedomain.io",
-        "necrozma@bzzzt.io"
+        "bob@fakedomain.io"
       ]
     },
     "timeout_seconds": 0,
