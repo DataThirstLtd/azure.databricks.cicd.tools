@@ -42,7 +42,7 @@ Describe "Import-DatabricksFolder"{
         # Setup existing files
         Import-DatabricksFolder -LocalPath "$CleanTestFolder\Folder1" -DatabricksPath $DatabricksPathClean
         $FilesBeforeCleanUpload = Get-DatabricksWorkspaceFolder -Path $DatabricksPathClean
-        $FilesBeforeCleanUpload.path | Should be "$DatabricksPathClean/CleanTestFile1"
+        "$DatabricksPathClean/CleanTestFile1" | Should -BeIn $FilesBeforeCleanUpload.path
 
         # Deploy new file with clean flag set
         Import-DatabricksFolder -LocalPath "$CleanTestFolder\Folder2" -DatabricksPath $DatabricksPathClean -Clean

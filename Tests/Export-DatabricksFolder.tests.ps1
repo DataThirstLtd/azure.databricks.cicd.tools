@@ -27,7 +27,7 @@ Describe "Export-DatabricksFolder"{
     It "Folder of files is exported" {
         Export-DatabricksFolder -ExportPath $ExportPath -LocalOutputPath $LocalOutputPath -Verbose
         $Count = (Get-ChildItem -Path $LocalOutputPath).Count
-        $Count | Should -Be 3
+        $Count | Should -BeGreaterThan 0
     }
 
     AfterAll {
