@@ -16,10 +16,12 @@ switch ($mode){
 }
 
 $UploadFolder = 'Samples\DummyNotebooks'
+$CleanTestFolder = 'Samples\DummyNotebooks\CleanTest'
 New-Item -Path $UploadFolder -Name "empty" -Force -ItemType Directory | Out-Null
 
 $DatabricksPath = "/Shared/UnitTestImport"
 $DatabricksPathClean = "/Shared/UnitTestImportClean2"
+$DatabricksPathDoesNotAlreadyExist = "/Shared/NewPath"
 
 Describe "Import-DatabricksFolder Empty Folder"{
 
@@ -36,8 +38,21 @@ Describe "Import-DatabricksFolder"{
         Import-DatabricksFolder -LocalPath $UploadFolder  -DatabricksPath $DatabricksPath
     }
 
-    It "With Clean" {
-        Import-DatabricksFolder `
-            -LocalPath $UploadFolder  -DatabricksPath $DatabricksPathClean -Clean
+    It "With Clean where files already exist" {
+        # Setup existing files
+        Import-DatabricksFolder -LocalPath "$CleanTestFolder\Folder1" -DatabricksPath $DatabricksPathClean
+        $FilesBeforeCleanUpload = Get-DatabricksWorkspaceFolder -Path $DatabricksPathClean
+        $FilesBeforeCleanUpload.path | Should be "$DatabricksPathClean/CleanTestFile1"
+
+        # Deploy new file with clean flag set
+        Import-DatabricksFolder -LocalPath "$CleanTestFolder\Folder2" -DatabricksPath $DatabricksPathClean -Clean
+        $FilesAfterCleanUpload = Get-DatabricksWorkspaceFolder -Path $DatabricksPathClean
+        $FilesAfterCleanUpload.path | Should be "$DatabricksPathClean/CleanTestFile2"
+    }
+
+    It "With Clean on folder that does not already exist" {
+        Import-DatabricksFolder -LocalPath "$CleanTestFolder\Folder1" -DatabricksPath $DatabricksPathDoesNotAlreadyExist -Clean
+        $FilesAfterCleanUploadToNewFolder = Get-DatabricksWorkspaceFolder -Path $DatabricksPathDoesNotAlreadyExist
+        $FilesAfterCleanUploadToNewFolder.path | Should be "$DatabricksPathDoesNotAlreadyExist/CleanTestFile1"
     }
 }

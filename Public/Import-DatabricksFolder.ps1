@@ -48,9 +48,12 @@ Function Import-DatabricksFolder {
     Set-Location $LocalPath
 
     if ($Clean) {
-        Trap {
-            $ExistingFiles = Get-DatabricksWorkspaceFolder -Path $DatabricksPath -ErrorAction:SilentlyContinue;
-            continue
+        try {
+            $ExistingFiles = Get-DatabricksWorkspaceFolder -Path $DatabricksPath
+        }
+        catch [System.Net.WebException] {
+            # A 404 response is expected if the specified workspace does not exist in Databricks
+            # In this case, there will be no existing files to clean so the exception can be safely ignored
         }
         foreach ($f in $ExistingFiles){
             if ($f.object_type -eq "DIRECTORY"){
