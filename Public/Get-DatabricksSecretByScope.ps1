@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-List all Secret Scopes
+List all Secrets By Scope
 
 .DESCRIPTION
-List all Secret Scopes. Or search for one
+List all Secrets of a scope. Or search for one secret by key.
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
@@ -12,14 +12,19 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .PARAMETER ScopeName
-Optional. Search for a specific scope by name
+Return secrets under this scope.
+
+.PARAMETER SecretKey
+Optional. Search for a specific secret by key
 
 
 .EXAMPLE
 PS C:\> Get-DatabricksSecretScopes -BearerToken $BearerToken -Region $Region -ScopeName "MyScope"
 
+PS C:\> Get-DatabricksSecretScopes -BearerToken $BearerToken -Region $Region -ScopeName "MyScope" -Secretkey "secretName"
+
 .NOTES
-Author: Simon D'Morias / Data Thirst Ltd 
+Author: Richie Lee / @richiebzzzt 
 
 #>  
 Function Get-DatabricksSecretByScope { 

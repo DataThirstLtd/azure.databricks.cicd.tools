@@ -20,6 +20,8 @@ Switch that if included will check if scope is not empty.
 .EXAMPLE
 PS C:\> Remove-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName "MyScope"
 
+PS C:\> Remove-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName "MyScope" -RemoveEmptyOnly
+
 .NOTES
 Author: Simon D'Morias / Data Thirst Ltd
 #>  
