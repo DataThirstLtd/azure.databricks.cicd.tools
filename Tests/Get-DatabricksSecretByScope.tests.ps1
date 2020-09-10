@@ -23,12 +23,21 @@ Describe "Get-DatabricksSecretByScope" {
         Set-DatabricksSecret -ScopeName $ScopeName -SecretName 'TestSecretName' -SecretValue 'ohdear'
         Set-DatabricksSecret -ScopeName $ScopeName -SecretName 'AnotherTestSecretName' -SecretValue 'ohdear'
     }
-    It "Get DataBricks Secrets - should be two results" {
+    It "Get all DataBricks Secrets under one scope" {
         $databricksSecrets = Get-DatabricksSecretByScope -ScopeName $ScopeName -Verbose
         $databricksSecrets.count | Should Be 2
     }
-    It "Delete non existent should not fail" {
+    It "Get non existent scope should not fail" {
         Get-DatabricksSecretByScope -ScopeName "Doesntexist"  -Verbose
+    }
+    It "Get Single Secret from Scope" {
+        $databricksSecrets = Get-DatabricksSecretByScope -ScopeName $ScopeName -SecretKey 'TestSecretName' -Verbose
+        $databricksSecrets.count | Should Be 1
+    }
+
+    It "Get Single Secret from Scope should not fail" {
+        $databricksSecrets = Get-DatabricksSecretByScope -ScopeName $ScopeName -SecretKey 'doesntexist' -Verbose
+        $databricksSecrets.count | Should Be 0
     }
     AfterAll{
         Remove-DatabricksSecretScope -ScopeName $ScopeName -Verbose
