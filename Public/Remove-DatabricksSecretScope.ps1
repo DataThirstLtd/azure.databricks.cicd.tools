@@ -38,7 +38,7 @@ Function Remove-DatabricksSecretScope {
     $secrets = Get-DatabricksSecretByScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName
 
     If ($PSBoundParameters.ContainsKey('RemoveEmptyOnly') -eq $true) {
-        if ($secrets.secrets.count -gt 0) {
+        if ($secrets.count -gt 0) {
             Write-Output "Scope $ScopeName has $($secrets.count) secret and is not empty!"
             Throw
         }
@@ -50,8 +50,10 @@ Function Remove-DatabricksSecretScope {
     $Body = @{}
     $Body['scope'] = $ScopeName
     $BodyText = $Body | ConvertTo-Json -Depth 10
-    $SecretNames  = $secrets.key -join "`n"
-    Write-Verbose "Following secrets will be deleted... `n $SecretNames"
+    if ($secrets.count -gt 0) {
+        $SecretNames = $secrets.key -join "`n"
+        Write-Verbose "Following secrets will be deleted... `n $SecretNames"
+    }
     Try {
         Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/secrets/scopes/delete" -Headers $Headers
     }
