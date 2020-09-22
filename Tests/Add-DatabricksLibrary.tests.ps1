@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('Bearer', 'ServicePrincipal')][string]$Mode = "ServicePrincipal"
+    [ValidateSet('Bearer', 'ServicePrincipal')][string]$Mode = "Bearer"
 )
 
 Set-Location $PSScriptRoot
@@ -22,11 +22,20 @@ Describe "Add-DatabricksLibrary" {
 
         $clusterLibrariesStatus = Get-DatabricksLibraries -ClusterId $Config.AddLibraryClusterId
         $clusterLibrariesStatus.Length | Should Be 0
-        {Add-DatabricksLibrary -InputObject $libraries} | Should Not Throw
+        { Add-DatabricksLibrary -InputObject $libraries } | Should Not Throw
         $clusterLibrariesStatus = Get-DatabricksLibraries -ClusterId $Config.AddLibraryClusterId
         $clusterLibrariesStatus.Length | Should Be 12
     }
-    AfterAll{
+    It "Add Libraries by InputObject" {
+        $clusterLibrariesStatus = Get-DatabricksLibraries -ClusterId $Config.AddLibraryClusterId -ReturnCluster
+        $clusterLibrariesStatus
+        for ($i = 0; $i -lt $clusterLibrariesStatus.library_statuses.Length; $i ++) {
+            $clusterLibrariesStatus.library_statuses[$i].psobject.properties.remove('status')
+            $clusterLibrariesStatus.library_statuses[$i].psobject.properties.remove('is_library_for_all_clusters')
+        } 
+        {$clusterLibrariesStatus | Add-DatabricksLibrary -Verbose} | Should Not Throw
+    }
+    AfterAll {
         Remove-DatabricksLibrary -InputObject $libraries
         Start-Sleep -Seconds 10
         Restart-DatabricksCluster -ClusterId $Config.AddLibraryClusterId

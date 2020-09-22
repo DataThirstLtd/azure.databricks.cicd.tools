@@ -22,13 +22,13 @@ Author: Simon D'Morias / Data Thirst Ltd
 
 #>  
 
-Function Get-DatabricksLibraries
-{ 
+Function Get-DatabricksLibraries { 
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $false)][string]$BearerToken, 
         [parameter(Mandatory = $false)][string]$Region,
-        [parameter(Mandatory = $true)][string]$ClusterId
+        [parameter(Mandatory = $true)][string]$ClusterId,
+        [parameter(Mandatory = $false)][switch]$returnCluster
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -45,7 +45,12 @@ Function Get-DatabricksLibraries
         Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
         Write-Error $_.ErrorDetails.Message
     }
+    if ($PSBoundParameters.ContainsKey('returnCluster') -eq $false) {
 
-    Return $Libraries.library_statuses
+        Return $Libraries.library_statuses
+    }
+    else {
+        $Libraries
+    }
 }
     
