@@ -11,6 +11,7 @@
     "WorkspaceName": "Databricks workspace name (resource name in portal)",
     "ClusterId": "Test Cluster Id to use",
     "AddLibraryClusterId": "Test Cluster Id to use for adding libraries. Should have no libraries installed. This cluster is restarted after test.",
+    "AddLibraryInputClusterId": "Test Cluster Id to use for adding libraries via InputObject. Should have no libraries installed. This cluster is restarted after test.",
     "RemoveLibraryClusterId": "Test Cluster Id to use for removing libraries. Should have no libraries installed. This cluster is restarted after test.",
     "Username": "Existing user in workspace to apply permissions to"
 }

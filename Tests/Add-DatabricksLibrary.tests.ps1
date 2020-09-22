@@ -7,6 +7,7 @@ Import-Module "..\azure.databricks.cicd.tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 $libraryFile = 'Samples\DummyLibraries\dummylibraries.json'
 $libraries = (Get-Content -path $libraryFile -Raw) -replace '__cluster_id__', $Config.AddLibraryClusterId | ConvertFrom-Json
+$removelibraries = (Get-Content -path $libraryFile -Raw) -replace '__cluster_id__', $Config.AddLibraryInputClusterId | ConvertFrom-Json
 
 switch ($mode) {
     ("Bearer") {
@@ -19,25 +20,35 @@ switch ($mode) {
 
 Describe "Add-DatabricksLibrary" {
     It "Add Libraries by file" {
-
-        $clusterLibrariesStatus = Get-DatabricksLibraries -ClusterId $Config.AddLibraryClusterId
-        $clusterLibrariesStatus.Length | Should Be 0
+        $AddClusterLibFile = Get-DatabricksLibraries -ClusterId $Config.AddLibraryClusterId
+        $AddClusterLibFile.Length | Should Be 0
         { Add-DatabricksLibrary -InputObject $libraries } | Should Not Throw
-        $clusterLibrariesStatus = Get-DatabricksLibraries -ClusterId $Config.AddLibraryClusterId
-        $clusterLibrariesStatus.Length | Should Be 12
+        $clusterLibrariesFile = Get-DatabricksLibraries -ClusterId $Config.AddLibraryClusterId
+        $clusterLibrariesFile.Length | Should Be 12
     }
     It "Add Libraries by InputObject" {
-        $clusterLibrariesStatus = Get-DatabricksLibraries -ClusterId $Config.AddLibraryClusterId -ReturnCluster
-        for ($i = 0; $i -lt $clusterLibrariesStatus.library_statuses.Length; $i ++) {
-            $clusterLibrariesStatus.library_statuses[$i].psobject.properties.remove('status')
-            $clusterLibrariesStatus.library_statuses[$i].psobject.properties.remove('is_library_for_all_clusters')
+        $RemoveClusterLib = Get-DatabricksLibraries -ClusterId $Config.AddLibraryInputClusterId
+        $RemoveClusterLib.Length | Should Be 0
+        $AddClusterLib = Get-DatabricksLibraries -ClusterId $Config.AddLibraryClusterId -ReturnCluster
+        for ($i = 0; $i -lt $AddClusterLib.library_statuses.Length; $i ++) {
+            $AddClusterLib.library_statuses[$i].psobject.properties.remove('status')
+            $AddClusterLib.library_statuses[$i].psobject.properties.remove('is_library_for_all_clusters')
         } 
-        {$clusterLibrariesStatus | Add-DatabricksLibrary -Verbose} | Should Not Throw
+        $LibsToRemove = [PSCustomObject]@{
+            cluster_id     = $Config.AddLibraryInputClusterId
+            libraries = $AddClusterLib.library_statuses.library
+        }
+        {$LibsToRemove | Add-DatabricksLibrary -Verbose} | Should Not Throw
+        $clusterLibrariesInput = Get-DatabricksLibraries -ClusterId $Config.AddLibraryInputClusterId
+        $clusterLibrariesInput.Length | Should Be 12
     }
+
     AfterAll {
         Remove-DatabricksLibrary -InputObject $libraries
-        Start-Sleep -Seconds 10
+        Remove-DatabricksLibrary -InputObject $removelibraries
+        Start-Sleep -Seconds 30
         Restart-DatabricksCluster -ClusterId $Config.AddLibraryClusterId
+        Restart-DatabricksCluster -ClusterId $Config.AddLibraryInputClusterId
     }
 }
 

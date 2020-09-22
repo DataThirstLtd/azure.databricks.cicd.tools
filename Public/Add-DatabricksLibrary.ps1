@@ -106,9 +106,16 @@ Function Add-DatabricksLibrary {
         $Body = $InputObject
     }
 
-    $BodyText = $Body | ConvertTo-Json -Depth 10
+    $BodyText = $Body | ConvertTo-Json -Depth 100
 
     Write-Verbose "Request Body: $BodyText"
     Write-Verbose "Installing library $LibraryType with setting $LibrarySettings to REST API: $uri"
-    Invoke-RestMethod -Uri $uri -Body $BodyText -Method 'POST' -Headers $Headers
+    try {
+        Invoke-RestMethod -Uri $uri -Body $BodyText -Method 'POST' -Headers $Headers
+    }
+    catch {
+        Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
+        Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
+        Write-Error $_.ErrorDetails.Message
+    }
 }
