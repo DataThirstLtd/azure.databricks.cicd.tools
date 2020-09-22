@@ -40,46 +40,56 @@ Author: Simon D'Morias / Data Thirst Ltd
 
 #>  
 
-Function Remove-DatabricksLibrary
-{ 
-    [cmdletbinding()]
+Function Remove-DatabricksLibrary { 
+    [cmdletbinding(DefaultParameterSetName = 'Settings')]
     param (
-        [parameter(Mandatory = $false)][string]$BearerToken, 
-        [parameter(Mandatory = $false)][string]$Region,
-        [parameter(Mandatory = $true)][string]$ClusterId,
-        [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran', 'whl')][string]$LibraryType,
-        [parameter(Mandatory = $true)][string]$LibrarySettings
+        [Parameter(ParameterSetName = 'InputObject', Mandatory = $false)]
+        [Parameter(ParameterSetName = 'Settings', Mandatory = $false)]
+        [string]$BearerToken, 
+        [Parameter(ParameterSetName = 'InpputObject', Mandatory = $false)]
+        [Parameter(ParameterSetName = 'Settings', Mandatory = $false)]
+        [string]$Region,
+        [parameter(ParameterSetName = 'InputObject', ValueFromPipeline, Mandatory = $true)][object]$InputObject,
+        [parameter(ParameterSetName = 'Settings', Mandatory = $true)][string]$ClusterId,
+        [Parameter(ParameterSetName = 'Settings', Mandatory = $true)][ValidateSet('jar', 'egg', 'maven', 'pypi', 'cran', 'whl')][string]$LibraryType,
+        [parameter(ParameterSetName = 'Settings', Mandatory = $true)][string]$LibrarySettings
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
 
-    $uri ="api/2.0/libraries/uninstall"
+    $uri = "api/2.0/libraries/uninstall"
 
-    $Body = @{"cluster_id"=$ClusterId}
+    if ($PSBoundParameters.ContainsKey('InputObject') -eq $false) {
 
-    if (($LibrarySettings -notmatch '{') -and ($LibraryType -eq "pypi")) {
-        #Pypi and only string passed - try as simple name
-        Write-Verbose "Converting to pypi JSON request"
-        $LibrarySettings = '{package: "' + $LibrarySettings + '"}'
-    }
+        $Body = @{"cluster_id" = $ClusterId }
 
-    if ($LibrarySettings -match '{'){
-        # Settings are JSON else assume String (name of library)
-        Write-Verbose "Request is in JSON"
-        $Libraries = @()
-        $Library = @{}
-        $Library[$LibraryType]= ($LibrarySettings | ConvertFrom-Json)
-        $Libraries += $Library
-        $Body['libraries'] = $Libraries
+        if (($LibrarySettings -notmatch '{') -and ($LibraryType -eq "pypi")) {
+            #Pypi and only string passed - try as simple name
+            Write-Verbose "Converting to pypi JSON request"
+            $LibrarySettings = '{package: "' + $LibrarySettings + '"}'
+        }
+
+        if ($LibrarySettings -match '{') {
+            # Settings are JSON else assume String (name of library)
+            Write-Verbose "Request is in JSON"
+            $Libraries = @()
+            $Library = @{}
+            $Library[$LibraryType] = ($LibrarySettings | ConvertFrom-Json)
+            $Libraries += $Library
+            $Body['libraries'] = $Libraries
+        }
+        else {
+            Write-Verbose "Request is a string"
+            $Libraries = @()
+            $Library = @{}
+            $Library[$LibraryType] = $LibrarySettings
+            $Libraries += $Library
+            $Body['libraries'] = $Libraries
+        }
     }
     else {
-        Write-Verbose "Request is a string"
-        $Libraries = @()
-        $Library = @{}
-        $Library[$LibraryType]= $LibrarySettings
-        $Libraries += $Library
-        $Body['libraries'] = $Libraries
+        $Body = $InputObject
     }
 
     $BodyText = $Body | ConvertTo-Json -Depth 10
