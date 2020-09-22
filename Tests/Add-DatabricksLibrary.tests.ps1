@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('Bearer', 'ServicePrincipal')][string]$Mode = "Bearer"
+    [ValidateSet('Bearer', 'ServicePrincipal')][string]$Mode = "ServicePrincipal"
 )
 
 Set-Location $PSScriptRoot
@@ -28,7 +28,6 @@ Describe "Add-DatabricksLibrary" {
     }
     It "Add Libraries by InputObject" {
         $clusterLibrariesStatus = Get-DatabricksLibraries -ClusterId $Config.AddLibraryClusterId -ReturnCluster
-        $clusterLibrariesStatus
         for ($i = 0; $i -lt $clusterLibrariesStatus.library_statuses.Length; $i ++) {
             $clusterLibrariesStatus.library_statuses[$i].psobject.properties.remove('status')
             $clusterLibrariesStatus.library_statuses[$i].psobject.properties.remove('is_library_for_all_clusters')
