@@ -32,6 +32,34 @@ If maven, specification of a Maven library to be installed. For example: { "coor
 
 If cran, specification of a CRAN library to be installed.
 
+.PARAMETER InputObject
+Can take an object that is correctly formatted so that more than one library can be removed.
+
+{
+  "cluster_id": "10201-my-cluster",
+  "libraries": [
+    {
+      "jar": "dbfs:/mnt/libraries/library.jar"
+    },
+    {
+      "egg": "dbfs:/mnt/libraries/library.egg"
+    }
+  ]
+}
+
+Output from Get-DatabricksLibraries can also be piped - 
+
+$rcl = Get-DatabricksLibraries -ClusterId $clusterId -ReturnCluster
+    for ($i = 0; $i -lt $rcl.library_statuses.Length; $i ++) {
+        $rcl.library_statuses[$i].psobject.properties.remove('status')
+        $rcl.library_statuses[$i].psobject.properties.remove('is_library_for_all_clusters')
+    } 
+    $LibsToRemove = [PSCustomObject]@{
+        cluster_id     = $clusterId
+        libraries = $rcl.library_statuses.library
+    }
+$LibsToRemove | Remove-DatabricksLibrary -Verbose
+
 .EXAMPLE
 PS C:\> Remove-DatabricksLibrary -BearerToken $BearerToken -Region $Region -ClusterId 'Bob-1234'
 

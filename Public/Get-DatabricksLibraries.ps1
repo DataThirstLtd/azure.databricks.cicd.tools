@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Get a list of Libraries and thier statuses for a Databricks cluster
+Get a list of Libraries and their statuses for a Databricks cluster
 
 .DESCRIPTION
-Get a list of Libraries and thier statuses for a Databricks cluster
+Get a list of Libraries and their statuses for a Databricks cluster
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
@@ -13,6 +13,9 @@ Azure Region - must match the URL of your Databricks workspace, example northeur
 
 .PARAMETER ClusterId
 ClusterId for existing Databricks cluster. Does not need to be running. See Get-DatabricksClusters.
+
+.PARAMETER returnCluster
+Switch that returns the entire object.
 
 .EXAMPLE
 PS C:\> Get-DatabricksLibraries -BearerToken $BearerToken -Region $Region -ClusterId 'Bob-1234'

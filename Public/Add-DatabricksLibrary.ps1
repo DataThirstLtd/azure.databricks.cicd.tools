@@ -38,6 +38,35 @@ If cran, specification of a CRAN library to be installed.
 The cluster to install the library to. Note that the API does not support auto installing to
 all clusters. See Get-DatabricksClusters. 
 
+.PARAMETER InpputObject
+Can take an object that is correctly formatted so that more than one library can be added.
+
+{
+  "cluster_id": "10201-my-cluster",
+  "libraries": [
+    {
+      "jar": "dbfs:/mnt/libraries/library.jar"
+    },
+    {
+      "egg": "dbfs:/mnt/libraries/library.egg"
+    }
+  ]
+}
+
+Output from Get-DatabricksLibraries can also be piped - 
+
+$rcl = Get-DatabricksLibraries -ClusterId $clusterId -ReturnCluster
+    for ($i = 0; $i -lt $rcl.library_statuses.Length; $i ++) {
+        $rcl.library_statuses[$i].psobject.properties.remove('status')
+        $rcl.library_statuses[$i].psobject.properties.remove('is_library_for_all_clusters')
+    } 
+    $LibsToAdd = [PSCustomObject]@{
+        cluster_id     = $anotherClusterId
+        libraries = $rcl.library_statuses.library
+    }
+$LibsToAdd | Add-DatabricksLibrary -Verbose
+
+
 .EXAMPLE
 C:\PS> Add-DatabricksLibrary -BearerToken $BearerToken -Region $Region -LibraryType "jar" -LibrarySettings "dbfs:/mnt/libraries/library.jar" -ClusterId "bob-1234"
 
