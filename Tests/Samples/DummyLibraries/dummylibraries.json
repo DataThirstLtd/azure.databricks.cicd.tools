@@ -1,0 +1,78 @@
+{
+    "cluster_id": "__cluster_id__",
+    "libraries": [
+      {
+        "pypi": {
+          "repo": null,
+          "package": "boto3==1.9.249"
+        }
+      },
+      {
+        "pypi": {
+          "repo": null,
+          "package": "paramiko==2.7.1"
+        }
+      },
+      {
+        "pypi": {
+          "repo": null,
+          "package": "psycopg2==2.8.4"
+        }
+      },
+      {
+        "pypi": {
+          "repo": null,
+          "package": "chardet==2.3.0"
+        }
+      },
+      {
+        "pypi": {
+          "repo": null,
+          "package": "requests==2.11.1"
+        }
+      },
+      {
+        "pypi": {
+          "repo": null,
+          "package": "pytest==4.6.9"
+        }
+      },
+      {
+        "pypi": {
+          "repo": null,
+          "package": "azure-identity==1.3.1"
+        }
+      },
+      {
+        "pypi": {
+          "repo": null,
+          "package": "azure-storage-file-datalake==12.0.2"
+        }
+      },
+      {
+        "maven": {
+          "repo": null,
+          "exclusions": null,
+          "coordinates": "com.databricks:spark-xml_2.11:0.9.0"
+        }
+      },
+      {
+        "pypi": {
+          "repo": null,
+          "package": "azure-storage-blob==12.3.2"
+        }
+      },
+      {
+        "pypi": {
+          "repo": null,
+          "package": "google-cloud-bigquery==1.13.0"
+        }
+      },
+      {
+        "pypi": {
+          "repo": null,
+          "package": "google-cloud-storage==1.30.0"
+        }
+      }
+    ]
+  }

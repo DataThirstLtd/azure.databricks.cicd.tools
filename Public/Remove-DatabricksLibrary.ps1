@@ -32,6 +32,34 @@ If maven, specification of a Maven library to be installed. For example: { "coor
 
 If cran, specification of a CRAN library to be installed.
 
+.PARAMETER InputObject
+Can take an object that is correctly formatted so that more than one library can be removed.
+
+{
+  "cluster_id": "10201-my-cluster",
+  "libraries": [
+    {
+      "jar": "dbfs:/mnt/libraries/library.jar"
+    },
+    {
+      "egg": "dbfs:/mnt/libraries/library.egg"
+    }
+  ]
+}
+
+Output from Get-DatabricksLibraries can also be piped - 
+
+$rcl = Get-DatabricksLibraries -ClusterId $clusterId -ReturnCluster
+    for ($i = 0; $i -lt $rcl.library_statuses.Length; $i ++) {
+        $rcl.library_statuses[$i].psobject.properties.remove('status')
+        $rcl.library_statuses[$i].psobject.properties.remove('is_library_for_all_clusters')
+    } 
+    $LibsToRemove = [PSCustomObject]@{
+        cluster_id     = $clusterId
+        libraries = $rcl.library_statuses.library
+    }
+$LibsToRemove | Remove-DatabricksLibrary -Verbose
+
 .EXAMPLE
 PS C:\> Remove-DatabricksLibrary -BearerToken $BearerToken -Region $Region -ClusterId 'Bob-1234'
 
@@ -40,51 +68,68 @@ Author: Simon D'Morias / Data Thirst Ltd
 
 #>  
 
-Function Remove-DatabricksLibrary
-{ 
-    [cmdletbinding()]
+Function Remove-DatabricksLibrary { 
+    [cmdletbinding(DefaultParameterSetName = 'Settings')]
     param (
-        [parameter(Mandatory = $false)][string]$BearerToken, 
-        [parameter(Mandatory = $false)][string]$Region,
-        [parameter(Mandatory = $true)][string]$ClusterId,
-        [Parameter(Mandatory = $true)][ValidateSet('jar','egg','maven','pypi','cran', 'whl')][string]$LibraryType,
-        [parameter(Mandatory = $true)][string]$LibrarySettings
+        [Parameter(ParameterSetName = 'InputObject', Mandatory = $false)]
+        [Parameter(ParameterSetName = 'Settings', Mandatory = $false)]
+        [string]$BearerToken, 
+        [Parameter(ParameterSetName = 'InpputObject', Mandatory = $false)]
+        [Parameter(ParameterSetName = 'Settings', Mandatory = $false)]
+        [string]$Region,
+        [parameter(ParameterSetName = 'InputObject', ValueFromPipeline, Mandatory = $true)][object]$InputObject,
+        [parameter(ParameterSetName = 'Settings', Mandatory = $true)][string]$ClusterId,
+        [Parameter(ParameterSetName = 'Settings', Mandatory = $true)][ValidateSet('jar', 'egg', 'maven', 'pypi', 'cran', 'whl')][string]$LibraryType,
+        [parameter(ParameterSetName = 'Settings', Mandatory = $true)][string]$LibrarySettings
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
 
-    $uri ="api/2.0/libraries/uninstall"
+    $uri = "api/2.0/libraries/uninstall"
 
-    $Body = @{"cluster_id"=$ClusterId}
+    if ($PSBoundParameters.ContainsKey('InputObject') -eq $false) {
 
-    if (($LibrarySettings -notmatch '{') -and ($LibraryType -eq "pypi")) {
-        #Pypi and only string passed - try as simple name
-        Write-Verbose "Converting to pypi JSON request"
-        $LibrarySettings = '{package: "' + $LibrarySettings + '"}'
-    }
+        $Body = @{"cluster_id" = $ClusterId }
 
-    if ($LibrarySettings -match '{'){
-        # Settings are JSON else assume String (name of library)
-        Write-Verbose "Request is in JSON"
-        $Libraries = @()
-        $Library = @{}
-        $Library[$LibraryType]= ($LibrarySettings | ConvertFrom-Json)
-        $Libraries += $Library
-        $Body['libraries'] = $Libraries
+        if (($LibrarySettings -notmatch '{') -and ($LibraryType -eq "pypi")) {
+            #Pypi and only string passed - try as simple name
+            Write-Verbose "Converting to pypi JSON request"
+            $LibrarySettings = '{package: "' + $LibrarySettings + '"}'
+        }
+
+        if ($LibrarySettings -match '{') {
+            # Settings are JSON else assume String (name of library)
+            Write-Verbose "Request is in JSON"
+            $Libraries = @()
+            $Library = @{}
+            $Library[$LibraryType] = ($LibrarySettings | ConvertFrom-Json)
+            $Libraries += $Library
+            $Body['libraries'] = $Libraries
+        }
+        else {
+            Write-Verbose "Request is a string"
+            $Libraries = @()
+            $Library = @{}
+            $Library[$LibraryType] = $LibrarySettings
+            $Libraries += $Library
+            $Body['libraries'] = $Libraries
+        }
     }
     else {
-        Write-Verbose "Request is a string"
-        $Libraries = @()
-        $Library = @{}
-        $Library[$LibraryType]= $LibrarySettings
-        $Libraries += $Library
-        $Body['libraries'] = $Libraries
+        $Body = $InputObject
     }
 
     $BodyText = $Body | ConvertTo-Json -Depth 10
 
     Write-Verbose "Request Body: $BodyText"
     Write-Verbose "Uninstalling library $LibraryType with setting $LibrarySettings to REST API: $uri"
-    Invoke-RestMethod -Uri "$global:DatabricksURI/$uri" -Body $BodyText -Method 'POST' -Headers $Headers
+    try {
+        Invoke-RestMethod -Uri "$global:DatabricksURI/$uri" -Body $BodyText -Method 'POST' -Headers $Headers
+    }
+    catch {
+        Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
+        Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
+        Write-Error $_.ErrorDetails.Message
+    }
 }
