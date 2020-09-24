@@ -7,11 +7,12 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
         Try {
             New-Item -Force -path $tempLocalExportPath -Type File | Out-Null
             Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers -OutFile $tempLocalExportPath  
-            [System.Collections.ArrayList]$Response = Get-Content $tempLocalExportPath -Encoding UTF8 
-            $Response.RemoveAt(0)
+            $Response = @()
+            $Response = Get-Content $tempLocalExportPath -Encoding UTF8
+            $NewResponse = $Response -ne "# Databricks notebook source"
             Remove-Item $tempLocalExportPath 
             if ($Format -eq "SOURCE") { 
-                $ResponseString = ($Response.replace("[^`r]`n", "`n") -Join "`n")
+                $ResponseString = ($NewResponse.replace("[^`r]`n", "`n") -Join "`n")
             } 
             New-Item -force -path $LocalExportPath -value $ResponseString -type file | Out-Null 
         }
