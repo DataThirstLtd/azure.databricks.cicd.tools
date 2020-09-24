@@ -55,8 +55,8 @@ Function Import-DatabricksFolder {
             # A 404 response is expected if the specified workspace does not exist in Databricks
             # In this case, there will be no existing files to clean so the exception can be safely ignored
         }
-        foreach ($f in $ExistingFiles){
-            if ($f.object_type -eq "DIRECTORY"){
+        foreach ($f in $ExistingFiles) {
+            if ($f.object_type -eq "DIRECTORY") {
                 Write-Verbose "Removing directory $($f.path)"
                 Remove-DatabricksNotebook -Path $f.path -Recursive
             }
@@ -86,8 +86,12 @@ Function Import-DatabricksFolder {
         # Create folder in Databricks
         Add-DatabricksFolder -Path $Path
         Write-Verbose "Path: $Path"
-
-        $BinaryContents = [System.IO.File]::ReadAllBytes($FileToPush.FullName)
+        if ($PSVersionTable.PSVersion.Major -lt 6) {
+            $BinaryContents = [System.IO.File]::ReadAllBytes($FileToPush.FullName)
+        }
+        else {
+            $BinaryContents = Get-Content $FileToPush.FullName -AsByteStream -ReadCount 0
+        }
         $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
         $TargetPath = $Path + '/' + $FileToPush.BaseName
 
@@ -137,30 +141,30 @@ Function Import-DatabricksFolder {
         }
         else {
             Write-Verbose "Pushing file $FileToPush to $TargetPath"
-            $ProgressPreference ='SilentlyContinue'
+            $ProgressPreference = 'SilentlyContinue'
             $threadJobs += Start-ThreadJob -Name $fileToPush -ScriptBlock { Invoke-RestMethod -Uri $args[0] -Body $args[1] -Method 'POST' -Headers $args[2] } -ArgumentList "$global:DatabricksURI/api/2.0/workspace/import", $BodyText, $Headers -ThrottleLimit $throttleLimit
         }
     }
     
-    if ($threadJobs.length -eq 0){
+    if ($threadJobs.length -eq 0) {
         Pop-Location
         return
     }
 
     Wait-Job -Job $threadJobs | Out-Null
     $toThrow = $null
-    foreach ($threadJob in $threadJobs){
+    foreach ($threadJob in $threadJobs) {
         $getState = Get-Job $threadJob.Name | Select-Object -Last 1
         if ($getState.State -eq 'Failed') {
             $toThrow = 1
             Write-Host ($threadJob.ChildJobs[0].JobStateInfo.Reason.Message) -ForegroundColor Red
         } 
-        else{
+        else {
             Write-Verbose "$($getState.Name) has $($getState.State)" 
         }
     }
     Pop-Location
-    if ($null -ne $toThrow){
+    if ($null -ne $toThrow) {
         Write-Error "Oh dear one of the jobs has failed. Check the details of the jobs above."
     }
 }

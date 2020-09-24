@@ -6,14 +6,14 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
     $scriptBlock = { param($DatabricksFile, $Format = "SOURCE", $Headers, $uri, $LocalExportPath, $tempLocalExportPath)         
         Try {
             New-Item -Force -path $tempLocalExportPath -Type File | Out-Null
-            Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers -OutFile $tempLocalExportPath 
-            $Response = Get-Content $tempLocalExportPath -Encoding UTF8 
-            $Response = $response.Replace("# Databricks notebook source", " ") 
+            Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers -OutFile $tempLocalExportPath  
+            [System.Collections.ArrayList]$Response = Get-Content $tempLocalExportPath -Encoding UTF8 
+            $Response.RemoveAt(0)
             Remove-Item $tempLocalExportPath 
             if ($Format -eq "SOURCE") { 
-                $Response = ($Response.replace("[^`r]`n", "`r`n") -Join "`r`n") 
+                $ResponseString = ($Response.replace("[^`r]`n", "`n") -Join "`n")
             } 
-            New-Item -force -path $LocalExportPath -value $Response -type file | out-null 
+            New-Item -force -path $LocalExportPath -value $ResponseString -type file | Out-Null 
         }
         Catch {
             Write-Error $_.ErrorDetails.Message
