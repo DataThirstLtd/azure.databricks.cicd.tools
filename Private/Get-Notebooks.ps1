@@ -46,9 +46,6 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
         elseif ($Object.object_type -eq "NOTEBOOK") {
             $Notebook = $Object.path
             $NotebookLanguage = $Object.language
-            if ( $notebook -eq "/Users/richie.lee@effem.com/kronos-graph/master/COUNTS/01_CURRENT_ACTIVITY") {
-                Write-Host "Here"
-            }
             Write-Verbose "Calling Writing of $Notebook ($NotebookLanguage)"
             $DatabricksFileForUrl = Format-DataBricksFileName -DataBricksFile $Notebook 
             $uri = "$global:DatabricksURI/api/2.0/workspace/export?path=" + $DatabricksFileForUrl + "&format=$Format&direct_download=true"
