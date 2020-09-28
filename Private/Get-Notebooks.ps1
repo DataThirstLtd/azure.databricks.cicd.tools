@@ -14,7 +14,12 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
             if ($Format -eq "SOURCE") { 
                 $ResponseString = ($NewResponse.replace("[^`r]`n", "`n") -Join "`n")
             } 
-            New-Item -force -path $LocalExportPath -value $ResponseString -type file | Out-Null 
+            if ((Test-Path -PathType Leaf -Path $LocalExportPath) -eq $true) {
+                Set-Content -path $LocalExportPath -value $ResponseString | Out-Null
+            }
+            else {
+                New-Item -force -path $LocalExportPath -value $ResponseString -type file | Out-Null 
+            }
         }
         Catch {
             Write-Error $_.ErrorDetails.Message
