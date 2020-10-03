@@ -49,8 +49,8 @@ jobs:
       targetType: 'inline'
       script: |
         $Mode="Bearer"
-        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
-        Import-Module Pester -MinimumVersion 4.4.2 
+        Install-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1
         Set-Location "./Tests"
         Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "Win-PS-Bearer.xml" -OutputFormat NUnitXML
       pwsh: false
@@ -69,8 +69,8 @@ jobs:
       targetType: 'inline'
       script: |
         $Mode="ServicePrincipal"
-        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
-        Import-Module Pester -MinimumVersion 4.4.2 
+        Install-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1
         Set-Location "./Tests"
         Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "Win-PS-SP.xml" -OutputFormat NUnitXML
       pwsh: false
@@ -90,8 +90,8 @@ jobs:
       targetType: 'inline'
       script: |
         $Mode="Bearer"
-        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
-        Import-Module Pester -MinimumVersion 4.4.2 
+        Install-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1 
         Set-Location "./Tests"
         Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "Win-PSCORE-Bearer.xml" -OutputFormat NUnitXML
       pwsh: true
@@ -110,8 +110,8 @@ jobs:
       targetType: 'inline'
       script: |
         $Mode="ServicePrincipal"
-        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
-        Import-Module Pester -MinimumVersion 4.4.2 
+        Install-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1 
         Set-Location "./Tests"
         Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "Win-PSCORE-SP.xml" -OutputFormat NUnitXML
       pwsh: true
@@ -160,8 +160,8 @@ jobs:
       targetType: 'inline'
       script: |
         $Mode="Bearer"
-        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
-        Import-Module Pester -MinimumVersion 4.4.2 
+        Install-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1 
         Set-Location "./Tests"
         Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "U-PS-Bearer.xml" -OutputFormat NUnitXML
       pwsh: true
@@ -180,8 +180,8 @@ jobs:
       targetType: 'inline'
       script: |
         $Mode="ServicePrincipal"
-        Install-Module Pester -MinimumVersion 4.4.2 -Scope CurrentUser -SkipPublisherCheck -Force
-        Import-Module Pester -MinimumVersion 4.4.2 
+        Install-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1 -Scope CurrentUser -SkipPublisherCheck -Force
+        Import-Module Pester -MinimumVersion 4.4.2 -MaximumVersion 4.10.1 
         Set-Location "./Tests"
         Invoke-Pester -Script @{Path = "./*.tests.ps1"; Parameters = @{mode=$Mode}} -OutputFile "U-PS-SP.xml" -OutputFormat NUnitXML
       pwsh: true
