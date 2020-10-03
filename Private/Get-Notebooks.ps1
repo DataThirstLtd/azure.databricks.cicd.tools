@@ -30,11 +30,10 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
         }
     }
 
-    # this doesn't work anymore - currently DBC format broken
-    #if ($Format -eq "DBC") {
-    #    Set-LocalNotebook $OriginalPath "dbc" $Region $InternalBearerToken $LocalOutputPath "DBC"
-    #    return
-    #}
+    if ($Format -eq "DBC") {
+        Set-LocalNotebook $OriginalPath "dbc" $LocalOutputPath "DBC"
+        return
+    }
 
     $Headers = GetHeaders $null
 
