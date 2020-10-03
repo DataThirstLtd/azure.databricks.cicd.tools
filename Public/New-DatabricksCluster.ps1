@@ -107,11 +107,17 @@ Function New-DatabricksCluster {
             $InputObject.PSObject.properties.remove('cluster_id')
             $Mode = "create"
         }
+        elseif (($InputObject.cluster_name) -and (Get-DatabricksClusters | Where-Object {$_.cluster_name -eq $InputObject.cluster_name})){
+            Write-Verbose "Cluster name provided in pipe and it exists - updating cluster"
+            $Mode = "edit"
+            $ClusterId = (Get-DatabricksClusters | Where-Object {$_.cluster_name -eq $InputObject.cluster_name}).cluster_id
+            $ExistingClusterConfig = Get-DatabricksClusters -ClusterId $ClusterId | ConvertPSObjectToHashtable
+            $Body['cluster_id'] = $ClusterId
+        }
         elseif ($InputObject.cluster_id) {
             Write-Verbose "Input object contains a cluster id that exists - updating cluster"
             $Mode = "edit"
             $ClusterId = $InputObject.cluster_id
-            # $Body['cluster_id'] = $ClusterId
             $ExistingClusterConfig = Get-DatabricksClusters -ClusterId $ClusterId | ConvertPSObjectToHashtable
         }
         else{

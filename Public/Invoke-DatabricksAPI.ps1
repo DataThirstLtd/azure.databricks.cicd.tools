@@ -40,7 +40,8 @@ Function Invoke-DatabricksAPI
         
         [parameter(Mandatory = $true)] [string]$API,
         [parameter(Mandatory = $false)] [hashtable]$Body,
-        [parameter(Mandatory = $false)] [ValidateSet('POST','GET','DELETE','PATCH', 'PUT')] [string]$Method="GET"
+        [parameter(Mandatory = $false)] [ValidateSet('POST','GET','DELETE','PATCH', 'PUT')] [string]$Method="GET",
+        [parameter(ValueFromPipeline)][object]$InputObject
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -51,7 +52,11 @@ Function Invoke-DatabricksAPI
     }
 
     $Headers = GetHeaders $PSBoundParameters
-    
+
+    if ($InputObject){
+        # InputObject provider then overwrite body
+        $InputObject.PSObject.properties | ForEach-Object { $Body[$_.Name] = $_.Value }
+    }
     
     try{
         if ($Body){
@@ -65,8 +70,9 @@ Function Invoke-DatabricksAPI
     }
     catch{
         $ErrorCode = $_.Exception.Response.StatusCode.value__ 
-        Write-Error "Response Code: $ErrorCode"
-        throw $_.Exception
+        $Msg = $_.ErrorDetails.Message
+        Write-Error "Response Code: $ErrorCode. Message: $Msg"
+        throw $_
     }
     
     
