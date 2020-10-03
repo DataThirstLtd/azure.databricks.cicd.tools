@@ -92,7 +92,14 @@ Function Import-DatabricksFolder {
         else {
             $BinaryContents = Get-Content $FileToPush.FullName -AsByteStream -ReadCount 0
         }
-        $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
+
+        # Handle empty files
+        if($BinaryContents){
+            $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
+        }
+        else {
+            $EncodedContents = $null
+        }
         $TargetPath = $Path + '/' + $FileToPush.BaseName
 
         $Body = @{ }
