@@ -49,8 +49,13 @@ Function Set-DatabricksSecret {
     else {
         Add-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName
     }
-    $SecretValue = $SecretValue.Replace('\','\\')
-    $body = '{ "scope": "' + $ScopeName + '", "key": "' + $SecretName + '", "string_value": "' + $SecretValue + '"}'
+
+    $DataBricksSecret = @{
+        scope        = $ScopeName
+        key          = $SecretName
+        string_value = $SecretValue
+    }
+    $body = $DataBricksSecret | ConvertTo-Json
 
     Invoke-RestMethod -Method Post -Body $body -Uri "$global:DatabricksURI/api/2.0/secrets/put" -Headers $Headers
     Write-Output "Secret $SecretName Set"
