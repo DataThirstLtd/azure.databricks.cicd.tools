@@ -62,7 +62,7 @@ Function Add-DatabricksSecretScope
         $LastPart = $KeyVaultResourceId.split('/')[-1]
         $kv['dns_name'] = "https://$LastPart.vault.azure.net/"
         
-        $body['scope_backend_type'] = 2
+        $body['scope_backend_type'] = 'AZURE_KEYVAULT'
         $body['backend_azure_keyvault'] = $kv
     }
     
@@ -82,7 +82,7 @@ Function Add-DatabricksSecretScope
         }
         else
         {
-            throw
+            throw $_
         }
     }
 

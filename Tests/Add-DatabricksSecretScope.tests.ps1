@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="Bearer"
 )
 
 Set-Location $PSScriptRoot
@@ -11,13 +11,16 @@ switch ($mode){
         Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
     }
     ("ServicePrincipal"){
-        Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+        # Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
+        Connect-Databricks -Region $Config.Region -ApplicationId $Config.ApplicationId -Secret $Config.Secret `
+            -ResourceGroupName $Config.ResourceGroupName `
+            -SubscriptionId $Config.SubscriptionId `
+            -WorkspaceName $Config.WorkspaceName `
+            -TenantId $Config.TenantId
     }
 }
 
-
-
-$ResID = "/subscriptions/b146ae31-d42f-4c88-889b-318f2cc23f98/resourceGroups/dataThirstDBTools-RG/providers/Microsoft.KeyVault/vaults/dataThirstcicdtoolkv"
+$ResID = $Config.KeyVault
 
 Describe "Add-DatabricksSecretScope" {
     BeforeAll{
@@ -33,13 +36,12 @@ Describe "Add-DatabricksSecretScope" {
         Add-DatabricksSecretScope -ScopeName "NormalWithPermissions" -AllUserAccess  -Verbose
     }
 
-    #It "Key Vault addition"{
-    #    Connect-Databricks -Region $Config.Region -ApplicationId $Config.ApplicationId -Secret $Config.Secret `
-    #        -ResourceGroupName $Config.ResourceGroupName `
-    #        -SubscriptionId $Config.SubscriptionId `
-    #        -WorkspaceName $Config.WorkspaceName `
-    #        -TenantId $Config.TenantId
-
-    #    Add-DatabricksSecretScope -ScopeName "KVScope" -KeyVaultResourceId $ResID  -Verbose
-    #}
+    It "Key Vault addition"{
+        if ($Mode -eq "Bearer"){
+            {Add-DatabricksSecretScope -ScopeName "KVScope" -KeyVaultResourceId $ResID  -Verbose} | Should Throw
+        }
+        else{
+            {Add-DatabricksSecretScope -ScopeName "KVScope" -KeyVaultResourceId $ResID  -Verbose} | Should Not Throw
+        }
+    }
 }
