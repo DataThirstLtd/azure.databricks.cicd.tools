@@ -15,7 +15,32 @@ switch ($mode) {
     }
 }
 
+function WaitCluster{
+    param([string]$ClusterId)
+    $Start = Get-Date
+    $State = ""
+    $BadStates = @("TERMINATING","TERMINATED","ERROR", "UNKNOWN", "RESIZING")
+    while (($State -ne "RUNNING") -and ($Timer.Minutes -lt 7)){
+        $State = (Get-DatabricksClusters -ClusterId $Config.RemoveLibraryClusterId).state
+        if ($BadStates.contains($State)){
+            Write-Error "Cluster $ClusterId in $State state"
+            return $false
+        }
+        Start-Sleep -Seconds 10
+        $Timer = New-TimeSpan -Start $Start -End (Get-Date)
+    }
+    return $true
+}
+
 Describe "Remove-DatabricksLibrary" {
+    BeforeAll{
+        Start-DatabricksCluster -ClusterId $Config.AddLibraryClusterId -ErrorAction:SilentlyContinue
+        Start-DatabricksCluster -ClusterId $Config.AddLibraryInputClusterId -ErrorAction:SilentlyContinue
+        Start-DatabricksCluster -ClusterId $Config.RemoveLibraryClusterId -ErrorAction:SilentlyContinue
+        if (!((WaitCluster $Config.AddLibraryClusterId) -and (WaitCluster $Config.AddLibraryInputClusterId) -and (WaitCluster $Config.RemoveLibraryClusterId))){
+            throw "Clusters not started"
+        }
+    }
     BeforeEach {
         $libraryFile = 'Samples\DummyLibraries\dummylibraries.json'
         $libraries = (Get-Content -path $libraryFile -Raw) -replace '__cluster_id__', $Config.RemoveLibraryClusterId | ConvertFrom-Json
