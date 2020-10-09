@@ -21,7 +21,7 @@ function WaitCluster{
     $State = ""
     $BadStates = @("TERMINATING","TERMINATED","ERROR", "UNKNOWN", "RESIZING")
     while (($State -ne "RUNNING") -and ($Timer.Minutes -lt 7)){
-        $State = (Get-DatabricksClusters -ClusterId $Config.RemoveLibraryClusterId).state
+        $State = (Get-DatabricksClusters -ClusterId $ClusterId).state
         if ($BadStates.contains($State)){
             Write-Error "Cluster $ClusterId in $State state"
             return $false
