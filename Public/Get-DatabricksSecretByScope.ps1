@@ -19,9 +19,9 @@ Optional. Search for a specific secret by key
 
 
 .EXAMPLE
-PS C:\> Get-DatabricksSecretScopes -BearerToken $BearerToken -Region $Region -ScopeName "MyScope"
+PS C:\> Get-DatabricksSecretByScope -BearerToken $BearerToken -Region $Region -ScopeName "MyScope"
 
-PS C:\> Get-DatabricksSecretScopes -BearerToken $BearerToken -Region $Region -ScopeName "MyScope" -Secretkey "secretName"
+PS C:\> Get-DatabricksSecretByScope -BearerToken $BearerToken -Region $Region -ScopeName "MyScope" -Secretkey "secretName"
 
 .NOTES
 Author: Richie Lee / @richiebzzzt 
