@@ -92,7 +92,6 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
         }
         if ($null -ne $toThrow) {
             Write-Error "Oh dear one of the jobs has failed. Check the details of the jobs above."
-            Throw
         }
     }
 }
