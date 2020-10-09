@@ -16,6 +16,14 @@ switch ($mode) {
 }
 
 Describe "Set-DatabricksSecret" {
+    BeforeAll{
+        Remove-DatabricksSecretScope -ScopeName "Simpletestvalue"
+        Remove-DatabricksSecretScope -ScopeName "JsonasSecretValue"
+        Remove-DatabricksSecretScope -ScopeName "GuidasSecretValue"
+        Remove-DatabricksSecretScope -ScopeName "S3asSecretValue"
+        Remove-DatabricksSecretScope -ScopeName "SQLIPasSecretValue"
+        Remove-DatabricksSecretScope -ScopeName "SQLasSecretValue"
+    }
     It "Simple test value" {
         $ScopeName = "Simpletestvalue"
         $SecretName = "Test1"

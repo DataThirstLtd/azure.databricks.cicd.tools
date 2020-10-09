@@ -36,7 +36,13 @@ jobs:
             "SubscriptionId": "$(SubscriptionId)",
             "WorkspaceName": "$(Workspace)",
             "ClusterId": "$(ClusterId)",
-            "Username": "$(TestUser)"
+            "Username": "$(TestUser)",
+            "InstancePoolId": "$(InstancePoolId)",
+            "SparkVersion": "$(SparkVersion)",
+            "AddLibraryClusterId": "$(AddLibraryClusterId)",
+            "AddLibraryInputClusterId": "$(AddLibraryInputClusterId)",
+            "RemoveLibraryClusterId": "$RemoveLibraryClusterId)",
+            "KeyVault": "$(KeyVault)"
         }
         "@
         Set-Content .\config.json $c

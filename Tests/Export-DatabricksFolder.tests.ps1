@@ -30,7 +30,13 @@ Describe "Export-DatabricksFolder"{
         $Count | Should -BeGreaterThan 0
     }
 
-    AfterAll {
+    It "DBC Export" {
+        Export-DatabricksFolder -ExportPath $ExportPath -LocalOutputPath $LocalOutputPath -Verbose -Format "DBC"
+        $Count = (Get-ChildItem -Path $LocalOutputPath).Count
+        $Count | Should -BeGreaterThan 0
+    }
+
+    AfterEach {
         Remove-Item "$PSScriptRoot\Output" -Force -Recurse
     }
 }

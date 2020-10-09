@@ -13,6 +13,7 @@
     "AddLibraryClusterId": "Test Cluster Id to use for adding libraries. Should have no libraries installed. This cluster is restarted after test.",
     "AddLibraryInputClusterId": "Test Cluster Id to use for adding libraries via InputObject. Should have no libraries installed. This cluster is restarted after test.",
     "RemoveLibraryClusterId": "Test Cluster Id to use for removing libraries. Should have no libraries installed. This cluster is restarted after test.",
-    "Username": "Existing user in workspace to apply permissions to"
+    "Username": "Existing user in workspace to apply permissions to",
+    "KeyVault": "Resource id in form of /subscriptions/{SubsciptionId}/resourceGroups/{RG Name}/providers/Microsoft.KeyVault/vaults/{vaultName}}"
 }
 

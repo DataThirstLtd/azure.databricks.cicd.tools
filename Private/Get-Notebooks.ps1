@@ -14,6 +14,9 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
             if ($Format -eq "SOURCE") { 
                 $ResponseString = ($NewResponse.replace("[^`r]`n", "`n") -Join "`n")
             } 
+            else{
+                $ResponseString = $NewResponse
+            }
             if ((Test-Path -PathType Leaf -Path $LocalExportPath) -eq $true) {
                 Set-Content -path $LocalExportPath -value $ResponseString | Out-Null
             }
@@ -28,7 +31,7 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
     }
 
     if ($Format -eq "DBC") {
-        Set-LocalNotebook $OriginalPath "dbc" $Region $InternalBearerToken $LocalOutputPath "DBC"
+        Set-LocalNotebook $OriginalPath "dbc" $LocalOutputPath "DBC"
         return
     }
 

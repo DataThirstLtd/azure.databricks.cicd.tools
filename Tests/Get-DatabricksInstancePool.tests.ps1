@@ -27,7 +27,7 @@ Describe "Get-DatabricksInstancePool"{
     }
 
     It "Search by Id"{
-        $json = Get-DatabricksInstancePool -InstancePoolId "1024-123439-parks264-pool-5UyPO5xj"
+        $json = Get-DatabricksInstancePool -InstancePoolId $Config.InstancePoolId
     }
 
 }
