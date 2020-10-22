@@ -32,7 +32,7 @@ Function Remove-DatabricksNotebook {
         [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$Path,
         [parameter(Mandatory = $false)][switch]$Recursive
-        )
+    )
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
@@ -46,5 +46,14 @@ Function Remove-DatabricksNotebook {
     $Body['path'] = $Path
 
     $BodyText = $Body | ConvertTo-Json -Depth 10
-    Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/delete" -Body $BodyText -Method 'POST' -Headers $Headers
+    try {
+        Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/delete" -Body $BodyText -Method 'POST' -Headers $Headers
+    }
+    catch {
+        if ($_.Exception.Response.StatusCode -eq "Too Many Requests") {
+            Write-Verbose "Too many requests, trying once more"
+            Start-Sleep -Milliseconds 400
+            Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/delete" -Body $BodyText -Method 'POST' -Headers $Headers
+        }
+    }
 }
