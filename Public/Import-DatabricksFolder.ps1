@@ -57,6 +57,9 @@ Function Import-DatabricksFolder {
                 Write-Verbose "# A 404 response is expected if the specified workspace does not exist in Databricks
                                # In this case, there will be no existing files to clean so the exception can be safely ignored"
             }
+            else{
+                Throw $_.Exception
+            }
         }
         foreach ($f in $ExistingFiles) {
             if ($f.object_type -eq "DIRECTORY") {

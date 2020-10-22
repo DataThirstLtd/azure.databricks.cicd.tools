@@ -51,7 +51,7 @@ Function Remove-DatabricksNotebook {
         Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/delete" -Body $BodyText -Method 'POST' -Headers $Headers
     }
     catch {
-        if ($_.Exception.Response.StatusCode -eq "Too Many Requests") {
+        if ($_.Exception.Response.StatusCode -eq "TooManyRequests") {
             Write-Verbose "Too many requests, trying once more"
             Start-Sleep -Milliseconds $SleepInMs
             Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/workspace/delete" -Body $BodyText -Method 'POST' -Headers $Headers
