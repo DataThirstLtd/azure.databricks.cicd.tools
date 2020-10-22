@@ -9,20 +9,16 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
             Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers -OutFile $tempLocalExportPath  
             $Response = @()
             $Response = Get-Content $tempLocalExportPath -Encoding UTF8
-            $NewResponse = $Response -ne "# Databricks notebook source"
+            $NewResponse = $Response | Where-Object { $_ -ne "# Databricks notebook source" }
             Remove-Item $tempLocalExportPath 
-            if ($Format -eq "SOURCE") { 
-                $ResponseString = ($NewResponse.replace("[^`r]`n", "`n") -Join "`n")
+            if ($Format -eq "SOURCE" -and $null -ne $NewResponse) { 
+                $ResponseString = ($NewResponse -Join [Environment]::NewLine)
             } 
-            else{
+            else {
                 $ResponseString = $NewResponse
             }
-            if ((Test-Path -PathType Leaf -Path $LocalExportPath) -eq $true) {
-                Set-Content -path $LocalExportPath -value $ResponseString | Out-Null
-            }
-            else {
-                New-Item -force -path $LocalExportPath -value $ResponseString -type file | Out-Null 
-            }
+            $UTF8_NO_BOM = New-Object System.Text.UTF8Encoding $False
+            [system.io.file]::WriteAllText($LocalExportPath, $ResponseString, $UTF8_NO_BOM)
         }
         Catch {
             Write-Error $_.ErrorDetails.Message
@@ -84,7 +80,8 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
             $getState = Get-Job $threadJob.Name | Select-Object -Last 1
             if ($getState.State -eq 'Failed') {
                 $toThrow = 1
-                Write-Host ($threadJob.ChildJobs[0].JobStateInfo.Reason.Message) -ForegroundColor Red
+
+                Write-Host ($threadJob.JobStateInfo.Reason) -ForegroundColor DarkMagenta
             } 
             else {
                 Write-Verbose "$($getState.Name) has $($getState.State)" 
@@ -92,6 +89,7 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
         }
         if ($null -ne $toThrow) {
             Write-Error "Oh dear one of the jobs has failed. Check the details of the jobs above."
+            Throw
         }
     }
 }

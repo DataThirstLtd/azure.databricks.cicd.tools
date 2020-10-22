@@ -35,7 +35,8 @@ Function Import-DatabricksFolder {
         [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$LocalPath,
         [parameter(Mandatory = $true)][string]$DatabricksPath,
-        [parameter(Mandatory = $false)][switch]$Clean
+        [parameter(Mandatory = $false)][switch]$Clean,
+        [parameter(Mandatory = $false)][int]$SleepInMs = 200
     )
     $threadJobs = @()
     $throttleLimit = GetCpuCount
@@ -51,20 +52,25 @@ Function Import-DatabricksFolder {
         try {
             $ExistingFiles = Get-DatabricksWorkspaceFolder -Path $DatabricksPath
         }
-        catch [System.Net.WebException] {
-            # A 404 response is expected if the specified workspace does not exist in Databricks
-            # In this case, there will be no existing files to clean so the exception can be safely ignored
+        catch {
+            if ($_.Exception.Response.StatusCode -eq "NotFound") {
+                Write-Verbose "# A 404 response is expected if the specified workspace does not exist in Databricks
+                               # In this case, there will be no existing files to clean so the exception can be safely ignored"
+            }
+            else{
+                Throw $_.Exception
+            }
         }
         foreach ($f in $ExistingFiles) {
             if ($f.object_type -eq "DIRECTORY") {
                 Write-Verbose "Removing directory $($f.path)"
-                Remove-DatabricksNotebook -Path $f.path -Recursive
+                Remove-DatabricksNotebook -Path $f.path -Recursive -SleepInMs $SleepInMs 
             }
             else {
                 Write-Verbose "Removing file $($f.path)"
-                Remove-DatabricksNotebook -Path $f.path 
+                Remove-DatabricksNotebook -Path $f.path -SleepInMs $SleepInMs
             }
-            Start-Sleep -Milliseconds 200 # Prevent 429 responses
+            Start-Sleep -Milliseconds $SleepInMs # Prevent 429 responses
         }
     }
     
@@ -94,7 +100,7 @@ Function Import-DatabricksFolder {
         }
 
         # Handle empty files
-        if($BinaryContents){
+        if ($BinaryContents) {
             $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
         }
         else {

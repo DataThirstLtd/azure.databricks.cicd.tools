@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="Bearer"
 )
 
 Set-Location $PSScriptRoot
@@ -16,7 +16,7 @@ switch ($mode){
 }
 
 $ExportPath = "/Shared/UnitTest"
-$LocalOutputPath = "Output"
+$LocalOutputPath = "Samples\DummyNotebooks"
 New-Item -Name Output -ItemType Directory -Force -ErrorAction SilentlyContinue | Out-Null
 
 Describe "Export-DatabricksFolder"{
@@ -36,7 +36,7 @@ Describe "Export-DatabricksFolder"{
         $Count | Should -BeGreaterThan 0
     }
 
-    AfterEach {
-        Remove-Item "$PSScriptRoot\Output" -Force -Recurse
-    }
+    # AfterEach {
+    #     Remove-Item "$PSScriptRoot\Output" -Force -Recurse
+    # }
 }
