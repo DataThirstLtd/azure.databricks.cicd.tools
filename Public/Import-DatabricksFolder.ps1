@@ -35,7 +35,8 @@ Function Import-DatabricksFolder {
         [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$LocalPath,
         [parameter(Mandatory = $true)][string]$DatabricksPath,
-        [parameter(Mandatory = $false)][switch]$Clean
+        [parameter(Mandatory = $false)][switch]$Clean,
+        [parameter(Mandatory = $false)][int]$SleepInMs = 200
     )
     $threadJobs = @()
     $throttleLimit = GetCpuCount
@@ -58,13 +59,13 @@ Function Import-DatabricksFolder {
         foreach ($f in $ExistingFiles) {
             if ($f.object_type -eq "DIRECTORY") {
                 Write-Verbose "Removing directory $($f.path)"
-                Remove-DatabricksNotebook -Path $f.path -Recursive
+                Remove-DatabricksNotebook -Path $f.path -Recursive -SleepInMs $SleepInMs 
             }
             else {
                 Write-Verbose "Removing file $($f.path)"
-                Remove-DatabricksNotebook -Path $f.path 
+                Remove-DatabricksNotebook -Path $f.path -SleepInMs $SleepInMs
             }
-            Start-Sleep -Milliseconds 200 # Prevent 429 responses
+            Start-Sleep -Milliseconds $SleepInMs # Prevent 429 responses
         }
     }
     
