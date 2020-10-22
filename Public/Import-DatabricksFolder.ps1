@@ -52,9 +52,11 @@ Function Import-DatabricksFolder {
         try {
             $ExistingFiles = Get-DatabricksWorkspaceFolder -Path $DatabricksPath
         }
-        catch [System.Net.WebException] {
-            # A 404 response is expected if the specified workspace does not exist in Databricks
-            # In this case, there will be no existing files to clean so the exception can be safely ignored
+        catch {
+            if ($_.Exception.Response.StatusCode -eq "NotFound") {
+                Write-Verbose "# A 404 response is expected if the specified workspace does not exist in Databricks
+                               # In this case, there will be no existing files to clean so the exception can be safely ignored"
+            }
         }
         foreach ($f in $ExistingFiles) {
             if ($f.object_type -eq "DIRECTORY") {
@@ -95,7 +97,7 @@ Function Import-DatabricksFolder {
         }
 
         # Handle empty files
-        if($BinaryContents){
+        if ($BinaryContents) {
             $EncodedContents = [System.Convert]::ToBase64String($BinaryContents)
         }
         else {
