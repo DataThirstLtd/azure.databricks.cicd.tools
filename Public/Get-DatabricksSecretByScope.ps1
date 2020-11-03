@@ -38,14 +38,9 @@ Function Get-DatabricksSecretByScope {
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-
-    $Body = @{}
-    $Body['scope'] = $ScopeName
-
-    $BodyText = $Body | ConvertTo-Json -Depth 10
     
     Try {
-        $Secrets = Invoke-RestMethod -Method Get -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/secrets/list" -Headers $Headers
+        $Secrets = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/secrets/list?scope=$ScopeName" -Headers $Headers
     }
     Catch {
         $err = $_.ErrorDetails.Message
