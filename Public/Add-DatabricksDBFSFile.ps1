@@ -103,7 +103,7 @@ Function Add-DatabricksDBFSFile {
             $Body['path'] = $FileTarget
             $Body['overwrite'] = "true"    
             $BodyText = $Body | ConvertTo-Json -Depth 10
-            Write-Verbose "Pushing file $($f.FullName) to $FileTarget"
+            Write-Verbose "Pushing file $($f.Path) to $FileTarget"
             Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/put" -Body $BodyText -Method 'POST' -Headers $Headers
         }
     }
