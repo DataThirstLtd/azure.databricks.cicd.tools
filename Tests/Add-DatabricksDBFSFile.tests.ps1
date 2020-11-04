@@ -46,7 +46,7 @@ Describe "Add-DatabricksDBFSFile" {
         Add-DatabricksDBFSFile -LocalRootFolder Samples/DummyNotebooks -FilePattern "*.py"  -TargetLocation '/test2/' -Verbose
         $Files = Get-DatabricksDBFSFolder -Path /test2
         $Found = ($Files | Where-Object {$_.Path -like "*.py"}).Count
-        $Found | Should -Be 2
+        $Found | Should -Be 3
     }
 }
 
