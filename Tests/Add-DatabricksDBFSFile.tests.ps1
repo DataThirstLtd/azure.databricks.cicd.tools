@@ -46,7 +46,13 @@ Describe "Add-DatabricksDBFSFile" {
         Add-DatabricksDBFSFile -LocalRootFolder Samples/DummyNotebooks -FilePattern "*.py"  -TargetLocation '/test2/' -Verbose
         $Files = Get-DatabricksDBFSFolder -Path /test2
         $Found = ($Files | Where-Object {$_.Path -like "*.py"}).Count
-        $Found | Should -Be 2
+        $Found | Should -Be 3
+    }
+
+    It "Logs the filename being written when called with -Verbose"{
+        $output = $(Add-DatabricksDBFSFile -LocalRootFolder "Samples" -FilePattern "Test.jar"  -TargetLocation '/test' -Verbose) 4>&1
+        
+        $output[3] | Should -be "Pushing file $PSScriptRoot/Samples/Test.jar to /test/Test.jar"
     }
 }
 
