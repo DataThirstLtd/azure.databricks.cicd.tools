@@ -74,7 +74,7 @@ Function Remove-DatabricksLibrary {
         [Parameter(ParameterSetName = 'InputObject', Mandatory = $false)]
         [Parameter(ParameterSetName = 'Settings', Mandatory = $false)]
         [string]$BearerToken, 
-        [Parameter(ParameterSetName = 'InpputObject', Mandatory = $false)]
+        [Parameter(ParameterSetName = 'InputObject', Mandatory = $false)]
         [Parameter(ParameterSetName = 'Settings', Mandatory = $false)]
         [string]$Region,
         [parameter(ParameterSetName = 'InputObject', ValueFromPipeline, Mandatory = $true)][object]$InputObject,
