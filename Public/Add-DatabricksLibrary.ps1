@@ -38,7 +38,7 @@ If cran, specification of a CRAN library to be installed.
 The cluster to install the library to. Note that the API does not support auto installing to
 all clusters. See Get-DatabricksClusters. 
 
-.PARAMETER InpputObject
+.PARAMETER InputObject
 Can take an object that is correctly formatted so that more than one library can be added.
 
 {
@@ -88,7 +88,7 @@ Function Add-DatabricksLibrary {
         [Parameter(ParameterSetName = 'InputObject', Mandatory = $false)]
         [Parameter(ParameterSetName = 'Settings', Mandatory = $false)]
         [string]$BearerToken, 
-        [Parameter(ParameterSetName = 'InpputObject', Mandatory = $false)]
+        [Parameter(ParameterSetName = 'InputObject', Mandatory = $false)]
         [Parameter(ParameterSetName = 'Settings', Mandatory = $false)]
         [string]$Region,
         [parameter(ParameterSetName = 'InputObject', ValueFromPipeline, Mandatory = $true)][object]$InputObject,
