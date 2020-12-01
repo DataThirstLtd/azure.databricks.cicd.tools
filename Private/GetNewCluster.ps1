@@ -48,7 +48,7 @@ Function GetNewClusterCluster {
         $Body['custom_tags'] = $CustomTags
     }
 
-    If (($PSBoundParameters.ContainsKey('InitScripts')) -and ($null -ne $InitScripts)) {
+    If (($PSBoundParameters.ContainsKey('InitScripts')) -and ($null -ne $InitScripts) -and ($InitScripts.Length -gt 0)) {
         $Body['init_scripts'] = Get-InitScript $InitScripts
     }
 
