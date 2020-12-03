@@ -35,7 +35,7 @@ Function GetNewClusterCluster {
     If (($PSBoundParameters.ContainsKey('NodeType')) -and ($NodeType)) { $Body['node_type_id'] = $NodeType }
     If (($PSBoundParameters.ContainsKey('DriverNodeType')) -and ($DriverNodeType)) { $Body['driver_node_type_id'] = $DriverNodeType }
     
-    If ($MinNumberOfWorkers -ge 0){
+    If (($MinNumberOfWorkers -ge 0) -and (-not $ClusterObject)){
         If ($MinNumberOfWorkers -eq $MaxNumberOfWorkers){
             $Body['num_workers'] = $MinNumberOfWorkers
         }
