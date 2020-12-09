@@ -138,10 +138,10 @@ Function Connect-Databricks {
     if ($PSBoundParameters.ContainsKey('TestConnectDatabricks')) {
         Write-Verbose "Connecting to Workspace to verify connection details are correct:" 
         if ($PSCmdlet.ParameterSetName -eq "Bearer") {
-            Test-ConnectDatabricks -Region $AzureRegion -BearerToken $BearerToken | Out-Null
+            Test-ConnectDatabricks -Region $AzureRegion -BearerToken $BearerToken
         }
         else {
-            Test-ConnectDatabricks | Out-Null
+            Test-ConnectDatabricks
         }
     }
 }
