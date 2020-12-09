@@ -67,6 +67,8 @@ Function Connect-Databricks {
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithOrgId')]
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithResource')]
         [string]$Region,
+        [parameter(Mandatory = $true, ParameterSetName = 'Bearer')]
+        [parameter(Mandatory = $true, ParameterSetName = 'AADwithOrgId')]
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithResource')]
         [string]$DatabricksURI = "https://$Region.azuredatabricks.net" ,
 
@@ -104,6 +106,8 @@ Function Connect-Databricks {
     }
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    $AzureRegion = $Region.Replace(" ", "")
+    $URI = "https://login.microsoftonline.com/$tenantId/oauth2/token/"
     if ($PSCmdlet.ParameterSetName -eq "Bearer") {
         Set-GlobalsNull
         # Use Databricks Bearer Token Method
@@ -120,17 +124,23 @@ Function Connect-Databricks {
         $global:DatabricksOrgId = $DatabricksOrgId
     }
     elseif ($PSCmdlet.ParameterSetName -eq "AADwithResource") {
-        $AzureRegion = $Region.Replace(" ", "")
-        $URI = "https://login.microsoftonline.com/$tenantId/oauth2/token/"
         Get-AADManagementToken
         Get-AADDatabricksToken
         $global:Headers = @{"Authorization"            = "Bearer $global:DatabricksAccessToken";
             "X-Databricks-Azure-SP-Management-Token"   = $global:ManagementAccessToken;
             "X-Databricks-Azure-Workspace-Resource-Id" = "/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroupName/providers/Microsoft.Databricks/workspaces/$WorkspaceName"
         }
-        $global:DatabricksURI = $DatabricksURI.Replace(" ", "")
     }
-
+    $global:DatabricksURI = $DatabricksURI.Replace(" ", "")
     Write-Verbose "Globals at end of Connect:" 
     Write-Globals
+    
+    Write-Verbose "Connecting to Workspace to verify conneciton details are correct:" 
+    try {
+        Get-DatabricksSparkVersions | Out-Null
+    }
+    catch {
+        Write-Error $_.Exception.Response
+        Throw
+    }
 }
