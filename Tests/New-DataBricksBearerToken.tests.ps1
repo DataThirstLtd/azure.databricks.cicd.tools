@@ -16,16 +16,22 @@ switch ($mode){
 }
 
 
-Describe "New-DatabricksBearerToken" {
-    It "Token with Comment"{
-        $Global:Token = New-DatabricksBearerToken -LifetimeSeconds 180 -Comment "Test"
-    }
+# Describe "New-DatabricksBearerToken" {
+#     It "Token with Comment"{
+#         $Global:Token = New-DatabricksBearerToken -LifetimeSeconds 180 -Comment "Test"
+#     }
 
-    It "Token with No Comment"{
-        $Global:Token = New-DatabricksBearerToken -LifetimeSeconds 180
-    }
+#     It "Token with No Comment"{
+#         $Global:Token = New-DatabricksBearerToken -LifetimeSeconds 180
+#     }
 
-    AfterEach{
-        Remove-DatabricksBearerToken -TokenId ($Global:Token.token_info.token_id)
-    }
-}
+#     AfterEach{
+#         Remove-DatabricksBearerToken -TokenId ($Global:Token.token_info.token_id)
+#     }
+# }
+
+$Token = New-DatabricksBearerToken -LifetimeSeconds 180 -Comment "Test"
+
+$Token.GetType()
+
+$Token.token_value
