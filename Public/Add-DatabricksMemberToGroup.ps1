@@ -56,7 +56,7 @@ Function Add-DatabricksMemberToGroup
         }
 
         Invoke-RestMethod -Method Post -Body $body -Uri "$global:DatabricksURI/api/2.0/groups/add-member" -Headers $Headers -OutFile $OutFile
-        Write-Verbose "User $UserName added to $Parent group"
+        Write-Verbose "User $Member added to $Parent group"
     }
     Catch {
         if ($_.Exception.Response -eq $null) {
