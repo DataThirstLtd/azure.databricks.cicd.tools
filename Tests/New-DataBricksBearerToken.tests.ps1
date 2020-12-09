@@ -29,9 +29,3 @@ Describe "New-DatabricksBearerToken" {
         Remove-DatabricksBearerToken -TokenId ($Global:Token.token_info.token_id)
     }
 }
-
-$Token = New-DatabricksBearerToken -LifetimeSeconds 180 -Comment "Test"
-
-$Token.GetType()
-
-$Token.token_value
