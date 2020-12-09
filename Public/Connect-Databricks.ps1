@@ -67,11 +67,10 @@ Function Connect-Databricks {
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithOrgId')]
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithResource')]
         [string]$Region,
-        [parameter(Mandatory = $true, ParameterSetName = 'Bearer')]
-        [parameter(Mandatory = $true, ParameterSetName = 'AADwithOrgId')]
-        [parameter(Mandatory = $true, ParameterSetName = 'AADwithResource')]
-        [string]$DatabricksURI = "https://$Region.azuredatabricks.net" ,
-
+        [parameter(Mandatory = $false, ParameterSetName = 'Bearer')]
+        [parameter(Mandatory = $false, ParameterSetName = 'AADwithOrgId')]
+        [parameter(Mandatory = $false, ParameterSetName = 'AADwithResource')]
+        [string]$DatabricksURISuffix = "azuredatabricks.net" ,
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithOrgId')]
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithResource')]
         [string]$ApplicationId,
@@ -94,7 +93,8 @@ Function Connect-Databricks {
 
         [parameter(Mandatory = $false, ParameterSetName = 'AADwithOrgId')]
         [parameter(Mandatory = $false, ParameterSetName = 'AADwithResource')]
-        [switch]$Force
+        [switch]$Force,
+        [switch]$TestConnectDatabricks
     ) 
 
     Write-Verbose "Globals at start of Connect:" 
@@ -107,6 +107,7 @@ Function Connect-Databricks {
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $AzureRegion = $Region.Replace(" ", "")
+    $AzureDatabricksURISuffix = $DatabricksURISuffix.Trim(".", " ").Replace(" ", "")
     $URI = "https://login.microsoftonline.com/$tenantId/oauth2/token/"
     if ($PSCmdlet.ParameterSetName -eq "Bearer") {
         Set-GlobalsNull
@@ -131,16 +132,16 @@ Function Connect-Databricks {
             "X-Databricks-Azure-Workspace-Resource-Id" = "/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroupName/providers/Microsoft.Databricks/workspaces/$WorkspaceName"
         }
     }
-    $global:DatabricksURI = $DatabricksURI.Replace(" ", "")
+    $global:DatabricksURI = "https://$AzureRegion.$AzureDatabricksURISuffix"
     Write-Verbose "Globals at end of Connect:" 
     Write-Globals
-    
-    Write-Verbose "Connecting to Workspace to verify conneciton details are correct:" 
-    try {
-        Get-DatabricksSparkVersions | Out-Null
-    }
-    catch {
-        Write-Error $_.Exception.Response
-        Throw
+    if ($PSBoundParameters.ContainsKey('TestConnectDatabricks')) {
+        Write-Verbose "Connecting to Workspace to verify connection details are correct:" 
+        if ($PSCmdlet.ParameterSetName -eq "Bearer") {
+            Test-ConnectDatabricks -Region $AzureRegion -BearerToken $BearerToken | Out-Null
+        }
+        else {
+            Test-ConnectDatabricks | Out-Null
+        }
     }
 }
