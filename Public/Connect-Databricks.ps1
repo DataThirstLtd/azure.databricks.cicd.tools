@@ -131,8 +131,6 @@ Function Connect-Databricks {
         $global:DatabricksURI = $DatabricksURI.Replace(" ", "")
     }
 
-
-
     Write-Verbose "Globals at end of Connect:" 
     Write-Globals
 }
