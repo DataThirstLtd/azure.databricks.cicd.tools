@@ -71,7 +71,6 @@ Function Connect-Databricks {
         [parameter(Mandatory = $false, ParameterSetName = 'AADwithOrgId')]
         [parameter(Mandatory = $false, ParameterSetName = 'AADwithResource')]
         [string]$DatabricksURISuffix = "azuredatabricks.net" ,
-        [parameter(Mandatory = $false, ParameterSetName = 'Bearer')]
         [parameter(Mandatory = $false, ParameterSetName = 'AADwithOrgId')]
         [parameter(Mandatory = $false, ParameterSetName = 'AADwithResource')]
         [string]$oauthLogin = "login.microsoftonline.com" ,
@@ -112,8 +111,8 @@ Function Connect-Databricks {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $AzureRegion = $Region.Replace(" ", "")
     $AzureDatabricksURISuffix = $DatabricksURISuffix.Trim(".", " ").Replace(" ", "")
-    $oauthLogin = $oauthLogin.Trim("/", " ").Replace(" ", "")
-    $URI = "https://$oauthLogin/$tenantId/oauth2/token/"
+    $AzureOauthLogin = $oauthLogin.Trim("/", " ").Replace(" ", "")
+    $URI = "https://$AzureOauthLogin/$tenantId/oauth2/token/"
     if ($PSCmdlet.ParameterSetName -eq "Bearer") {
         Set-GlobalsNull
         # Use Databricks Bearer Token Method
