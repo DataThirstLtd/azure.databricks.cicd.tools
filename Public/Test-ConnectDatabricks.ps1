@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Get a list of Spark versions available for use.
+Called in Connect-Databricks when switch TestConnectDatabricks is included
 
 .DESCRIPTION
-Get a list of Spark versions available for use.
+Called in Connect-Databricks when switch TestConnectDatabricks is included
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
@@ -12,10 +12,10 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 Azure Region - must match the URL of your Databricks workspace, example northeurope
 
 .EXAMPLE
-PS C:\> Get-DatabricksSparkVersions -BearerToken $BearerToken -Region $Region
+PS C:\> Test-ConnectDatabricks -BearerToken $BearerToken -Region $Region
 
 .NOTES
-Author: Simon D'Morias / Data Thirst Ltd 
+Author: Richie Lee 
 
 #> 
 
