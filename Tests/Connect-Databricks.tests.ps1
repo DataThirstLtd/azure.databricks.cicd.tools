@@ -10,11 +10,30 @@ Describe "ConnectFunctions"{
     }
 
     It "Legacy token connect"{
-        Connect-Databricks -BearerToken $Config.BearerToken -Region $Config.Region
+        {Connect-Databricks -BearerToken $Config.BearerToken `
+        -Region $Config.Region} | Should Not Throw
         $global:DatabricksAccessToken | Should -Not -Be $null
         $global:ManagementAccessToken | Should -Be $null
         $global:Headers | Should -Not -Be $null
     }
+
+    It "Legacy token connect testing connection"{
+        {Connect-Databricks -BearerToken $Config.BearerToken `
+        -Region $Config.Region -TestConnectDatabricks} | Should Not Throw
+        $global:DatabricksAccessToken | Should -Not -Be $null
+        $global:ManagementAccessToken | Should -Be $null
+        $global:Headers | Should -Not -Be $null
+    }
+
+
+    It "Legacy token connect testing connection with non-existent region"{
+        {Connect-Databricks -BearerToken $Config.BearerToken `
+        -Region "mars" -TestConnectDatabricks} | Should Throw
+        $global:DatabricksAccessToken | Should -Not -Be $null
+        $global:ManagementAccessToken | Should -Be $null
+        $global:Headers | Should -Not -Be $null
+    }
+
 
     It "ApplicationId AAD Autentication using OrgId"{
         Connect-Databricks -Region $Config.Region -ApplicationId $Config.ApplicationId -Secret $Config.Secret `
