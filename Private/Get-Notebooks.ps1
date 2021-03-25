@@ -9,7 +9,7 @@ Function Get-Notebooks ($FolderContents, $OriginalPath, $LocalOutputPath, $Forma
             Invoke-RestMethod -Method Get -Uri $uri -Headers $Headers -OutFile $tempLocalExportPath  
             $Response = @()
             $Response = Get-Content $tempLocalExportPath -Encoding UTF8
-            $NewResponse = $Response | Where-Object { $_ -ne "# Databricks notebook source" }
+            $NewResponse = $Response #| Where-Object { $_ -ne "# Databricks notebook source" }
             Remove-Item $tempLocalExportPath 
             if ($Format -eq "SOURCE" -and $null -ne $NewResponse) { 
                 $ResponseString = ($NewResponse -Join [Environment]::NewLine)
