@@ -64,6 +64,10 @@ Example dbfs:/logs/mycluster
 If you would like to use nodes from an instance pool set the pool id 
 https://docs.azuredatabricks.net/user-guide/instance-pools/index.html#instance-pools
 
+.PARAMETER AzureAttributes
+Hashtable. 
+Example @{first_on_demand=1; availability="SPOT_WITH_FALLBACK_AZURE"; spot_bid_max_price=-1}
+
 .PARAMETER InputObject
 Pipe the contents of Get-DatabricksCluster or a json file
 
@@ -93,6 +97,7 @@ Function New-DatabricksCluster {
         [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
         [parameter(Mandatory = $false)][string]$ClusterLogPath,
         [parameter(Mandatory = $false)][string]$InstancePoolId,
+        [parameter(Mandatory = $false)][hashtable]$AzureAttributes,
         [parameter(ValueFromPipeline)][object]$InputObject
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -153,9 +158,10 @@ Function New-DatabricksCluster {
     $ClusterArgs['PythonVersion'] = $PythonVersion
     $ClusterArgs['ClusterLogPath'] = $ClusterLogPath
     $ClusterArgs['InstancePoolId'] = $InstancePoolId
+    $ClusterArgs['AzureAttributes'] = $AzureAttributes
     $ClusterArgs['ClusterObject'] = $InputObject
-
     
+
     $Body += GetNewClusterCluster @ClusterArgs
     if ($ClusterName){
         $Body += @{"cluster_name"=$ClusterName}
