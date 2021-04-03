@@ -1,6 +1,5 @@
 param(
-    #[ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
-    [string]$Mode="Bearer"
+    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
 )
 
 Set-Location $PSScriptRoot
