@@ -6,7 +6,7 @@ Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
-switch ($mode){
+switch ($Mode){
     ("Bearer"){
         Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
     }
@@ -15,8 +15,8 @@ switch ($mode){
     }
 }
 
-$ClusterName="TestCluster5"
-$SparkVersion="5.5.x-scala2.11"
+$ClusterName="TestCluster7"
+$SparkVersion="7.3.x-scala2.12"
 $NodeType="Standard_D3_v2"
 $MinNumberOfWorkers=1
 $MaxNumberOfWorkers=1
@@ -27,6 +27,7 @@ $SparkEnvVars = @{SPARK_WORKER_MEMORY="29000m"} #;SPARK_LOCAL_DIRS="/local_disk0
 $AutoTerminationMinutes = 15
 $PythonVersion = 3
 $ClusterLogPath = "dbfs:/logs/mycluster"
+$AzureAttributes = @{first_on_demand=1; availability="SPOT_WITH_FALLBACK_AZURE"; spot_bid_max_price=-1}
 
 Describe "New-DatabricksCluster" {
     It "Create basic cluster"{
@@ -34,6 +35,22 @@ Describe "New-DatabricksCluster" {
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
             -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts
+
+        $ClusterId.Length | Should -BeGreaterThan 1
+    }
+
+    AfterAll {
+        Start-Sleep -Seconds 5
+        Remove-DatabricksCluster -ClusterName $ClusterName
+    }
+}
+
+Describe "New-DatabricksCluster with AzureAttributes" {
+    It "Create basic cluster with AzureAttributes"{
+        $ClusterId = New-DatabricksCluster  -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
+            -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
+            -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts -AzureAttributes $AzureAttributes
 
         $ClusterId.Length | Should -BeGreaterThan 1
     }
@@ -75,7 +92,7 @@ Describe "New Cluster - via pipe"{
         $json = '{
             "num_workers": 1,
             "cluster_name": "UnitTestPipeCluster",
-            "spark_version": "6.4.x-scala2.11",
+            "spark_version": "7.3.x-scala2.12",
             "spark_conf": {
                 "spark.databricks.service.port": "8787",
                 "spark.databricks.service.server.enabled": "true",

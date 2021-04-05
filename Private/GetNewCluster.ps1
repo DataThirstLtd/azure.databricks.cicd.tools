@@ -13,6 +13,7 @@ Function GetNewClusterCluster {
         [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
         [parameter(Mandatory = $false)][string]$ClusterLogPath,
         [parameter(Mandatory = $false)][string]$InstancePoolId,
+        [parameter(Mandatory = $false)][hashtable]$AzureAttributes,
         [parameter(Mandatory = $false)][object]$ClusterObject
 
     ) 
@@ -73,6 +74,8 @@ Function GetNewClusterCluster {
     If ($PSBoundParameters.ContainsKey('InstancePoolId') -and (!([string]::IsNullOrEmpty($InstancePoolId)))) {
         $Body['instance_pool_id'] = $InstancePoolId
     }
+
+    if ($null -ne $AzureAttributes) {$Body['azure_attributes'] = $AzureAttributes}
 
     
     
