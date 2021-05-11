@@ -182,7 +182,7 @@ This command can be used for calling the API directly just lookup the syntax (ht
 ## Examples
 
 See the [Wiki](https://github.com/DataThirstLtd/azure.databricks.cicd.tools/wiki) for help on the commands.
-You can also see more examples in the tests folder.
+You can also see more examples in the Tests folder.
 
 # Misc
 
