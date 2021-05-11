@@ -3,9 +3,9 @@
 function Get-SCIMURL {
     [cmdletbinding()]
     param (
-        [string]$Api,
-        [string]$id,
-        [hashtable]$filters
+        [Parameter(Mandatory=$true)][string]$Api,
+        [Parameter(Mandatory=$false)][string]$id,
+        [Parameter(Mandatory=$false)][hashtable]$filters = @{}
     )
     
     $Root = '/api/2.0/preview/scim/v2/'
