@@ -10,6 +10,9 @@ Your Databricks Bearer token to authenticate to your workspace (see User Setting
 
 .PARAMETER Region
 Azure Region - must match the URL of your Databricks workspace, example northeurope
+
+.PARAMETER Id
+Id of a user in a scenario of search by Id
 #> 
 
 Function Get-DatabricksUsers { 
