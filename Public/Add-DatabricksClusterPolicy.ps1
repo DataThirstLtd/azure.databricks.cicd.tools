@@ -1,6 +1,6 @@
 
 
-Function Add-DatabricksPolicy {
+Function Add-DatabricksClusterPolicy {
     <#
 
 .SYNOPSIS
@@ -43,8 +43,6 @@ Function Add-DatabricksPolicy {
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
-
-    [Array]$policies = Get-DatabricksPolicies
 
     $Body = $policy | ConvertTo-Json
 

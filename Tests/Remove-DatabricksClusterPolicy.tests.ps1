@@ -16,7 +16,7 @@ switch ($mode) {
 }
 
 
-Describe "Get-DatabricksClusterPolicies" {
+Describe "Remove-DatabricksClusterPolicies" {
     BeforeAll {
         $name = "testPolicy" + (Get-Random)
         $policy = @{
@@ -26,13 +26,12 @@ Describe "Get-DatabricksClusterPolicies" {
         $newPolicyId = Add-DatabricksClusterPolicy -policy $policy
     }
 
-    AfterAll {
+    It "Remove a policy" {
         Remove-DatabricksClusterPolicy -Id $newPolicyId
-    }
 
-    It "Get all Policies" {
         $policies = Get-DatabricksClusterPolicies 
-        $policies.Count | Should -BeGreaterThan 0
+        $policy = $policies | where-object {$_.policy_id -eq $newPolicyId}
+        $policy | Should -BeNullOrEmpty
     }
 
 }

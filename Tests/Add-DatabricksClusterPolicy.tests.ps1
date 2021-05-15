@@ -16,26 +16,29 @@ switch ($mode) {
 }
 
 
-Describe "Add-DatabricksPolicy" {
-    $name = "testPolicy" + (Get-Random)
+Describe "Add-DatabricksClusterPolicy" {
 
-    It "Add a policy: $name" {
+    BeforeAll {
+        $name = "testPolicy" + (Get-Random)
         $policy = @{
             name       = $name
             definition = '{"spark_version":{"type":"fixed","value":"next-major-version-scala2.12","hidden":true}}'
         }
-    
-        $id = Add-DatabricksPolicy -policy $policy
     }
 
-    It "Add again policy and raise exception: $name" {
-        $policy = @{
-            name       = $name
-            definition = '{"spark_version":{"type":"fixed","value":"next-major-version-scala2.12","hidden":true}}'
-        }
-    
+    It "Add a policy" {
+        $newPolicyId = Add-DatabricksClusterPolicy -policy $policy
+
+        $newPolicyId | should -Not -BeNullOrEmpty
+
+        $policies = Get-DatabricksClusterPolicies 
+        $policy = $policies | where-object {$_.policy_id -eq $newPolicyId}
+        $policy | should -Not -BeNullOrEmpty
+    }
+
+    It "Add again policy and raise exception" {
         try {
-            $id = Add-DatabricksPolicy -policy $policy
+            $id = Add-DatabricksClusterPolicy -policy $policy
         }
         catch {
             $errorThrown = $true

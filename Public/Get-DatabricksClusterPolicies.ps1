@@ -12,13 +12,16 @@
 .PARAMETER Region
     Azure Region - must match the URL of your Databricks workspace, example northeurope
 
+.PARAMETER Id
+    Id of a policy in the context of a search by Id
+
 .EXAMPLE 
 Get-DatabricksPolicies -BearerToken $BearerToken -Region $Region 
+Get-DatabricksPolicies -BearerToken $BearerToken -Region $Region -Id 1234
 
-This example get all a cluster policies
 
 #>
-Function Get-DatabricksPolicies {
+Function Get-DatabricksClusterPolicies {
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true, ParameterSetName = 'Bearer')]
@@ -33,8 +36,6 @@ Function Get-DatabricksPolicies {
     $Headers = GetHeaders $PSBoundParameters
 
     [Array]$policies = Invoke-RestMethod -Method Get -Uri "$global:DatabricksURI/api/2.0/policies/clusters/list" -Headers $Headers
-
-    Write-host "Found cluster policies"
-
     return $policies[0].policies
+
 }

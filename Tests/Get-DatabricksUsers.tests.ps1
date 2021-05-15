@@ -20,21 +20,21 @@ Describe "Get-DatabricksUsers" {
 
     BeforeAll {
         $userName = "myUser" + (Get-Random) + "@foo.com" 
-        Add-DatabricksUser -BearerToken $BearerToken -Region $Region -Username $userName
+        $newUser = Add-DatabricksUser -BearerToken $BearerToken -Region $Region -Username $userName
+    }
+
+    AfterAll {
+        Remove-DatabricksUser -UserId $newUser.Id
     }
 
     It "Get all users" {
         $users = Get-DatabricksUsers 
-        $users.Resources.Count | Should -BeGreaterOrEqual 0
+        $users.Resources.Count | Should -BeGreaterThan 0
     }
 
     It "Get user by id" {
-
-        $users = Get-DatabricksUsers 
-        $user = $users.Resources | where-object {$_.userName -eq $userName }
-
-        $searchResult = Get-DatabricksUsers -id $user.id
-        $searchResult.id | Should -Be $user.id
+        $searchResult = Get-DatabricksUsers -id $newUser.id
+        $searchResult.id | Should -Be $newUser.id
     }
 
 }
