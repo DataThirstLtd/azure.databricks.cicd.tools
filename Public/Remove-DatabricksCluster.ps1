@@ -4,6 +4,7 @@ Removes a Databricks cluster or set of clusters with the same name.
 
 .DESCRIPTION
 Removes a Databricks cluster or set of clusters with the same name.
+This function does a permanent delete.
 
 .PARAMETER BearerToken
 Your Databricks Bearer token to authenticate to your workspace (see User Settings in Datatbricks WebUI)
