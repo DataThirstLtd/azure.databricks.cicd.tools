@@ -31,11 +31,11 @@ Describe "Get-DatabricksIPAccessList" {
             }
         }
 
-        Set-DatabricksIPAccessList -enabled $true
+        Set-DatabricksIPAccessListStatus -enabled $true
     }
 
     AfterAll {
-        Set-DatabricksIPAccessList -enabled $false
+        Set-DatabricksIPAccessListStatus -enabled $false
     }
 
     It "Add access IP list" {

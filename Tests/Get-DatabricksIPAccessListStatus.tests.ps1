@@ -19,19 +19,19 @@ switch ($mode) {
 Describe "Get-DatabricksIPAccessListStatus" {
 
     AfterAll {
-        Set-DatabricksIPAccessList -enabled $false
+        Set-DatabricksIPAccessListStatus -enabled $false
     }
 
     It "Get Current Status, set false" {
-        Set-DatabricksIPAccessList -enabled $false
+        Set-DatabricksIPAccessListStatus -enabled $false
 
         $status = Get-DatabricksIPAccessListStatus
         $status | Should -BeFalse
     }
 
     It "Switch status" {
-        Set-DatabricksIPAccessList -enabled $false  
-        Set-DatabricksIPAccessList -enabled $true
+        Set-DatabricksIPAccessListStatus -enabled $false  
+        Set-DatabricksIPAccessListStatus -enabled $true
         $status = Get-DatabricksIPAccessListStatus
         $status | Should -BeTrue
     }

@@ -31,7 +31,7 @@ Describe "Add-DatabricksIPAccessList" {
     }
 
     AfterAll {
-        Set-DatabricksIPAccessList -enabled $false
+        Set-DatabricksIPAccessListStatus -enabled $false
     }
 
     It "Can't provide unexpected ListType value" {

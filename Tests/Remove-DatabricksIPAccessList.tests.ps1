@@ -20,7 +20,6 @@ Describe "Remove-DatabricksIPAccessList" {
 
     BeforeAll {
         $name = "testList" + (Get-Random)
-        Add-DatabricksIPAccessList -ListName $name -ListType 'ALLOW' -ListIPs  $myIP
 
         $sites = @('https://api.ipify.org', 'https://ifconfig.me/ip', 'https://ipinfo.io')
         $myIP = foreach ($site in $sites) {
@@ -32,17 +31,18 @@ Describe "Remove-DatabricksIPAccessList" {
             }
         }
 
-        Set-DatabricksIPAccessList -enabled $true
+        Set-DatabricksIPAccessListStatus -enabled $true
+        Add-DatabricksIPAccessList -ListName $name -ListType 'ALLOW' -ListIPs  $myIP
     }
 
     AfterAll {
-        Set-DatabricksIPAccessList -enabled $false
+        Set-DatabricksIPAccessListStatus -enabled $false
     }
 
     It "Remove all access IP" {
         $accessList = Get-DatabricksIPAccessList
         foreach ($item in $accessList) {
-            Remove-DatabricksIPAccessList -ListID $accessList.list_id
+            Remove-DatabricksIPAccessList -ListID $item.list_id
         }
 
         $accessList = Get-DatabricksIPAccessList

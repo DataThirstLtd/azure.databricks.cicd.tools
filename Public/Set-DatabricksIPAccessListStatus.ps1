@@ -1,7 +1,7 @@
 <#
 
 .SYNOPSIS
-    Activate/deactivate IP access list for the workspace
+    Enable/disable IP access list feature for the workspace
 
 .DESCRIPTION
 The IP Access List API enables Azure Databricks admins to configure IP allow lists and block lists for a workspace.
@@ -23,7 +23,7 @@ https://docs.microsoft.com/en-us/azure/databricks/security/network/ip-access-lis
 
 #>
 
-Function Set-DatabricksIPAccessList {
+Function Set-DatabricksIPAccessListStatus {
     [cmdletbinding()]
     param (
         [parameter(Mandatory = $true, ParameterSetName = 'Bearer')]
