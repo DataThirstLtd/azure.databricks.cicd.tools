@@ -57,5 +57,6 @@ Function Add-DatabricksIPAccessList {
     }
     $BodyText = $Body | ConvertTo-Json -Depth 10
 
-    Invoke-RestMethod -Method Post -Uri $URI -Headers $Headers -Body $BodyText
+    $response = Invoke-RestMethod -Method Post -Uri $URI -Headers $Headers -Body $BodyText
+    return $response.ip_access_list
 }
