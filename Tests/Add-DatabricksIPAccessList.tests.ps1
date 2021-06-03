@@ -19,9 +19,7 @@ switch ($mode) {
 Describe "Add-DatabricksIPAccessList" {
 
     BeforeAll {
-        $name = "testList" + (Get-Random)
-
-        $sites = @('https://api.ipify.org', 'https://ifconfig.me/ip', 'https://ipinfo.io')
+         $sites = @('https://api.ipify.org', 'https://ifconfig.me/ip', 'https://ipinfo.io')
         $myIP = foreach ($site in $sites) {
             $return = Invoke-RestMethod -Uri $site
             $ip = ([IPAddress] $return).IPAddressToString
@@ -38,7 +36,7 @@ Describe "Add-DatabricksIPAccessList" {
 
     It "Can't provide unexpected ListType value" {
         try {
-            Add-DatabricksIPAccessList -ListName $name -ListType 'FOO' -ListIPs  $myIP
+            Add-DatabricksIPAccessList -ListName "test" -ListType 'FOO' -ListIPs  $myIP
         }
         catch {
             $errorThrown = $true
@@ -47,11 +45,19 @@ Describe "Add-DatabricksIPAccessList" {
         $errorThrown | Should -Be $true
     }
 
-    It "Can add a IP access list" {
-
+    It "Can add a single IP access list" {
+        $name = "testList" + (Get-Random)
         $response = Add-DatabricksIPAccessList -ListName $name -ListType 'ALLOW' -ListIPs  $myIP
 
         $response.label | Should -Be $name
+    }
+
+    It "Can add an array of IP access list" {
+        $name = "testList" + (Get-Random)
+        $ips = $myIP, "127.0.0.1"
+        $response = Add-DatabricksIPAccessList -ListName $name -ListType 'ALLOW' -ListIPs $ips
+
+        $response.address_count | Should -Be 2
     }
 }
   

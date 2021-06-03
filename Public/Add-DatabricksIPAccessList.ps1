@@ -26,6 +26,24 @@ https://docs.microsoft.com/en-us/azure/databricks/security/network/ip-access-lis
 .PARAMETER ListIPs
     A string array of IP addresses and CIDR ranges, as String values.
 
+    .OUTPUTS
+    A structure describing the new Access List IP. Looks like:
+
+    {
+    "list_id": "<list-id>",
+    "label": "office",
+    "ip_addresses": [
+        "1.1.1.1",
+        "2.2.2.2/21"
+    ],
+    "address_count": 2,
+    "list_type": "ALLOW",
+    "created_at": 1578423494457,
+    "created_by": 6476783916686816,
+    "updated_at": 1578423494457,
+    "updated_by": 6476783916686816,
+    "enabled": true
+  }
 #>
 
 Function Add-DatabricksIPAccessList {
