@@ -46,7 +46,6 @@ Describe "Set-DatabricksClusterPinStatus" {
     It "Pin a cluster" {
         Set-DatabricksClusterPinStatus -clusterId $ClusterId -enablePin $true
 
-        $listStatus = Get-DatabricksClusterPinStatus
         $status = Get-DatabricksClusterPinStatus | where-object { $_.cluster_id -eq $ClusterId }
 
         $status.pinned_by_user_name | should -not -be $null
