@@ -43,7 +43,7 @@ Describe "Add-DatabricksClusterPolicy" {
         catch {
             $errorThrown = $true
         }
-        $errorThrown | Should Be $true
+        $errorThrown | Should -Be $true
     }
 }
   
