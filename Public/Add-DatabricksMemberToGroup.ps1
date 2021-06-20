@@ -19,7 +19,7 @@
     Name of an existing parent group.
 
 .EXAMPLE 
-C:\PS> Add-DatabricksUserToGroup -BearerToken $BearerToken -Region $Region -Name "user@yourdomain.com" -Parent "developers"
+C:\PS> Add-DatabricksMemberToGroup -Name "user@yourdomain.com" -Parent "developers"
 
 This example adds user user@yourdomain.com to "developers" group 
 
@@ -62,9 +62,17 @@ Function Add-DatabricksMemberToGroup
         if ($_.Exception.Response -eq $null) {
             Write-Error $_.Exception.Message
         } else {
-            Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
-            Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
-            Write-Error $_.ErrorDetails.Message   
+            $err = $_.ErrorDetails.Message
+            if ($err.Contains('exists'))
+            {
+                Write-Verbose $err
+            }
+            else
+            {
+                Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
+                Write-Output "StatusDescription:" $_.Exception.Response.StatusDescription
+                Write-Error $_.ErrorDetails.Message   
+            }
         }  
     }
 }

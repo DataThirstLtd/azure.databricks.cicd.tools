@@ -43,15 +43,49 @@ Author: Simon D'Morias / Data Thirst Ltd
 Function Add-DatabricksInstancePool {  
     [cmdletbinding()]
     param (
-        [parameter(Mandatory = $false)][string]$BearerToken,    
-        [parameter(Mandatory = $false)][string]$Region,
-        [parameter(Mandatory = $true, ValueFromPipeline = $true)][string]$InstancePoolName,
-        [parameter(Mandatory = $false)][int]$MinIdleInstances,
-        [parameter(Mandatory = $true)][int]$MaxCapacity,
-        [parameter(Mandatory = $true)][string]$NodeType,
-        [parameter(Mandatory = $false)][hashtable]$CustomTags,
-        [parameter(Mandatory = $false)][int]$IdleInstanceAutoterminationMinutes,
-        [parameter(Mandatory = $false)][string[]]$PreloadedSparkVersions
+        [parameter(Mandatory = $false)]
+        [string]$BearerToken,    
+
+        [parameter(Mandatory = $false)]
+        [string]$Region,
+        
+        [Alias("instance_pool_name")]
+        [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$InstancePoolName,
+        
+        [Alias("min_idle_instances")]
+        [parameter(Mandatory = $false)]
+        [int]$MinIdleInstances,
+        
+        [Alias("max_capacity")]
+        [parameter(Mandatory = $false)]
+        [int]$MaxCapacity,
+        
+        [parameter(Mandatory = $true)]
+        [Alias("node_type_id")]
+        [string]$NodeType,
+        
+        [parameter(Mandatory = $false)]
+        [Alias("default_tags")]
+        [hashtable]$CustomTags,
+        
+        [parameter(Mandatory = $false)]
+        [Alias("idle_instance_autotermination_minutes")]
+        [int]$IdleInstanceAutoterminationMinutes,
+        
+        [parameter(Mandatory = $false)]
+        [Alias("preloaded_spark_versions")]
+        [string[]]$PreloadedSparkVersions,
+
+        [parameter(Mandatory = $false)]
+        [Alias("azure_attributes")]
+        [hashtable]$AzureAttributes,
+
+        [parameter(Mandatory = $false)]
+        [switch]$UseSpotInstances,
+
+        [Parameter(ValueFromRemainingArguments)]
+        $Remaining
     ) 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $Headers = GetHeaders $PSBoundParameters
@@ -75,9 +109,21 @@ Function Add-DatabricksInstancePool {
     if ($IdleInstanceAutoterminationMinutes) { $Body['idle_instance_autotermination_minutes'] = $IdleInstanceAutoterminationMinutes }
     if ($MaxCapacity) { $Body['max_capacity'] = $MaxCapacity }
     if (($PreloadedSparkVersions) -and ($Mode -eq "create")) { $Body['preloaded_spark_versions'] = $PreloadedSparkVersions }
-    
+
+    if ($UseSpotInstances){
+        if (!($AzureAttributes)){
+            $AzureAttributes = @{}
+        }
+        $AzureAttributes['availability'] = "SPOT_AZURE"
+        $AzureAttributes['spot_bid_max_price'] = -1.0
+    }
+
+    if ($AzureAttributes){
+        $Body['azure_attributes'] = $AzureAttributes
+    }
+
+
     $BodyText = $Body | ConvertTo-Json -Depth 10
-    Write-Verbose $BodyText
 
     $Response = Invoke-RestMethod -Method POST -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/instance-pools/$Mode" -Headers $Headers
 
