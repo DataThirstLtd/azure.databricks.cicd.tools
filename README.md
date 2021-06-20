@@ -3,7 +3,7 @@
 
 # azure.databricks.cicd.tools
 
-PowerShell Tools for Deploying & Managing Databricks Solutions in Azure. These commandlets help you build continuous delivery pipelines and better source control for your scripts.
+PowerShell tools for Deploying & Managing Databricks Solutions in Azure. These commandlets help you build continuous delivery pipelines and better source control for your scripts.
 
 ## Overview
 
@@ -32,18 +32,6 @@ To upgrade from a previous version
 ```powershell
 Update-Module -Name azure.databricks.cicd.tools
 ```
-# Connecting
-
-## Using AAD Service Principals (PREVIEW)
-Please note the use of AAD Authentication and Service Principals with Databricks is in Preview only. These commands are liable to change and/or break at any time.
-
-## Install
-You must install version 2 or higher of azure.databricks.cicd.tools
-```powershell
-Install-Module -Name azure.databricks.cicd.tools -MinimumVersion 2.0.39 -Force
-Import-Module -Name azure.databricks.cicd.tools -MinimumVersion 2.0.39 -Force
-```
-If you receive a message that -AllowPrerelease is an unknown parameter please run ```Install-Module PowershellGet -Force``` as Administrator and restart your PowerShell session.
 
 ## Create Service Principal
 [Create a new Service Principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal), you will need the following:
@@ -54,7 +42,8 @@ If you receive a message that -AllowPrerelease is an unknown parameter please ru
 Make the Service Principal a Contributor on your Databricks Workspace using the Access Control (IAM) blade in the portal.
 
 ## Connect-Databricks
-You must first create a connection to Databricks. Currently there are three methods supported:
+You must first create a connection to Databricks. Currently there are four methods supported:
+* Use your already logged in AAD Context from Az PowerShell (requires Az module version 5.1+) - known as **AZCONTEXT**
 * Provide the ApplicationId/Secret and the Databricks OrganisationId for your workspace - known as **DIRECT**
   * This is the o=1234567890 number in the URL when you use your workspace
 * Provide the ApplicationId/Secret and the SubscriptionID, Resource Group Name & Workspace Name - known as **MANAGEMENT**
@@ -65,6 +54,21 @@ You must first create a connection to Databricks. Currently there are three meth
 **NOTE: The first time a service principal connects it must use the MANAGEMENT method as this provisions the service principal in the workspace. Therefore after you can use the DIRECT method.** Without doing this first you will receive a 403 Unauthorized response on all commands. 
 
 ### Examples
+
+AZCONTEXT:
+
+You can login with the Az Context of your PowerShell session - assuming you are logged in already use ```Connect-AzAccount```. 
+
+```powershell
+Connect-Databricks -UseAzContext -DatabricksOrgId $OrgId -Region $Region
+```
+
+You can also use Az PowerShell to get the details using the resource name:
+```powershell
+$Workspace = (Get-AzDatabricksWorkspace -ResourceGroupName "MyRG" -Name "MyWorkspaceName")
+$Region = (($Workspace.Url).split("."))[0,1] -Join "."
+Connect-Databricks -UseAzContext -DatabricksOrgId $Workspace.WorkspaceId -Region $Region
+```
 
 DIRECT:
 ```powershell
@@ -112,7 +116,9 @@ For a full list of commands with help please see the [Wiki](https://github.com/D
 
 Deploys a Secret value to Databricks, this can be a key to a storage account or a password etc. The secret must be created within a scope which will be created for you if it does not exist.
 
-Please note that the Databricks REST API currently does not support the adding of Key Vault backed scopes so these commands cannot either.
+### Key Vault backed secret scopes
+
+Please note that the Databricks REST API currently only supports adding of Key Vault backed scopes using AAD User credentials (NOT Service Principals). Please use the AzContext connect method as an AAD User.
 
 ## Cluster Management
 

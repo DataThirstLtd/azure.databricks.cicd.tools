@@ -7,11 +7,20 @@
     Connects your current PowerShell session to Azure Databricks.
     Supports Service Princial AAD authenication or via Databricks Bearer Token
 
+.PARAMETER UseAzContext
+    Uses your credentials from your already logged in Az module session
+    Can be either Seervice Princpal or User Credentials
+    Requires DatabricksOrgId to also be set use:
+        ```$OrgId = (Get-AzDatabricksWorkspace -ResourceGroupName $ResourceGroupName -Name $WorkspaceName).WorkspaceId ```
+
 .PARAMETER BearerToken
     Your Databricks Bearer token to authenticate to your workspace (see User Settings in Databricks WebUI)
+    Using Bearer tokens should be avoided - ideally use AAD Authentication
 
 .PARAMETER Region
     Azure Region - must match the URL of your Databricks workspace, example northeurope
+    Also accepts the URL Prefix in place, for example if your URL is https://adb-293060087280.0.azuredatabricks.net/
+        then the prefix would be adb-293060087280.0
 
 .PARAMETER ApplicationId
     Azure Active Directory Service Principal Client ID (also known as Application ID)
@@ -37,6 +46,14 @@
 .PARAMETER Force
     Removes any cached credentials and reconnects
 
+.PARAMETER oauthLogin
+    Change the AAD Login URL for China/Government Deployments
+
+.EXAMPLE 
+    C:\PS> Connect-Databricks -UseAzContext -Region "adb-293060087280.0" -DatabricksOrgId "1234567"
+
+    This example of logging in using your current Az Context (See Get-AzContext)
+
 .EXAMPLE 
     C:\PS> Connect-Databricks -Region "westeurope" -ApplicationId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3" -Secret "myPrivateSecret" -DatabricksOrgId 1234567 -TenantId "8a686772-0e5b-4cdb-ad19-bf1d1e7f89f3"
 
@@ -60,10 +77,14 @@
 Function Connect-Databricks {  
     [cmdletbinding(DefaultParameterSetName = 'Bearer')]
     param (
+        [parameter(Mandatory = $false, ParameterSetName = 'AzContext')]
+        [switch]$UseAzContext,
+
         [parameter(Mandatory = $true, ParameterSetName = 'Bearer')]
         [string]$BearerToken,
 
         [parameter(Mandatory = $true, ParameterSetName = 'Bearer')]
+        [parameter(Mandatory = $true, ParameterSetName = 'AzContext')]
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithOrgId')]
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithResource')]
         [string]$Region,
@@ -82,6 +103,7 @@ Function Connect-Databricks {
         [string]$Secret,
 
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithOrgId')]
+        [parameter(Mandatory = $true, ParameterSetName = 'AzContext')]
         [string]$DatabricksOrgId,
 
         [parameter(Mandatory = $true, ParameterSetName = 'AADwithOrgId')]
@@ -120,6 +142,15 @@ Function Connect-Databricks {
         # Basically do not expire the token
         $global:DatabricksTokenExpires = (Get-Date).AddDays(90)
         $global:Headers = @{"Authorization" = "$global:DatabricksAccessToken" }
+    }
+    elseif ($PSCmdlet.ParameterSetName -eq "AzContext") {
+        $ADResponseToken = Get-AzAccessToken -ResourceUrl "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d"
+        $global:DatabricksAccessToken = $ADResponseToken.Token
+        $global:DatabricksTokenExpires = ($ADResponseToken.ExpiresOn).dateTime
+        $global:Headers = @{"Authorization" = "Bearer $DatabricksAccessToken";
+            "X-Databricks-Org-Id"           = "$DatabricksOrgId"
+        }
+        $global:DatabricksOrgId = $DatabricksOrgId
     }
     elseif ($PSCmdlet.ParameterSetName -eq "AADwithOrgId") {
         Get-AADDatabricksToken
