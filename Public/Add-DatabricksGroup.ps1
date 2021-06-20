@@ -50,7 +50,7 @@ Function Add-DatabricksGroup
     Catch
     {
         $err = $_.ErrorDetails.Message
-        if ($err.Contains('RESOURCE_ALREADY_EXISTS'))
+        if ($err.Contains('exists'))
         {
             Write-Verbose $err
         }
