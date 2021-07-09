@@ -5,7 +5,7 @@ Function DatabricksTokenState{
     {
         return "Missing"
     }
-    elseif ((Get-Date -AsUTC) -gt $global:DatabricksTokenExpires) {
+    elseif ((Get-Date) -gt $global:DatabricksTokenExpires) {
         return "Expired"
     }
     else{
@@ -20,7 +20,7 @@ Function ManagementTokenState{
     {
         return "Missing"
     }
-    elseif ((Get-Date -AsUTC) -gt $global:ManagementTokenExpires) {
+    elseif ((Get-Date) -gt $global:ManagementTokenExpires) {
         return "Expired"
     }
     else{
