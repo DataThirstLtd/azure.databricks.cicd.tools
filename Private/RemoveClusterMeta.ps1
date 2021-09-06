@@ -14,7 +14,6 @@ function RemoveClusterMeta{
     $hashtable.Remove('spark_context_id')
     $hashtable.Remove('last_state_loss_time')
     $hashtable.Remove('init_scripts_safe_mode')
-    $hashtable.Remove('azure_attributes')
     $hashtable.Remove('cluster_source')
 
     return $hashtable
