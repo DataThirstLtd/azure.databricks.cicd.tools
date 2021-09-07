@@ -87,6 +87,32 @@ Describe "Edit Cluster New-DatabricksCluster" {
     }
 }
 
+Describe "Edit Cluster New-DatabricksCluster with AzureAttributes" {
+    BeforeAll{
+        $global:ClusterId = New-DatabricksCluster  -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
+            -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
+            -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts
+        Start-Sleep -Seconds 3
+        Stop-DatabricksCluster -ClusterName $ClusterName
+        Start-Sleep -Seconds 3
+    }
+
+    It "Update cluster with AzureAttributes (Spot Instances)"{
+        $ClusterIdEdited = New-DatabricksCluster -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
+            -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
+            -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts -AzureAttributes $AzureAttributes
+
+        $ClusterIdEdited | Should -Be $global:ClusterId
+    }
+
+    AfterAll {
+        Start-Sleep -Seconds 3
+        Remove-DatabricksCluster -ClusterName $ClusterName
+    }
+}
+
 Describe "New Cluster - via pipe"{
     It "Basic Pipe" {
         $json = '{
