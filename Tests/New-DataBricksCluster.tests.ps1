@@ -27,7 +27,11 @@ $SparkEnvVars = @{SPARK_WORKER_MEMORY="29000m"} #;SPARK_LOCAL_DIRS="/local_disk0
 $AutoTerminationMinutes = 15
 $PythonVersion = 3
 $ClusterLogPath = "dbfs:/logs/mycluster"
-$AzureAttributes = @{first_on_demand=1; availability="SPOT_WITH_FALLBACK_AZURE"; spot_bid_max_price=-1}
+$AzureAttributes = @{
+    first_on_demand = 1
+    availability = "SPOT_WITH_FALLBACK_AZURE"
+    spot_bid_max_price = -1
+}
 
 Describe "New-DatabricksCluster" {
     It "Create basic cluster"{
@@ -79,6 +83,33 @@ Describe "Edit Cluster New-DatabricksCluster" {
             -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts
 
         $ClusterIdEdited | Should -Be $global:ClusterId
+    }
+
+    AfterAll {
+        Start-Sleep -Seconds 3
+        Remove-DatabricksCluster -ClusterName $ClusterName
+    }
+}
+
+Describe "Edit Cluster New-DatabricksCluster with AzureAttributes" {
+    BeforeAll{
+        $global:ClusterId = New-DatabricksCluster  -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
+            -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
+            -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts
+        Start-Sleep -Seconds 3
+        Stop-DatabricksCluster -ClusterName $ClusterName
+        Start-Sleep -Seconds 3
+    }
+
+    It "Update cluster with AzureAttributes (Spot Instances)"{
+        $ClusterIdEdited = New-DatabricksCluster -ClusterName $ClusterName -SparkVersion $SparkVersion -NodeType $NodeType `
+            -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
+            -Spark_conf $Spark_conf -CustomTags $CustomTags -AutoTerminationMinutes $AutoTerminationMinutes -ClusterLogPath $ClusterLogPath `
+            -Verbose -SparkEnvVars $SparkEnvVars -PythonVersion $PythonVersion -InitScripts $InitScripts -AzureAttributes $AzureAttributes
+
+        $EditedClusterConfig = Get-DatabricksClusters -ClusterId $ClusterIdEdited
+        $EditedClusterConfig.azure_attributes.availability | Should -Be $AzureAttributes.availability
     }
 
     AfterAll {
