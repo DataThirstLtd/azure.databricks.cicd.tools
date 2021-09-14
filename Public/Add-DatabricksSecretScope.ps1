@@ -75,15 +75,7 @@ Function Add-DatabricksSecretScope
     }
     Catch
     {
-        $err = $_.ErrorDetails.Message
-        if ($err.Contains('already exists'))
-        {
-            Write-Verbose $err
-        }
-        else
-        {
-            throw $_
-        }
+        Write-Host $_
     }
 
 }
