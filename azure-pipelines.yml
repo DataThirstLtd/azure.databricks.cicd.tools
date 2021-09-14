@@ -40,7 +40,7 @@ steps:
           "SparkVersion": "$(SparkVersion)",
           "AddLibraryClusterId": "$(AddLibraryClusterId)",
           "AddLibraryInputClusterId": "$(AddLibraryInputClusterId)",
-          "RemoveLibraryClusterId": "$RemoveLibraryClusterId)",
+          "RemoveLibraryClusterId": "$(RemoveLibraryClusterId)",
           "KeyVault": "$(KeyVault)"
       }
       "@
