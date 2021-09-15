@@ -90,6 +90,10 @@ Setting this option returns a RunId.
 DBFS Location for Cluster logs - must start with dbfs:/
 Example dbfs:/logs/mycluster
 
+.PARAMETER MaxConcurrentRuns
+Number of allowed concurrent runs of the job before databricks will skip further requests.
+
+
 .EXAMPLE
 PS C:\> Add-DatabricksPythonJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.5.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -PythonPath "/Shared/TestPython.py" -PythonParameters "val1", "val2" -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
 
@@ -118,14 +122,15 @@ Function Add-DatabricksPythonJob {
         [parameter(Mandatory = $true)][string]$PythonPath,
         [parameter(Mandatory = $false)][string[]]$PythonParameters,
         [parameter(Mandatory = $false)][string[]]$Libraries,
-        [parameter(Mandatory = $false)][ValidateSet(2,3)] [string]$PythonVersion=3,
+        [parameter(Mandatory = $false)][ValidateSet(2, 3)] [string]$PythonVersion = 3,
         [parameter(Mandatory = $false)][hashtable]$Spark_conf,
         [parameter(Mandatory = $false)][hashtable]$CustomTags,
         [parameter(Mandatory = $false)][string[]]$InitScripts,
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
         [parameter(Mandatory = $false)][switch]$RunImmediate,
         [parameter(Mandatory = $false)][string]$ClusterLogPath,
-        [parameter(Mandatory = $false)][string]$InstancePoolId
+        [parameter(Mandatory = $false)][string]$InstancePoolId,
+        [parameter(Mandatory = $false)][int]$MaxConcurrentRuns
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -134,27 +139,27 @@ Function Add-DatabricksPythonJob {
 
     $ExistingJobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
 
-    $ExistingJobDetail = $ExistingJobs | Where-Object {$_.settings.name -eq $JobName} | Select-Object job_id -First 1
+    $ExistingJobDetail = $ExistingJobs | Where-Object { $_.settings.name -eq $JobName } | Select-Object job_id -First 1
 
-    if (($ExistingJobDetail) -and (!($RunImmediate.IsPresent))){
+    if (($ExistingJobDetail) -and (!($RunImmediate.IsPresent))) {
         $JobId = $ExistingJobDetail.job_id[0]
         Write-Verbose "Updating JobId: $JobId"
         $Mode = "reset"
     } 
-    else{
+    else {
         $Mode = "create"
     }
 
     $JobBody = @{}
 
-    if ($RunImmediate.IsPresent){
+    if ($RunImmediate.IsPresent) {
         $JobBody['run_name'] = $JobName
     }
-    else{
+    else {
         $JobBody['name'] = $JobName
     }
 
-    If ($ClusterId){
+    If ($ClusterId) {
         $JobBody['existing_cluster_id'] = $ClusterId
     }
     else {
@@ -175,10 +180,11 @@ Function Add-DatabricksPythonJob {
         $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
     }
 
-    If ($PSBoundParameters.ContainsKey('Timeout')) {$JobBody['timeout_seconds'] = $Timeout}
-    If ($PSBoundParameters.ContainsKey('MaxRetries')) {$JobBody['max_retries'] = $MaxRetries}
+    If ($PSBoundParameters.ContainsKey('Timeout')) { $JobBody['timeout_seconds'] = $Timeout }
+    If ($PSBoundParameters.ContainsKey('MaxRetries')) { $JobBody['max_retries'] = $MaxRetries }
+    If ($PSBoundParameters.ContainsKey('MaxConcurrentRuns')) { $JobBody['max_concurrent_runs'] = $MaxConcurrentRuns }
     If ($PSBoundParameters.ContainsKey('ScheduleCronExpression')) {
-        $JobBody['schedule'] = @{"quartz_cron_expression"=$ScheduleCronExpression;"timezone_id"=$Timezone}
+        $JobBody['schedule'] = @{"quartz_cron_expression" = $ScheduleCronExpression; "timezone_id" = $Timezone }
     }
 
     $Python = @{}
@@ -199,12 +205,12 @@ Function Add-DatabricksPythonJob {
         $JobBody['libraries'] = $Libraries | ConvertFrom-Json
     }
 
-    If ($Mode -eq 'create'){
+    If ($Mode -eq 'create') {
         $Body = $JobBody
     }
     else {
         $Body = @{}
-        $Body['job_id']= $JobId
+        $Body['job_id'] = $JobId
         $Body['new_settings'] = $JobBody
     }
 
@@ -215,10 +221,10 @@ Function Add-DatabricksPythonJob {
     Write-Verbose $BodyText
   
     Try {
-        if ($RunImmediate.IsPresent){
+        if ($RunImmediate.IsPresent) {
             $Url = "jobs/runs/submit"
         }
-        else{
+        else {
             $Url = "jobs/$Mode"
         }        
         $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/$Url" -Headers $Headers
@@ -229,10 +235,10 @@ Function Add-DatabricksPythonJob {
         Write-Error $_.ErrorDetails.Message
     }
 
-    if ($RunImmediate.IsPresent){
+    if ($RunImmediate.IsPresent) {
         Return $JobDetails.run_id
     }
-    else{
+    else {
         if ($Mode -eq "create") {
             Return $JobDetails.job_id
         }

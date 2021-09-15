@@ -85,6 +85,9 @@ Custom Tags to set, provide hash table of tags. Example: @{CreatedBy="SimonDM";N
 DBFS Location for Cluster logs - must start with dbfs:/
 Example dbfs:/logs/mycluster
 
+.PARAMETER MaxConcurrentRuns
+Number of allowed concurrent runs of the job before databricks will skip further requests.
+
 .EXAMPLE
 PS C:\> Add-DatabricksJarJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.5.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -JarPath "folder/Test.jar" -JarMainClass 'com.test.me' -JarParameters "val1", "val2" -Libraries '{"jar": "DBFS:/mylibraries/test.jar"}'
 
@@ -119,7 +122,8 @@ Function Add-DatabricksJarJob {
         [parameter(Mandatory = $false)][string[]]$InitScripts,
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
         [parameter(Mandatory = $false)][string]$ClusterLogPath,
-        [parameter(Mandatory = $false)][string]$InstancePoolId
+        [parameter(Mandatory = $false)][string]$InstancePoolId,
+        [parameter(Mandatory = $false)][int]$MaxConcurrentRuns
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -128,21 +132,21 @@ Function Add-DatabricksJarJob {
 
     $ExistingJobs = Get-DatabricksJobs -BearerToken $BearerToken -Region $Region
 
-    $ExistingJobDetail = $ExistingJobs | Where-Object {$_.settings.name -eq $JobName} | Select-Object job_id -First 1
+    $ExistingJobDetail = $ExistingJobs | Where-Object { $_.settings.name -eq $JobName } | Select-Object job_id -First 1
 
-    if ($ExistingJobDetail){
+    if ($ExistingJobDetail) {
         $JobId = $ExistingJobDetail.job_id[0]
         Write-Verbose "Updating JobId: $JobId"
         $Mode = "reset"
     } 
-    else{
+    else {
         $Mode = "create"
     }
 
     $JobBody = @{}
     $JobBody['name'] = $JobName
 
-    If ($ClusterId){
+    If ($ClusterId) {
         $JobBody['existing_cluster_id'] = $ClusterId
     }
     else {
@@ -163,10 +167,11 @@ Function Add-DatabricksJarJob {
         $JobBody['new_cluster'] = (GetNewClusterCluster @ClusterArgs)
     }
 
-    If ($PSBoundParameters.ContainsKey('Timeout')) {$JobBody['timeout_seconds'] = $Timeout}
-    If ($PSBoundParameters.ContainsKey('MaxRetries')) {$JobBody['max_retries'] = $MaxRetries}
+    If ($PSBoundParameters.ContainsKey('Timeout')) { $JobBody['timeout_seconds'] = $Timeout }
+    If ($PSBoundParameters.ContainsKey('MaxRetries')) { $JobBody['max_retries'] = $MaxRetries }
+    If ($PSBoundParameters.ContainsKey('MaxConcurrentRuns')) { $JobBody['max_concurrent_runs'] = $MaxConcurrentRuns }
     If ($PSBoundParameters.ContainsKey('ScheduleCronExpression')) {
-        $JobBody['schedule'] = @{"quartz_cron_expression"=$ScheduleCronExpression;"timezone_id"=$Timezone}
+        $JobBody['schedule'] = @{"quartz_cron_expression" = $ScheduleCronExpression; "timezone_id" = $Timezone }
     }
 
     $Jar = @{}
@@ -187,12 +192,12 @@ Function Add-DatabricksJarJob {
         $JobBody['libraries'] = $Libraries | ConvertFrom-Json
     }
 
-    If ($Mode -eq 'create'){
+    If ($Mode -eq 'create') {
         $Body = $JobBody
     }
     else {
         $Body = @{}
-        $Body['job_id']= $JobId
+        $Body['job_id'] = $JobId
         $Body['new_settings'] = $JobBody
     }
 
