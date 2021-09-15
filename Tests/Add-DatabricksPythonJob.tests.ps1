@@ -1,16 +1,16 @@
 param(
-    [ValidateSet('Bearer','ServicePrincipal')][string]$Mode="ServicePrincipal"
+    [ValidateSet('Bearer', 'ServicePrincipal')][string]$Mode = "ServicePrincipal"
 )
 
 Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
-switch ($mode){
-    ("Bearer"){
+switch ($mode) {
+    ("Bearer") {
         Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
     }
-    ("ServicePrincipal"){
+    ("ServicePrincipal") {
         Connect-Databricks -Region $Config.Region -DatabricksOrgId $Config.DatabricksOrgId -ApplicationId $Config.ApplicationId -Secret $Config.Secret -TenantId $Config.TenantId
     }
 }
@@ -31,9 +31,12 @@ Describe "Add-DatabricksPythonJob" {
     $ClusterId = $Config.ClusterId
     $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
     $InitScripts = 'dbfs:/pythonjobtestFile2.py'
-    $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
+    $Spark_conf = @{"spark.speculation" = $true; "spark.streaming.ui.retainedBatches" = 5 }
+    $MaxConcurrentRuns = 2
 
-    BeforeAll{
+
+
+    BeforeAll {
         Add-DatabricksDBFSFile -LocalRootFolder Samples/DummyNotebooks -FilePattern 'File*.py' -TargetLocation '/pythonjobtest'
     }
 
@@ -42,6 +45,7 @@ Describe "Add-DatabricksPythonJob" {
             -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Timeout $Timeout -MaxRetries $MaxRetries `
+            -MaxConcurrentRuns $MaxConcurrentRuns `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
             -PythonParameters $PythonParameters `
@@ -53,6 +57,7 @@ Describe "Add-DatabricksPythonJob" {
     It "Update Job to use existing cluster" {
         $global:jobid = Add-DatabricksPythonJob -JobName $JobName `
             -Timeout $Timeout -MaxRetries $MaxRetries `
+            -MaxConcurrentRuns $MaxConcurrentRuns `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
             -PythonParameters $PythonParameters -ClusterId $ClusterId `
@@ -66,6 +71,7 @@ Describe "Add-DatabricksPythonJob" {
 
         $global:jobid = Add-DatabricksPythonJob -JobName "Libary Test1" `
             -Timeout $Timeout -MaxRetries $MaxRetries `
+            -MaxConcurrentRuns $MaxConcurrentRuns `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
             -PythonParameters $PythonParameters -ClusterId $ClusterId `
@@ -79,6 +85,7 @@ Describe "Add-DatabricksPythonJob" {
 
         $global:jobid = Add-DatabricksPythonJob -JobName "Libary Test2" `
             -Timeout $Timeout -MaxRetries $MaxRetries `
+            -MaxConcurrentRuns $MaxConcurrentRuns `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
             -PythonParameters $PythonParameters -ClusterId $ClusterId `
@@ -92,6 +99,7 @@ Describe "Add-DatabricksPythonJob" {
 
         $global:jobid = Add-DatabricksPythonJob -JobName "Libary Test2" `
             -Timeout $Timeout -MaxRetries $MaxRetries `
+            -MaxConcurrentRuns $MaxConcurrentRuns `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
             -PythonParameters $PythonParameters -ClusterId $ClusterId `
@@ -101,10 +109,10 @@ Describe "Add-DatabricksPythonJob" {
     }
 
     
-    AfterEach{
+    AfterEach {
         Remove-DatabricksJob -JobId $global:jobid
     }
-    AfterAll{
+    AfterAll {
         Remove-DatabricksDBFSItem -Path '/pythonjobtest'
     }
 }
@@ -126,15 +134,17 @@ Describe "Add-DatabricksPythonJob2" {
     $ClusterId = $Config.ClusterId
     $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
     $InitScripts = 'dbfs:/pythonjobtestFile2.py'
-    $Spark_conf = @{"spark.speculation"=$true; "spark.streaming.ui.retainedBatches"= 5}
+    $Spark_conf = @{"spark.speculation" = $true; "spark.streaming.ui.retainedBatches" = 5 }
+    $MaxConcurrentRuns = 2
 
-    BeforeAll{
+    BeforeAll {
         Add-DatabricksDBFSFile -LocalRootFolder Samples/DummyNotebooks -FilePattern 'File*.py' -TargetLocation '/pythonjobtest'
     }
 
     It "Execute Immediate Run" {
         $global:res = Add-DatabricksPythonJob -JobName "Immediate Job" `
             -Timeout $Timeout -MaxRetries $MaxRetries `
+            -MaxConcurrentRuns $MaxConcurrentRuns `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -PythonPath $PythonPath `
             -PythonParameters $PythonParameters -ClusterId $ClusterId `
@@ -143,7 +153,7 @@ Describe "Add-DatabricksPythonJob2" {
         $global:res | Should -BeGreaterThan 0
     }
 
-    AfterAll{
+    AfterAll {
         Remove-DatabricksDBFSItem -Path '/pythonjobtest'
     }
 
