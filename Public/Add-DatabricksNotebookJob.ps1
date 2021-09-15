@@ -106,6 +106,11 @@ Example "marc.mcdonald@microsoft.com,gordon.letwin@microsoft.com"
 Switch.
 if set, do not send email to recipients specified in on_failure if the run is skipped.
 
+
+.PARAMETER MaxConcurrentRuns
+Number of allowed concurrent runs of the job before databricks will skip further requests.
+
+
 .EXAMPLE
 PS C:\> Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.5.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -NotebookPath "/Shared/Test" -NotebookParametersJson '{"key": "value", "name": "test2"}' -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
 
@@ -147,7 +152,8 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][hashtable]$SparkEnvVars,
         [parameter(Mandatory = $false)][switch]$RunImmediate,
         [parameter(Mandatory = $false)][string]$ClusterLogPath,
-        [parameter(Mandatory = $false)][string]$InstancePoolId
+        [parameter(Mandatory = $false)][string]$InstancePoolId,
+        [parameter(Mandatory = $false)][int]$MaxConcurrentRuns
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -198,6 +204,7 @@ Function Add-DatabricksNotebookJob {
 
         If ($PSBoundParameters.ContainsKey('Timeout')) { $JobBody['timeout_seconds'] = $Timeout }
         If ($PSBoundParameters.ContainsKey('MaxRetries')) { $JobBody['max_retries'] = $MaxRetries }
+        If ($PSBoundParameters.ContainsKey('MaxConcurrentRuns')) { $JobBody['max_concurrent_runs'] = $MaxConcurrentRuns }
         If ($PSBoundParameters.ContainsKey('ScheduleCronExpression')) {
             $JobBody['schedule'] = @{"quartz_cron_expression" = $ScheduleCronExpression; "timezone_id" = $Timezone }
         }

@@ -30,12 +30,14 @@ Describe "Add-DatabricksNotebookJob" {
     $ClusterId = $Config.ClusterId
     $Libraries = '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
     $Spark_conf = @{"spark.speculation" = $true; "spark.streaming.ui.retainedBatches" = 5 }
+    $MaxConcurrentRuns = 2
 
     It "Autoscale with parameters, new cluster" {
         $global:JobId2 = Add-DatabricksNotebookJob -JobName $JobName `
             -SparkVersion $SparkVersion -NodeType $NodeType `
             -MinNumberOfWorkers $MinNumberOfWorkers -MaxNumberOfWorkers $MaxNumberOfWorkers `
             -Timeout $Timeout -MaxRetries $MaxRetries `
+            -MaxConcurrentRuns $MaxConcurrentRuns `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -NotebookPath $NotebookPath `
             -NotebookParametersJson $NotebookParametersJson `
@@ -47,6 +49,7 @@ Describe "Add-DatabricksNotebookJob" {
     It "Update Job to use existing cluster" {
         $global:JobId1 = Add-DatabricksNotebookJob -JobName $JobName `
             -Timeout $Timeout -MaxRetries $MaxRetries `
+            -MaxConcurrentRuns $MaxConcurrentRuns `
             -ScheduleCronExpression $ScheduleCronExpression `
             -Timezone $Timezone -NotebookPath $NotebookPath `
             -NotebookParametersJson $NotebookParametersJson -ClusterId $ClusterId `
@@ -58,6 +61,7 @@ Describe "Add-DatabricksNotebookJob" {
     It "With run now" {
         $global:JobId = Add-DatabricksNotebookJob -JobName $JobName `
             -Timeout $Timeout -MaxRetries $MaxRetries `
+            -MaxConcurrentRuns $MaxConcurrentRuns `
             -Timezone $Timezone -NotebookPath $NotebookPath `
             -ClusterId $ClusterId `
             -NotebookParametersJson $NotebookParametersJson `
