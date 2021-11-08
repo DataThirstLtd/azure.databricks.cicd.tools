@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Creates Notebook Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create  
+Creates Notebook Job in Databricks. Script uses Databricks API 2.1 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create  
 
 .DESCRIPTION
-Creates Notebook Job in Databricks. Script uses Databricks API 2.0 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create
+Creates Notebook Job in Databricks. Script uses Databricks API 2.1 create job query: https://docs.azuredatabricks.net/api/latest/jobs.html#create
 If the job name exists it will be updated instead of creating a new job.
 
 .PARAMETER BearerToken
@@ -110,12 +110,19 @@ if set, do not send email to recipients specified in on_failure if the run is sk
 .PARAMETER MaxConcurrentRuns
 Number of allowed concurrent runs of the job before databricks will skip further requests.
 
+.PARAMETER AccessControlList
+Number of allowed concurrent runs of the job before databricks will skip further requests.
+Optional. Array of json strings. Example: '{"user_name": "loren.ipsum@nodomain.asdf","permission_level": "CAN_MANAGE_RUN"}', '{"group_name": "these_users","permission_level": "CAN_MANAGE"}'
 
 .EXAMPLE
 PS C:\> Add-DatabricksNotebookJob -BearerToken $BearerToken -Region $Region -JobName "Job1" -SparkVersion "5.5.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -NotebookPath "/Shared/Test" -NotebookParametersJson '{"key": "value", "name": "test2"}' -Libraries '{"pypi":{package:"simplejson"}}', '{"jar": "DBFS:/mylibraries/test.jar"}'
 
 The above example create a job on a new cluster.
     
+Add-DatabricksNotebookJob -JobName "Job1" -SparkVersion "5.5.x-scala2.11" -NodeType "Standard_D3_v2" -MinNumberOfWorkers 2 -MaxNumberOfWorkers 2 -Timeout 100 -MaxRetries 3 -ScheduleCronExpression "0 15 22 ? * *" -Timezone "UTC" -NotebookPath "/Shared/Test" -NotebookParametersJson '{"key": "value", "name": "test2"}' -AccessControlList '{"user_name": "loren.ipsum@nodomain.asdf","permission_level": "CAN_MANAGE_RUN"}', '{"group_name": "these_users","permission_level": "CAN_MANAGE"}'
+
+The above example creates an access control list on a new job
+
 .NOTES
 Author: Tadeusz Balcer
 Extended: Simon D'Morias / Data Thirst Ltd
@@ -153,7 +160,8 @@ Function Add-DatabricksNotebookJob {
         [parameter(Mandatory = $false)][switch]$RunImmediate,
         [parameter(Mandatory = $false)][string]$ClusterLogPath,
         [parameter(Mandatory = $false)][string]$InstancePoolId,
-        [parameter(Mandatory = $false)][int]$MaxConcurrentRuns
+        [parameter(Mandatory = $false)][int]$MaxConcurrentRuns,
+        [parameter(Mandatory = $false)][string[]]$AccessControlList
     ) 
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -166,7 +174,7 @@ Function Add-DatabricksNotebookJob {
     if (($ExistingJobDetail) -and (!($RunImmediate.IsPresent))) {
         $JobId = $ExistingJobDetail.job_id[0]
         Write-Verbose "Updating JobId: $JobId"
-        $Mode = "reset"
+        $Mode = "update"
     } 
     else {
         $Mode = "create"
@@ -230,7 +238,10 @@ Function Add-DatabricksNotebookJob {
             else {
                 $JobBody['email_notifications'] = @{"on_failure" = $EmailAlertsOnFailure }
             }
-    
+        }
+
+        If ($PSBoundParameters.ContainsKey('AccessControlList')) {
+            $JobBody['access_control_list'] = $AccessControlList | ConvertFrom-Json
         }
 
         if ($noAlertSkippedRuns.IsPresent) {
@@ -277,7 +288,7 @@ Function Add-DatabricksNotebookJob {
         else {
             $Url = "jobs/$Mode"
         }   
-        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.0/$Url" -Headers $Headers
+        $JobDetails = Invoke-RestMethod -Method Post -Body $BodyText -Uri "$global:DatabricksURI/api/2.1/$Url" -Headers $Headers
     }
     Catch {
         Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
