@@ -59,7 +59,7 @@ Function Add-DatabricksSecretScope
     if ($PSBoundParameters.ContainsKey('KeyVaultResourceId')){
         $kv = @{}
         $kv['resource_id'] = $KeyVaultResourceId
-        $LastPart = $KeyVaultResourceId.split('/')[-1]
+        $LastPart = ($KeyVaultResourceId.split('/')[-1]).toLower()
         $kv['dns_name'] = "https://$LastPart.vault.azure.net/"
         
         $body['scope_backend_type'] = 'AZURE_KEYVAULT'
