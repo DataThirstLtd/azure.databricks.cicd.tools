@@ -17,6 +17,9 @@ Name for the scope - do not include spaces or special characters.
 .PARAMETER SecretName
 Name of the Secret to delete
 
+.PARAMETER FailOnNotExist
+Switch that if included will fail if secret does not exist
+
 .EXAMPLE 
 C:\PS> Remove-DatabricksSecret -BearerToken $BearerToken -Region $Region -ScopeName "Test1" -SecretName "Test"
 
@@ -34,7 +37,8 @@ Function Remove-DatabricksSecret
         [parameter(Mandatory=$false)][string]$BearerToken,
         [parameter(Mandatory=$false)][string]$Region,
         [parameter(Mandatory=$true)][string]$ScopeName,
-        [parameter(Mandatory=$true)][string]$SecretName
+        [parameter(Mandatory=$true)][string]$SecretName,
+        [parameter(Mandatory=$false)][switch]$FailOnNotExist
     )
 
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -57,6 +61,10 @@ Function Remove-DatabricksSecret
         if ($err.Contains('exist'))
         {
             Write-Verbose $err
+            if ($PSBoundParameters.ContainsKey('FailOnNotExist') -eq $true)
+            {
+                throw
+            }
         }
         else
         {

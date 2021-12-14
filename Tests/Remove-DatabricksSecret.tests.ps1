@@ -6,7 +6,7 @@ Set-Location $PSScriptRoot
 Import-Module "..\azure.databricks.cicd.tools.psd1" -Force
 $Config = (Get-Content '.\config.json' | ConvertFrom-Json)
 
-switch ($mode){
+switch ($Mode){
     ("Bearer"){
         Connect-Databricks -Region $Config.Region -BearerToken $Config.BearerToken
     }
@@ -21,10 +21,24 @@ $SecretValue = "mykey"
 
 
 Describe "Set-DatabricksSecret" {
-    BeforeAll{
+    BeforeEach{
         Set-DatabricksSecret -ScopeName $ScopeName -SecretName $SecretName -SecretValue $SecretValue  -Verbose
     }
     It "Simple test value" {
         Remove-DatabricksSecret -ScopeName $ScopeName -SecretName $SecretName -Verbose
+    }
+    
+    It "Include switch to fail if not exist" {
+        { Remove-DatabricksSecret -ScopeName $ScopeName -SecretName $SecretName -Verbose -FailOnNotExist } | Should Not Throw
+    }
+}
+
+Describe "Remove_secRetThatDoesNotExist" {
+    It "Does not throw if secret does not exist" {
+        { Remove-DatabricksSecret -ScopeName $ScopeName -SecretName $SecretName -Verbose } |Should Not Throw
+    }
+
+    It "Does throw if secret does not exist" {
+        {Remove-DatabricksSecret -ScopeName $ScopeName -SecretName $SecretName -Verbose -FailOnNotExist} | Should Throw
     }
 }

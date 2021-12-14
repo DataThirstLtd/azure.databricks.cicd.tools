@@ -1,5 +1,5 @@
 param(
-    [ValidateSet('Bearer', 'ServicePrincipal')][string]$Mode = "ServicePrincipal"
+    [ValidateSet('Bearer', 'ServicePrincipal')][string]$Mode = "Bearer"
 )
 
 Set-Location $PSScriptRoot
@@ -31,12 +31,27 @@ Describe "Remove-DatabricksSecretScope" {
         }
 
     }
+
     Context "Remove an empty Secret Scope." {
-        BeforeAll {
+        BeforeEach {
             Add-DatabricksSecretScope -ScopeName $ScopeName  -Verbose
         }
         It "Remove Empty Only does not fail" {
             Remove-DatabricksSecretScope -ScopeName $ScopeName -RemoveEmptyOnly -Verbose
+        }
+        It "Remove Empty Only does not fail if FailOnNotExist included" {
+            { Remove-DatabricksSecretScope -ScopeName $ScopeName -RemoveEmptyOnly -Verbose -FailOnNotExist } | Should Not Throw
+        }
+    }
+
+    Context "Remove Secret Scope" {
+        It "Remove Empty Only does not fail if FailNotExist included" {
+            { 
+                Add-DatabricksSecretScope -ScopeName $ScopeName  -Verbose
+                Remove-DatabricksSecretScope -ScopeName $ScopeName -RemoveEmptyOnly -Verbose -FailOnNotExist } | Should Not Throw
+        }
+        It "Remove Scope does throw if FailOnNotExist included and scope does not exist" {
+            { Remove-DatabricksSecretScope -ScopeName $ScopeName -RemoveEmptyOnly -Verbose -FailOnNotExist } | Should Throw
         }
     }
 
