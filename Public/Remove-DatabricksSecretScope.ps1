@@ -17,6 +17,9 @@ Name of the scope to remove, will not error if it does not exist
 .PARAMETER RemoveEmptyOnly
 Switch that if included will check if scope is not empty.
 
+.PARAMETER FailOnNotExist
+Switch that if included will fail if scope does not exist
+
 .EXAMPLE
 PS C:\> Remove-DatabricksSecretScope -BearerToken $BearerToken -Region $Region -ScopeName "MyScope"
 
@@ -32,7 +35,8 @@ Function Remove-DatabricksSecretScope {
         [parameter(Mandatory = $false)][string]$BearerToken, 
         [parameter(Mandatory = $false)][string]$Region,
         [parameter(Mandatory = $true)][string]$ScopeName,
-        [parameter(Mandatory = $false)][switch]$RemoveEmptyOnly
+        [parameter(Mandatory = $false)][switch]$RemoveEmptyOnly,
+        [parameter(Mandatory = $false)][switch]$FailOnNotExist
 
     ) 
     $secrets = Get-DatabricksSecretByScope -BearerToken $BearerToken -Region $Region -ScopeName $ScopeName
@@ -61,6 +65,10 @@ Function Remove-DatabricksSecretScope {
         $err = $_.ErrorDetails.Message
         if ($err.Contains('RESOURCE_DOES_NOT_EXIST')) {
             Write-Verbose $err
+            if ($PSBoundParameters.ContainsKey('FailOnNotExist') -eq $true)
+            {
+                throw
+            }
         }
         else {
             Write-Output "StatusCode:" $_.Exception.Response.StatusCode.value__ 
