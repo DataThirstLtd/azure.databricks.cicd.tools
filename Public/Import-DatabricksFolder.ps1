@@ -114,8 +114,8 @@ Function Import-DatabricksFolder {
         $Body['overwrite'] = "true"
         switch ($FileToPush.Extension) {
             ".py" {
-                $Body['format'] = "SOURCE"
-                $Body['language'] = "PYTHON"
+                $Body['format'] = "AUTO"
+                $Body['path'] = $Path + "/" + $FileToPush.Name
             }
 
             ".scala" {
