@@ -57,7 +57,7 @@ Function Get-DatabricksDBFSFile {
 
         $finalFile += [Convert]::FromBase64String($chunk.data)
 
-        $chunkStart = $chunkEnd + 1
+        $chunkStart = $chunkEnd
         $chunkEnd = $chunkStart + $size
         $bytesRead = $chunk.bytes_read
     }
