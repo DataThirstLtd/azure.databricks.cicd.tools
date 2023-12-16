@@ -53,7 +53,7 @@ Function Get-DatabricksDBFSFile {
         else {
             $BodyText = $Body | ConvertTo-Json -Depth 10
         }
-        $chunk = Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/read" -Body $BodyText -Method 'GET' -Headers $Headers
+        $chunk = Invoke-RestMethod -Uri "$global:DatabricksURI/api/2.0/dbfs/read" -Body $BodyText -Method 'GET' -Headers $Headers -ContentType "application/json"
 
         $finalFile += [Convert]::FromBase64String($chunk.data)
 
