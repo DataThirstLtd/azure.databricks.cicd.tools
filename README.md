@@ -1,7 +1,8 @@
-[![Build status](https://dev.azure.com/datathirst/Databricks%20Tools/_apis/build/status/azure.databricks.cicd.tools)](https://dev.azure.com/datathirst/Databricks%20Tools/_build/latest?definitionId=54)
-![PSGalleryStatus](https://vsrm.dev.azure.com/datathirst/_apis/public/Release/badge/6982ad16-9bb5-4c62-93c7-e8f22e7e6b1f/1/2)
+# DEPRECATED
 
-# azure.databricks.cicd.tools
+**This code is no longer maintained.**
+
+## azure.databricks.cicd.tools
 
 PowerShell tools for Deploying & Managing Databricks Solutions in Azure. These commandlets help you build continuous delivery pipelines and better source control for your scripts.
 
