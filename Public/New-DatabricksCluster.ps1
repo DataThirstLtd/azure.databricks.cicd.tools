@@ -23,6 +23,9 @@ See Get-DatabricksNodeTypes
 Type of Driver for cluster. Example: Standard_D3_v2. If not set it will default to $NodeType
 See Get-DatabricksNodeTypes
 
+.PARAMETER DataSecurityMode
+Security Mode for the cluster. If not set it will default to None, to enable credential passthrough set as LEGACY_PASSTHROUGH
+
 .PARAMETER MinNumberOfWorkers
 Min number of workers for cluster that will run the job. If the same as $MaxNumberOfWorkers autoscale is disabled.
 
@@ -85,6 +88,7 @@ Function New-DatabricksCluster {
         [parameter(Mandatory = $false)][string]$SparkVersion,
         [parameter(Mandatory = $false)][string]$NodeType,
         [parameter(Mandatory = $false)][string]$DriverNodeType,
+        [parameter(Mandatory = $false)][string]$DataSecurityMode,
         [parameter(Mandatory = $false)][int]$MinNumberOfWorkers,
         [parameter(Mandatory = $false)][int]$MaxNumberOfWorkers,
         [parameter(Mandatory = $false)][int]$AutoTerminationMinutes,
@@ -150,6 +154,7 @@ Function New-DatabricksCluster {
     $ClusterArgs['MinNumberOfWorkers'] = $MinNumberOfWorkers
     $ClusterArgs['MaxNumberOfWorkers'] = $MaxNumberOfWorkers
     $ClusterArgs['DriverNodeType'] = $DriverNodeType
+    $ClusterArgs['DataSecurityMode'] = $DataSecurityMode
     $ClusterArgs['AutoTerminationMinutes'] = $AutoTerminationMinutes
     $ClusterArgs['Spark_conf'] = $Spark_conf
     $ClusterArgs['CustomTags'] = $CustomTags

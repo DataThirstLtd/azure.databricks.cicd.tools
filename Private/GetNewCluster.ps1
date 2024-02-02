@@ -3,6 +3,7 @@ Function GetNewClusterCluster {
         [parameter(Mandatory = $false)][string]$SparkVersion,
         [parameter(Mandatory = $false)][string]$NodeType,
         [parameter(Mandatory = $false)][string]$DriverNodeType,
+        [parameter(Mandatory = $false)][string]$DataSecurityMode,
         [parameter(Mandatory = $false)][int]$MinNumberOfWorkers,
         [parameter(Mandatory = $false)][int]$MaxNumberOfWorkers,
         [parameter(Mandatory = $false)][int]$AutoTerminationMinutes,
@@ -35,6 +36,7 @@ Function GetNewClusterCluster {
     if ($null -ne $Spark_conf) {$Body['spark_conf'] = $Spark_conf}
     If (($PSBoundParameters.ContainsKey('NodeType')) -and ($NodeType)) { $Body['node_type_id'] = $NodeType }
     If (($PSBoundParameters.ContainsKey('DriverNodeType')) -and ($DriverNodeType)) { $Body['driver_node_type_id'] = $DriverNodeType }
+    If (($PSBoundParameters.ContainsKey('DataSecurityMode')) -and ($DataSecurityMode)) { $Body['data_security_mode'] = $DataSecurityMode }
     
     If (($MinNumberOfWorkers -ge 0) -and (-not $ClusterObject)){
         If ($MinNumberOfWorkers -eq $MaxNumberOfWorkers){
